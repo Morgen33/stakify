@@ -8,6 +8,7 @@ interface AuthContextType {
   loading: boolean;
   isAdmin: boolean;
   isOperator: boolean;
+  isMaster: boolean;
   signOut: () => Promise<void>;
 }
 
@@ -17,6 +18,7 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
   isAdmin: false,
   isOperator: false,
+  isMaster: false,
   signOut: async () => {},
 });
 
@@ -28,6 +30,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isOperator, setIsOperator] = useState(false);
+  const [isMaster, setIsMaster] = useState(false);
 
   const checkRoles = async (userId: string) => {
     const { data } = await supabase
@@ -37,6 +40,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const roles = (data || []).map((r: any) => r.role);
     setIsAdmin(roles.includes("admin"));
     setIsOperator(roles.includes("operator"));
+    setIsMaster(roles.includes("master"));
   };
 
   useEffect(() => {
@@ -49,6 +53,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         } else {
           setIsAdmin(false);
           setIsOperator(false);
+          setIsMaster(false);
         }
         setLoading(false);
       }
@@ -71,7 +76,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, isAdmin, isOperator, signOut }}>
+    <AuthContext.Provider value={{ user, session, loading, isAdmin, isOperator, isMaster, signOut }}>
       {children}
     </AuthContext.Provider>
   );

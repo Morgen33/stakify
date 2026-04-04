@@ -13,6 +13,7 @@ import Dashboard from "./pages/Dashboard.tsx";
 import ProjectPanel from "./pages/ProjectPanel.tsx";
 import ProjectPage from "./pages/ProjectPage.tsx";
 import OperatorPanel from "./pages/OperatorPanel.tsx";
+import MasterPanel from "./pages/MasterPanel.tsx";
 import Arcade from "./pages/Arcade.tsx";
 import Raffle from "./pages/Raffle.tsx";
 import Pricing from "./pages/Pricing.tsx";
@@ -37,6 +38,7 @@ const App = () => (
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/operator" element={<OperatorPanel />} />
+                <Route path="/master" element={<MasterPanel />} />
                 <Route path="/project-panel" element={<ProjectPanel />} />
                 <Route path="/project/:slug" element={<ProjectPage />} />
                 <Route path="/arcade" element={<Arcade />} />

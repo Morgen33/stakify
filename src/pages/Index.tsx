@@ -20,7 +20,7 @@ import WelcomeSplash from "@/components/WelcomeSplash";
 import SeasonalBanner from "@/components/SeasonalBanner";
 
 const Index = () => {
-  const { user, isAdmin, isOperator, signOut } = useAuth();
+  const { user, isAdmin, isOperator, isMaster, signOut } = useAuth();
   const { isConnected, shortAddress } = useWallet();
   const [pools, setPools] = useState<any[]>([]);
 
@@ -95,6 +95,11 @@ const Index = () => {
             {isAdmin && (
               <Link to="/admin" className="text-sm text-neon-green hover:text-neon-green/80 transition-colors font-display">
                 Admin
+              </Link>
+            )}
+            {isMaster && (
+              <Link to="/master" className="text-sm text-primary hover:text-primary/80 transition-colors font-display">
+                👑 Master
               </Link>
             )}
 

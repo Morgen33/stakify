@@ -203,6 +203,75 @@ export type Database = {
           },
         ]
       }
+      fee_waivers: {
+        Row: {
+          active: boolean
+          created_at: string
+          granted_by: string
+          id: string
+          project_account_id: string | null
+          reason: string | null
+          user_id: string | null
+          waiver_type: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          granted_by: string
+          id?: string
+          project_account_id?: string | null
+          reason?: string | null
+          user_id?: string | null
+          waiver_type?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          granted_by?: string
+          id?: string
+          project_account_id?: string | null
+          reason?: string | null
+          user_id?: string | null
+          waiver_type?: string
+        }
+        Relationships: []
+      }
+      master_wallets: {
+        Row: {
+          address: string
+          created_at: string
+          id: string
+          is_active: boolean
+          label: string
+          notes: string | null
+          updated_at: string
+          user_id: string
+          wallet_purpose: string
+        }
+        Insert: {
+          address: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          label: string
+          notes?: string | null
+          updated_at?: string
+          user_id: string
+          wallet_purpose?: string
+        }
+        Update: {
+          address?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          label?: string
+          notes?: string | null
+          updated_at?: string
+          user_id?: string
+          wallet_purpose?: string
+        }
+        Relationships: []
+      }
       platform_settings: {
         Row: {
           id: string
@@ -741,7 +810,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "user" | "project_owner" | "operator"
+      app_role: "admin" | "user" | "project_owner" | "operator" | "master"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -869,7 +938,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "user", "project_owner", "operator"],
+      app_role: ["admin", "user", "project_owner", "operator", "master"],
     },
   },
 } as const
