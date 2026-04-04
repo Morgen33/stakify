@@ -35,6 +35,11 @@ const MasterPanel = () => {
   const [projects, setProjects] = useState<any[]>([]);
   const [roles, setRoles] = useState<any[]>([]);
   const [wallets, setWallets] = useState<any[]>([]);
+  const [airdrops, setAirdrops] = useState<any[]>([]);
+  const [payments, setPayments] = useState<any[]>([]);
+  const [badges, setBadges] = useState<any[]>([]);
+  const [raffles, setRaffles] = useState<any[]>([]);
+  const [earlyUnlocks, setEarlyUnlocks] = useState<any[]>([]);
 
   const [newMasterWallet, setNewMasterWallet] = useState({ label: "", address: "", wallet_purpose: "fee_collection", notes: "" });
   const [newWaiver, setNewWaiver] = useState({ user_id: "", project_account_id: "", waiver_type: "full", reason: "" });
