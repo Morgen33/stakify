@@ -17,6 +17,7 @@ import Arcade from "./pages/Arcade.tsx";
 import Raffle from "./pages/Raffle.tsx";
 import Pricing from "./pages/Pricing.tsx";
 import About from "./pages/About.tsx";
+import Lottery from "./pages/Lottery.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -41,6 +42,7 @@ const App = () => (
                 <Route path="/arcade" element={<Arcade />} />
                 <Route path="/raffle" element={<Raffle />} />
                 <Route path="/pricing" element={<Pricing />} />
+                <Route path="/lottery" element={<Lottery />} />
                 <Route path="/about" element={<About />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />

@@ -19,36 +19,11 @@ interface Founder {
 }
 
 const defaultFounders: Founder[] = [
-  {
-    name: "Alejandro",
-    title: "Lead Developer & Platform Architect",
-    bio: "Full-stack blockchain engineer with a passion for building secure, gamified DeFi experiences. The technical mind behind every smart contract, security layer, and user interaction on the platform.",
-    emoji: "⚡",
-  },
-  {
-    name: "Morgan",
-    title: "Co-Founder & Strategy",
-    bio: "Visionary strategist driving the platform's growth and partnerships. Focused on building sustainable revenue models and ensuring every project on the platform delivers real value to its community.",
-    emoji: "🎯",
-  },
-  {
-    name: "Barr",
-    title: "Co-Founder & Operations",
-    bio: "Operations lead keeping the platform running smoothly. From onboarding new projects to managing community relationships, Barr ensures everything operates at peak efficiency.",
-    emoji: "🔧",
-  },
-  {
-    name: "Cap",
-    title: "Co-Founder & Community",
-    bio: "Community champion building the bridge between projects and their holders. Focused on creating engagement strategies that keep stakers rewarded and communities thriving.",
-    emoji: "🏆",
-  },
-  {
-    name: "J Dub",
-    title: "Co-Founder & Creative",
-    bio: "The creative force behind the platform's identity and user experience. From branding to gamification mechanics, J Dub ensures every interaction feels fresh and exciting.",
-    emoji: "🎨",
-  },
+  { name: "", title: "Founder", bio: "", emoji: "👤" },
+  { name: "", title: "Co-Founder", bio: "", emoji: "👤" },
+  { name: "", title: "Co-Founder", bio: "", emoji: "👤" },
+  { name: "", title: "Co-Founder", bio: "", emoji: "👤" },
+  { name: "", title: "Co-Founder", bio: "", emoji: "👤" },
 ];
 
 const About = () => {
@@ -198,9 +173,9 @@ const About = () => {
                   </div>
                 ) : (
                   <>
-                    <h3 className="font-display text-lg text-foreground mb-1">{founder.name}</h3>
+                    <h3 className="font-display text-lg text-foreground mb-1">{founder.name || <span className="text-muted-foreground italic">Name not set</span>}</h3>
                     <p className="text-xs text-accent font-display tracking-wider mb-3">{founder.title}</p>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{founder.bio}</p>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{founder.bio || <span className="italic">Bio coming soon — check back later!</span>}</p>
                   </>
                 )}
               </div>
