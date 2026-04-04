@@ -30,6 +30,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isOperator, setIsOperator] = useState(false);
+  const [isMaster, setIsMaster] = useState(false);
 
   const checkRoles = async (userId: string) => {
     const { data } = await supabase
@@ -39,6 +40,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const roles = (data || []).map((r: any) => r.role);
     setIsAdmin(roles.includes("admin"));
     setIsOperator(roles.includes("operator"));
+    setIsMaster(roles.includes("master"));
   };
 
   useEffect(() => {
