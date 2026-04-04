@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Wallet, Shield, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ProfileRing from "./ProfileRing";
+import heroBg from "@/assets/hero-bg.jpg";
 
 const HeroHeader = () => {
   return (
