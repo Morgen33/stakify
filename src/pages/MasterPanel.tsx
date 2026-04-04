@@ -383,31 +383,74 @@ const MasterPanel = () => {
 
           {/* ═══ FEE CONTROL ═══ */}
           <TabsContent value="fees" className="space-y-6">
+            {/* Adjustable Network Fee */}
             <div className="rounded-lg border border-primary/30 bg-primary/5 p-6">
-              <h3 className="font-display text-sm text-primary mb-4 tracking-wider">MASTER FEE OVERRIDE</h3>
+              <h3 className="font-display text-sm text-primary mb-4 tracking-wider flex items-center gap-2">
+                <DollarSign className="w-4 h-4" /> NETWORK MAINTENANCE FEE
+              </h3>
               <p className="text-xs text-muted-foreground mb-4">
-                When enabled, <strong className="text-foreground">ALL platform fees</strong> are routed directly to your Master wallet.
-                This overrides the normal admin/operator splits entirely.
+                This is your fee per transaction. Adjust it up or down anytime — only you (Master) can change this.
+                Currently set to <strong className="text-primary">${currentFee} USDC</strong> per transaction.
               </p>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-muted-foreground font-display">$</span>
+                <Input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  defaultValue={currentFee}
+                  id="master-fee-input"
+                  className="bg-secondary border-border text-sm max-w-[120px]"
+                />
+                <span className="text-xs text-muted-foreground font-display">USDC / tx</span>
                 <Button
-                  onClick={() => setMasterFeeOverride(!masterTakesAll)}
-                  className={`font-display text-xs ${masterTakesAll ? "bg-destructive text-destructive-foreground" : "bg-primary text-primary-foreground"}`}
+                  onClick={() => {
+                    const val = (document.getElementById("master-fee-input") as HTMLInputElement)?.value;
+                    if (val) updateNetworkFee(val);
+                  }}
+                  className="bg-primary text-primary-foreground font-display text-xs"
                 >
-                  {masterTakesAll ? <><Lock className="w-3.5 h-3.5 mr-1" /> Disable Override</> : <><DollarSign className="w-3.5 h-3.5 mr-1" /> Take All Fees</>}
+                  <Save className="w-3.5 h-3.5 mr-1" /> Update Fee
                 </Button>
-                <span className={`text-xs font-display ${masterTakesAll ? "text-primary" : "text-muted-foreground"}`}>
-                  {masterTakesAll ? "✅ ALL FEES → MASTER" : "Normal fee split active"}
-                </span>
               </div>
             </div>
 
+            {/* Emergency Routing */}
+            <div className={`rounded-lg border p-6 ${emergencyRoutingActive ? "border-destructive/50 bg-destructive/10" : "border-border bg-card"}`}>
+              <h3 className={`font-display text-sm mb-4 tracking-wider flex items-center gap-2 ${emergencyRoutingActive ? "text-destructive" : "text-foreground"}`}>
+                <AlertTriangle className="w-4 h-4" /> EMERGENCY FUND ROUTING
+              </h3>
+              <p className="text-xs text-muted-foreground mb-4">
+                When activated, <strong className="text-foreground">all incoming funds</strong> are routed to your emergency wallet instead of the
+                normal fee collection wallet. Use this if you need to exit quickly.
+              </p>
+              <div className="flex items-center gap-4">
+                <Button
+                  onClick={toggleEmergencyRouting}
+                  variant={emergencyRoutingActive ? "destructive" : "outline"}
+                  className="font-display text-xs"
+                >
+                  {emergencyRoutingActive ? <><Power className="w-3.5 h-3.5 mr-1" /> Deactivate Emergency</> : <><AlertTriangle className="w-3.5 h-3.5 mr-1" /> Activate Emergency Routing</>}
+                </Button>
+                <span className={`text-xs font-display ${emergencyRoutingActive ? "text-destructive animate-pulse" : "text-muted-foreground"}`}>
+                  {emergencyRoutingActive ? "🚨 EMERGENCY ROUTING ACTIVE" : "Normal routing"}
+                </span>
+              </div>
+              {emergencyRoutingActive && emergencyWallet && (
+                <div className="mt-3 p-3 rounded-lg border border-destructive/30 bg-destructive/5">
+                  <span className="text-xs text-destructive font-display">Funds → </span>
+                  <code className="text-xs text-destructive/80">{emergencyWallet.address}</code>
+                </div>
+              )}
+            </div>
+
+            {/* Fee Structure Overview */}
             <div className="rounded-lg border border-border bg-card p-6">
               <h3 className="font-display text-sm text-foreground mb-4 tracking-wider">CURRENT FEE STRUCTURE</h3>
               <div className="space-y-2 text-xs text-muted-foreground">
                 <div className="flex justify-between p-3 rounded-lg bg-secondary/30 border border-border">
                   <span className="font-display">Network Maintenance Fee (Master)</span>
-                  <strong className="text-primary">$0.12 USDC / tx</strong>
+                  <strong className="text-primary">${currentFee} USDC / tx</strong>
                 </div>
                 <div className="flex justify-between p-3 rounded-lg bg-secondary/30 border border-border">
                   <span className="font-display">Platform Fee (Admin/Operator)</span>
