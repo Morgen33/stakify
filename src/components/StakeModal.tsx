@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Lock, Unlock, HelpCircle, AlertTriangle, Zap, Shield } from "lucide-react";
 
 // Platform micro-fee: $0.03 USDC equivalent per stake/unstake — non-negotiable, goes to platform admin
-const PLATFORM_MICRO_FEE_USDC = 0.03;
+const PLATFORM_MICRO_FEE_USDC = 0.12;
 
 type StakeType = "soft" | "hard" | "flexible";
 
@@ -211,7 +211,7 @@ const StakeModal = ({ poolName, apy, rewardToken, lockPeriodDays, platformFeePct
                 Platform micro-fee
                 <Tooltip>
                   <TooltipTrigger><HelpCircle className="w-2.5 h-2.5" /></TooltipTrigger>
-                  <TooltipContent>A fixed $0.03 USDC equivalent is charged on every stake and unstake action. This fee goes to the platform maintainer and is non-negotiable.</TooltipContent>
+                  <TooltipContent>A fixed $0.12 USDC equivalent is charged on every stake and unstake action (converted to ETH or SOL at current market rate). This fee goes to the platform admin and is non-negotiable.</TooltipContent>
                 </Tooltip>
               </span>
               <span className="text-muted-foreground/60">${PLATFORM_MICRO_FEE_USDC} per action</span>
@@ -225,7 +225,7 @@ const StakeModal = ({ poolName, apy, rewardToken, lockPeriodDays, platformFeePct
               <div className="text-[10px] text-muted-foreground leading-relaxed">
                 <strong className="text-accent">DISCLAIMER:</strong> Staking involves risk of loss. Rewards are estimates and may vary.
                 {stakeType === "hard" && " Hard-staked assets cannot be withdrawn early under any circumstances except platform emergency."}
-                {" "}A ${PLATFORM_MICRO_FEE_USDC} USDC platform fee applies to each stake/unstake action. All fees and terms are subject to change.
+                {" "}A ${PLATFORM_MICRO_FEE_USDC} USDC equivalent platform fee (charged in ETH or SOL at current rate) applies to each stake/unstake action. All fees and terms are subject to change.
                 By staking, you accept the Terms of Service.
               </div>
             </div>
