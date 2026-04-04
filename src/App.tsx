@@ -17,6 +17,7 @@ import Arcade from "./pages/Arcade.tsx";
 import Raffle from "./pages/Raffle.tsx";
 import Pricing from "./pages/Pricing.tsx";
 import About from "./pages/About.tsx";
+import Lottery from "./pages/Lottery.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
