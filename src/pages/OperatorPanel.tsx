@@ -143,6 +143,7 @@ const OperatorPanel = () => {
             <TabsTrigger value="users" className="font-display gap-1.5 text-xs"><Users className="w-3.5 h-3.5" /> Users</TabsTrigger>
             <TabsTrigger value="calculator" className="font-display gap-1.5 text-xs"><Calculator className="w-3.5 h-3.5" /> Calculator</TabsTrigger>
             <TabsTrigger value="battlelog" className="font-display gap-1.5 text-xs text-primary"><ScrollText className="w-3.5 h-3.5" /> Battle Log</TabsTrigger>
+            <TabsTrigger value="features" className="font-display gap-1.5 text-xs"><Settings className="w-3.5 h-3.5" /> Features</TabsTrigger>
           </TabsList>
 
           {/* Overview */}
