@@ -725,6 +725,13 @@ const Admin = () => {
             </div>
           </TabsContent>
 
+          {/* ═══ BATTLE LOG ═══ */}
+          <TabsContent value="battlelog">
+            <div className="rounded-lg border border-border bg-card p-6">
+              <BattleLog />
+            </div>
+          </TabsContent>
+
           {/* ═══ EMERGENCY ═══ */}
           <TabsContent value="emergency" className="space-y-6">
             <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-6">
