@@ -8,7 +8,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Layers, TrendingUp, Trophy, Coins, Gift, HelpCircle,
-  Clock, Unlock, Lock, RefreshCw, ExternalLink, Zap, Image, CheckCircle2
+  Clock, Unlock, Lock, RefreshCw, ExternalLink, Zap, Image, CheckCircle2, Gamepad2
 } from "lucide-react";
 import { motion } from "framer-motion";
 import WalletModal from "@/components/WalletModal";
@@ -163,6 +163,7 @@ const Dashboard = () => {
             </TabsTrigger>
             <TabsTrigger value="rewards" className="font-display gap-1.5 text-xs"><Coins className="w-3.5 h-3.5" /> Rewards</TabsTrigger>
             <TabsTrigger value="badges" className="font-display gap-1.5 text-xs"><Trophy className="w-3.5 h-3.5" /> Badges</TabsTrigger>
+            <TabsTrigger value="arcade" className="font-display gap-1.5 text-xs"><Gamepad2 className="w-3.5 h-3.5" /> Arcade</TabsTrigger>
           </TabsList>
 
           {/* Stakes */}
@@ -354,6 +355,47 @@ const Dashboard = () => {
                   No badges available yet. Check back soon!
                 </div>
               )}
+            </div>
+          </TabsContent>
+
+          {/* Arcade */}
+          <TabsContent value="arcade">
+            <div className="rounded-lg border border-border bg-card p-8 text-center">
+              <Gamepad2 className="w-14 h-14 text-accent mx-auto mb-4 opacity-60" />
+              <h3 className="font-display text-xl text-foreground mb-2">ARCADE</h3>
+              <p className="text-sm text-muted-foreground max-w-md mx-auto mb-4">
+                Use your earned points to play games, spin the prize wheel, and win exclusive rewards!
+              </p>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-w-lg mx-auto mb-6">
+                {[
+                  { name: "Prize Wheel", icon: "🎡", status: "live" },
+                  { name: "Loot Boxes", icon: "📦", status: "coming_soon" },
+                  { name: "NFT Raffle", icon: "🎟️", status: "coming_soon" },
+                  { name: "Prediction", icon: "🔮", status: "coming_soon" },
+                  { name: "Trivia", icon: "🧠", status: "coming_soon" },
+                  { name: "Battle Arena", icon: "⚔️", status: "coming_soon" },
+                ].map((game) => (
+                  <div
+                    key={game.name}
+                    className={`rounded-lg border p-4 text-center ${
+                      game.status === "live" ? "border-primary/30 bg-primary/5 cursor-pointer hover:bg-primary/10" : "border-border bg-card/50 opacity-50"
+                    }`}
+                    onClick={() => game.status === "live" && navigate("/arcade")}
+                  >
+                    <span className="text-2xl">{game.icon}</span>
+                    <p className="font-display text-[10px] text-foreground mt-1">{game.name}</p>
+                    {game.status === "coming_soon" && (
+                      <span className="text-[8px] text-muted-foreground font-display">COMING SOON</span>
+                    )}
+                    {game.status === "live" && (
+                      <span className="text-[8px] text-primary font-display">PLAY NOW →</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <Button variant="outline" size="sm" className="font-display text-xs" onClick={() => navigate("/arcade")}>
+                <Gamepad2 className="w-3.5 h-3.5 mr-1.5" /> Go to Arcade
+              </Button>
             </div>
           </TabsContent>
         </Tabs>

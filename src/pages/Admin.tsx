@@ -10,7 +10,8 @@ import {
   Shield, Plus, Trash2, Settings, Users, Layers, Award,
   AlertTriangle, Unlock, Lock, DollarSign, RefreshCw,
   Wallet, Power, Save, Ban, Zap, FileText, Building2,
-  CreditCard, Calculator, XCircle, CheckCircle2, ScrollText
+  CreditCard, Calculator, XCircle, CheckCircle2, ScrollText,
+  Gift, Send, Search, Image
 } from "lucide-react";
 import {
   Tooltip,
@@ -50,6 +51,9 @@ const Admin = () => {
     project_id: "", amount: "", currency: "ETH", payment_type: "platform_fee", status: "pending", notes: "", due_date: "",
   });
   const [newWallet, setNewWallet] = useState({ label: "", address: "", wallet_type: "primary", notes: "" });
+  const [adminAirdrop, setAdminAirdrop] = useState({ recipient_user_id: "", airdrop_type: "token", asset_name: "", asset_image_url: "", amount: "1", message: "", project_account_id: "" });
+  const [airdropSearch, setAirdropSearch] = useState("");
+  const [airdrops, setAirdrops] = useState<any[]>([]);
 
   // Calculator
   const [calcStakers, setCalcStakers] = useState("100");
@@ -67,7 +71,7 @@ const Admin = () => {
   }, [isAdmin]);
 
   const fetchAll = useCallback(async () => {
-    const [poolsRes, stakesRes, profilesRes, settingsRes, badgesRes, projectsRes, paymentsRes, walletsRes] = await Promise.all([
+    const [poolsRes, stakesRes, profilesRes, settingsRes, badgesRes, projectsRes, paymentsRes, walletsRes, airdropsRes] = await Promise.all([
       supabase.from("staking_pools").select("*").order("created_at", { ascending: false }),
       supabase.from("stakes").select("*").order("staked_at", { ascending: false }),
       supabase.from("profiles").select("*").order("points", { ascending: false }),
@@ -76,6 +80,7 @@ const Admin = () => {
       supabase.from("project_accounts").select("*").order("created_at", { ascending: false }),
       supabase.from("project_payments").select("*").order("created_at", { ascending: false }),
       supabase.from("platform_wallets").select("*").order("created_at", { ascending: false }),
+      supabase.from("airdrops").select("*").order("created_at", { ascending: false }),
     ]);
     setPools(poolsRes.data || []);
     setStakes(stakesRes.data || []);
@@ -85,6 +90,7 @@ const Admin = () => {
     setProjects(projectsRes.data || []);
     setPayments(paymentsRes.data || []);
     setWallets(walletsRes.data || []);
+    setAirdrops(airdropsRes.data || []);
   }, []);
 
   // ─── Pool CRUD ───
@@ -284,6 +290,34 @@ const Admin = () => {
     toast({ title: "Wallet deleted" }); fetchAll();
   };
 
+  // ─── Admin Airdrop ───
+  const adminSendAirdrop = async () => {
+    if (!adminAirdrop.recipient_user_id || !adminAirdrop.asset_name) {
+      toast({ title: "Missing fields", description: "Select a recipient and enter asset name.", variant: "destructive" }); return;
+    }
+    const insertData: any = {
+      recipient_user_id: adminAirdrop.recipient_user_id,
+      airdrop_type: adminAirdrop.airdrop_type,
+      asset_name: adminAirdrop.asset_name,
+      asset_image_url: adminAirdrop.asset_image_url || null,
+      amount: parseFloat(adminAirdrop.amount) || 1,
+      message: adminAirdrop.message || null,
+      status: "pending",
+      project_account_id: adminAirdrop.project_account_id || projects[0]?.id,
+    };
+    if (!insertData.project_account_id) {
+      toast({ title: "No project", description: "Create a project account first to link airdrops.", variant: "destructive" }); return;
+    }
+    const { error } = await supabase.from("airdrops").insert(insertData);
+    if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
+    else {
+      toast({ title: "🎁 Airdrop sent!" });
+      setAdminAirdrop({ recipient_user_id: "", airdrop_type: "token", asset_name: "", asset_image_url: "", amount: "1", message: "", project_account_id: "" });
+      setAirdropSearch("");
+      fetchAll();
+    }
+  };
+
   // Calculator
   const calcResults = () => {
     const s = parseInt(calcStakers) || 0, a = parseFloat(calcAvgStake) || 0;
@@ -349,6 +383,7 @@ const Admin = () => {
             <TabsTrigger value="wallets" className="font-display gap-1.5 text-xs"><Wallet className="w-3.5 h-3.5" /> Wallets</TabsTrigger>
             <TabsTrigger value="badges" className="font-display gap-1.5 text-xs"><Award className="w-3.5 h-3.5" /> Badges</TabsTrigger>
             <TabsTrigger value="calculator" className="font-display gap-1.5 text-xs"><Calculator className="w-3.5 h-3.5" /> Calculator</TabsTrigger>
+            <TabsTrigger value="airdrops" className="font-display gap-1.5 text-xs text-accent"><Gift className="w-3.5 h-3.5" /> Airdrops</TabsTrigger>
             <TabsTrigger value="battlelog" className="font-display gap-1.5 text-xs text-primary"><ScrollText className="w-3.5 h-3.5" /> Battle Log</TabsTrigger>
             <TabsTrigger value="emergency" className="font-display gap-1.5 text-xs text-destructive"><AlertTriangle className="w-3.5 h-3.5" /> Emergency</TabsTrigger>
             <TabsTrigger value="livealerts" className="font-display gap-1.5 text-xs text-neon-green"><Zap className="w-3.5 h-3.5 animate-pulse" /> Live Alerts</TabsTrigger>
@@ -877,7 +912,161 @@ const Admin = () => {
             </div>
           </TabsContent>
 
-          {/* ═══ BATTLE LOG ═══ */}
+          {/* ═══ AIRDROPS ═══ */}
+          <TabsContent value="airdrops" className="space-y-6">
+            {/* Search & Send */}
+            <div className="rounded-lg border border-accent/20 bg-card p-6">
+              <h3 className="font-display text-sm text-foreground mb-4 tracking-wider flex items-center gap-2">
+                <Send className="w-4 h-4 text-accent" /> SEND AIRDROP TO ANY USER
+              </h3>
+
+              {/* User Search */}
+              <div className="mb-4">
+                <label className="text-[10px] text-muted-foreground font-display tracking-wider">SEARCH USER (NAME, EMAIL, OR WALLET)</label>
+                <div className="relative mt-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    value={airdropSearch}
+                    onChange={(e) => setAirdropSearch(e.target.value)}
+                    placeholder="Search by display name, user ID, email..."
+                    className="bg-secondary border-border text-sm pl-9"
+                  />
+                </div>
+                {airdropSearch.length >= 2 && (
+                  <div className="mt-2 max-h-40 overflow-y-auto rounded-lg border border-border bg-secondary/50">
+                    {profiles
+                      .filter((p: any) => {
+                        const q = airdropSearch.toLowerCase();
+                        return (
+                          (p.display_name || "").toLowerCase().includes(q) ||
+                          p.user_id.toLowerCase().includes(q) ||
+                          (p.referral_code || "").toLowerCase().includes(q)
+                        );
+                      })
+                      .slice(0, 10)
+                      .map((p: any) => (
+                        <button
+                          key={p.user_id}
+                          onClick={() => {
+                            setAdminAirdrop({ ...adminAirdrop, recipient_user_id: p.user_id });
+                            setAirdropSearch(p.display_name || p.user_id.slice(0, 8));
+                          }}
+                          className={`w-full text-left px-3 py-2 hover:bg-primary/10 flex items-center gap-3 text-sm border-b border-border last:border-0 ${
+                            adminAirdrop.recipient_user_id === p.user_id ? "bg-primary/10" : ""
+                          }`}
+                        >
+                          <div className="w-7 h-7 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-[10px] font-display text-primary">
+                            {(p.display_name || "?")[0].toUpperCase()}
+                          </div>
+                          <div>
+                            <span className="font-display text-foreground text-xs">{p.display_name || "Unnamed"}</span>
+                            <span className="text-[10px] text-muted-foreground ml-2">{p.user_id.slice(0, 12)}...</span>
+                          </div>
+                          <span className="ml-auto text-[10px] text-accent font-display">Lvl {p.level} • {p.points}pts</span>
+                        </button>
+                      ))}
+                    {profiles.filter((p: any) => {
+                      const q = airdropSearch.toLowerCase();
+                      return (p.display_name || "").toLowerCase().includes(q) || p.user_id.toLowerCase().includes(q);
+                    }).length === 0 && (
+                      <p className="text-xs text-muted-foreground text-center py-3">No users found</p>
+                    )}
+                  </div>
+                )}
+                {adminAirdrop.recipient_user_id && (
+                  <p className="text-[10px] text-primary mt-1 font-display">✓ Selected: {adminAirdrop.recipient_user_id.slice(0, 16)}...</p>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+                <div>
+                  <label className="text-[10px] text-muted-foreground font-display">TYPE</label>
+                  <select
+                    value={adminAirdrop.airdrop_type}
+                    onChange={(e) => setAdminAirdrop({ ...adminAirdrop, airdrop_type: e.target.value })}
+                    className="w-full rounded-md border border-border bg-secondary px-3 py-2 text-sm text-foreground mt-1"
+                  >
+                    <option value="token">Token</option>
+                    <option value="nft">NFT</option>
+                    <option value="reward">Reward</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-[10px] text-muted-foreground font-display">ASSET NAME</label>
+                  <Input value={adminAirdrop.asset_name} onChange={(e) => setAdminAirdrop({ ...adminAirdrop, asset_name: e.target.value })} placeholder="e.g. 1000 $FORGE or Legendary NFT" className="bg-secondary border-border text-sm mt-1" />
+                </div>
+                <div>
+                  <label className="text-[10px] text-muted-foreground font-display">AMOUNT</label>
+                  <Input type="number" value={adminAirdrop.amount} onChange={(e) => setAdminAirdrop({ ...adminAirdrop, amount: e.target.value })} className="bg-secondary border-border text-sm mt-1" />
+                </div>
+                <div>
+                  <label className="text-[10px] text-muted-foreground font-display">IMAGE URL (OPTIONAL)</label>
+                  <Input value={adminAirdrop.asset_image_url} onChange={(e) => setAdminAirdrop({ ...adminAirdrop, asset_image_url: e.target.value })} placeholder="https://..." className="bg-secondary border-border text-sm mt-1" />
+                </div>
+                <div>
+                  <label className="text-[10px] text-muted-foreground font-display">MESSAGE (OPTIONAL)</label>
+                  <Input value={adminAirdrop.message} onChange={(e) => setAdminAirdrop({ ...adminAirdrop, message: e.target.value })} placeholder="Thanks for being a loyal staker!" className="bg-secondary border-border text-sm mt-1" />
+                </div>
+                <div>
+                  <label className="text-[10px] text-muted-foreground font-display">PROJECT</label>
+                  <select
+                    value={adminAirdrop.project_account_id}
+                    onChange={(e) => setAdminAirdrop({ ...adminAirdrop, project_account_id: e.target.value })}
+                    className="w-full rounded-md border border-border bg-secondary px-3 py-2 text-sm text-foreground mt-1"
+                  >
+                    <option value="">Select project...</option>
+                    {projects.map((p: any) => (
+                      <option key={p.id} value={p.id}>{p.project_name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <Button onClick={adminSendAirdrop} className="bg-accent text-accent-foreground font-display text-xs">
+                <Gift className="w-3.5 h-3.5 mr-1.5" /> Send Airdrop
+              </Button>
+            </div>
+
+            {/* Airdrop History */}
+            <div className="rounded-lg border border-border bg-card p-6">
+              <h3 className="font-display text-sm text-foreground mb-4 tracking-wider">ALL AIRDROPS ({airdrops.length})</h3>
+              {airdrops.length === 0 ? (
+                <p className="text-muted-foreground text-sm text-center py-8">No airdrops sent yet.</p>
+              ) : (
+                <div className="space-y-2">
+                  {airdrops.map((a: any) => {
+                    const recipient = profiles.find((p: any) => p.user_id === a.recipient_user_id);
+                    return (
+                      <div key={a.id} className="flex items-center justify-between p-3 rounded-lg bg-secondary/30 border border-border">
+                        <div className="flex items-center gap-3">
+                          {a.asset_image_url ? (
+                            <img src={a.asset_image_url} alt={a.asset_name} className="w-10 h-10 rounded-lg object-cover border border-border" />
+                          ) : (
+                            <div className="w-10 h-10 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center">
+                              {a.airdrop_type === "nft" ? <Image className="w-4 h-4 text-accent" /> : <Gift className="w-4 h-4 text-accent" />}
+                            </div>
+                          )}
+                          <div>
+                            <p className="font-display text-xs text-foreground">{a.asset_name}</p>
+                            <p className="text-[10px] text-muted-foreground">
+                              To: <strong className="text-foreground">{recipient?.display_name || a.recipient_user_id.slice(0, 10)}</strong> • {a.airdrop_type.toUpperCase()} • Qty: {a.amount}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <span className={`text-[10px] px-2 py-0.5 rounded-full border font-display ${
+                            a.status === "claimed" ? "border-primary/30 text-primary" : "border-accent/30 text-accent"
+                          }`}>{a.status.toUpperCase()}</span>
+                          <p className="text-[10px] text-muted-foreground mt-1">{new Date(a.created_at).toLocaleDateString()}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </TabsContent>
+
           <TabsContent value="battlelog">
             <div className="rounded-lg border border-border bg-card p-6">
               <BattleLog />
