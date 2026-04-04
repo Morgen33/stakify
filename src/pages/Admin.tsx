@@ -48,6 +48,7 @@ const Admin = () => {
   const [newPayment, setNewPayment] = useState({
     project_id: "", amount: "", currency: "ETH", payment_type: "platform_fee", status: "pending", notes: "", due_date: "",
   });
+  const [newWallet, setNewWallet] = useState({ label: "", address: "", wallet_type: "primary", notes: "" });
 
   // Calculator
   const [calcStakers, setCalcStakers] = useState("100");
