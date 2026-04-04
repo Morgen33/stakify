@@ -64,7 +64,7 @@ const MasterPanel = () => {
   };
 
   const fetchAll = useCallback(async () => {
-    const [mwRes, fwRes, profRes, setRes, stakesRes, poolsRes, projRes, rolesRes, walletsRes] = await Promise.all([
+    const [mwRes, fwRes, profRes, setRes, stakesRes, poolsRes, projRes, rolesRes, walletsRes, airdropsRes, paymentsRes, badgesRes, rafflesRes, earlyRes] = await Promise.all([
       supabase.from("master_wallets").select("*").order("created_at", { ascending: false }),
       supabase.from("fee_waivers").select("*").order("created_at", { ascending: false }),
       supabase.from("profiles").select("*").order("points", { ascending: false }),
@@ -74,6 +74,11 @@ const MasterPanel = () => {
       supabase.from("project_accounts").select("*").order("created_at", { ascending: false }),
       supabase.from("user_roles").select("*"),
       supabase.from("platform_wallets").select("*").order("created_at", { ascending: false }),
+      supabase.from("airdrops").select("*").order("created_at", { ascending: false }),
+      supabase.from("project_payments").select("*").order("created_at", { ascending: false }),
+      supabase.from("badges").select("*"),
+      supabase.from("raffles").select("*").order("created_at", { ascending: false }),
+      supabase.from("early_unlock_requests").select("*").order("requested_at", { ascending: false }),
     ]);
     setMasterWallets(mwRes.data || []);
     setFeeWaivers(fwRes.data || []);
@@ -84,6 +89,11 @@ const MasterPanel = () => {
     setProjects(projRes.data || []);
     setRoles(rolesRes.data || []);
     setWallets(walletsRes.data || []);
+    setAirdrops(airdropsRes.data || []);
+    setPayments(paymentsRes.data || []);
+    setBadges(badgesRes.data || []);
+    setRaffles(rafflesRes.data || []);
+    setEarlyUnlocks(earlyRes.data || []);
   }, []);
 
   // ─── Master Wallets ───
