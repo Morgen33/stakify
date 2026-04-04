@@ -143,6 +143,66 @@ export type Database = {
         }
         Relationships: []
       }
+      early_unlock_requests: {
+        Row: {
+          admin_share: number
+          fee_amount: number
+          fee_currency: string
+          id: string
+          operator_share: number
+          pool_id: string
+          processed_at: string | null
+          processed_by: string | null
+          requested_at: string
+          stake_id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          admin_share?: number
+          fee_amount?: number
+          fee_currency?: string
+          id?: string
+          operator_share?: number
+          pool_id: string
+          processed_at?: string | null
+          processed_by?: string | null
+          requested_at?: string
+          stake_id: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          admin_share?: number
+          fee_amount?: number
+          fee_currency?: string
+          id?: string
+          operator_share?: number
+          pool_id?: string
+          processed_at?: string | null
+          processed_by?: string | null
+          requested_at?: string
+          stake_id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "early_unlock_requests_pool_id_fkey"
+            columns: ["pool_id"]
+            isOneToOne: false
+            referencedRelation: "staking_pools"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "early_unlock_requests_stake_id_fkey"
+            columns: ["stake_id"]
+            isOneToOne: false
+            referencedRelation: "stakes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       platform_settings: {
         Row: {
           id: string
@@ -343,6 +403,41 @@ export type Database = {
           },
         ]
       }
+      project_rewards: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          project_account_id: string
+          reason: string | null
+          reward_type: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          id?: string
+          project_account_id: string
+          reason?: string | null
+          reward_type?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          project_account_id?: string
+          reason?: string | null
+          reward_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_rewards_project_account_id_fkey"
+            columns: ["project_account_id"]
+            isOneToOne: false
+            referencedRelation: "project_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       raffle_tickets: {
         Row: {
           created_at: string
@@ -531,6 +626,7 @@ export type Database = {
           apy: number
           created_at: string
           created_by: string | null
+          early_unlock_fee_pct: number
           id: string
           lock_period_days: number
           platform_fee_pct: number
@@ -546,6 +642,7 @@ export type Database = {
           apy?: number
           created_at?: string
           created_by?: string | null
+          early_unlock_fee_pct?: number
           id?: string
           lock_period_days?: number
           platform_fee_pct?: number
@@ -561,6 +658,7 @@ export type Database = {
           apy?: number
           created_at?: string
           created_by?: string | null
+          early_unlock_fee_pct?: number
           id?: string
           lock_period_days?: number
           platform_fee_pct?: number

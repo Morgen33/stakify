@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import {
   Ticket, Clock, Trophy, Users, Coins, Gift, ArrowLeft,
-  Sparkles, HelpCircle, Lock
+  Sparkles, HelpCircle, Lock, Share2
 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import WalletModal from "@/components/WalletModal";
@@ -229,6 +229,20 @@ const Raffle = () => {
                       </Button>
                     </div>
                   )}
+
+                  {/* Share to X */}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-full mt-2 text-xs text-muted-foreground hover:text-foreground font-display gap-1.5"
+                    onClick={() => {
+                      const text = encodeURIComponent(`🎟️ Check out "${raffle.title}" raffle on STAKEFORGE!\n\n🏆 Prize: ${raffle.prize_description}\n💰 Ticket: ${raffle.ticket_price} ${raffle.currency}\n\nJoin now 👇`);
+                      const url = encodeURIComponent(window.location.origin + "/raffle");
+                      window.open(`https://x.com/intent/tweet?text=${text}&url=${url}`, "_blank", "noopener");
+                    }}
+                  >
+                    <Share2 className="w-3 h-3" /> Share on 𝕏
+                  </Button>
 
                   {raffle.status === "drawn" && raffle.winner_user_id && (
                     <div className="rounded-lg border border-neon-gold/20 bg-neon-gold/5 p-3 text-center">

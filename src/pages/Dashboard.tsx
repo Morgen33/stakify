@@ -8,7 +8,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Layers, TrendingUp, Trophy, Coins, Gift, HelpCircle,
-  Clock, Unlock, Lock, RefreshCw, ExternalLink, Zap, Image, CheckCircle2, Gamepad2
+  Clock, Unlock, Lock, RefreshCw, ExternalLink, Zap, Image, CheckCircle2, Gamepad2, AlertTriangle, DollarSign
 } from "lucide-react";
 import { motion } from "framer-motion";
 import WalletModal from "@/components/WalletModal";
@@ -60,6 +60,25 @@ const Dashboard = () => {
     const { error } = await supabase.from("airdrops").update({ status: "claimed", claimed_at: new Date().toISOString() }).eq("id", id);
     if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
     else { toast({ title: "🎁 Airdrop claimed!" }); fetchAll(); }
+  };
+
+  const requestEarlyUnlock = async (stake: any) => {
+    const pool = getPool(stake.pool_id);
+    if (!pool) return;
+    const feePct = pool.early_unlock_fee_pct || 5;
+    const feeAmount = (Number(stake.amount) * feePct / 100).toFixed(4);
+    if (!window.confirm(`⚠️ Early unlock fee: ${feeAmount} (${feePct}% of staked amount) will be charged. This goes to the platform admin and operator. Proceed?`)) return;
+    const { error } = await supabase.from("early_unlock_requests").insert({
+      stake_id: stake.id,
+      user_id: user!.id,
+      pool_id: stake.pool_id,
+      fee_amount: parseFloat(feeAmount),
+      fee_currency: "ETH",
+      admin_share: parseFloat(feeAmount) * 0.5,
+      operator_share: parseFloat(feeAmount) * 0.5,
+    });
+    if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
+    else toast({ title: "🔓 Early unlock requested!", description: "The admin will process your request shortly." });
   };
 
   const getPool = (poolId: string) => pools.find(p => p.id === poolId);
@@ -212,7 +231,7 @@ const Dashboard = () => {
                           </div>
                         </div>
                       </div>
-                      <div className="text-right">
+                      <div className="text-right flex flex-col items-end gap-1">
                         <Badge variant="outline" className={`text-[10px] font-display ${
                           stake.status === "active" ? "border-primary/30 text-primary" :
                           stake.status === "emergency_unlocked" ? "border-destructive/30 text-destructive" :
@@ -221,13 +240,23 @@ const Dashboard = () => {
                           {stake.status.toUpperCase().replace("_", " ")}
                         </Badge>
                         {stake.unlock_at && (
-                          <p className="text-[10px] text-muted-foreground mt-1 flex items-center gap-1 justify-end">
+                          <p className="text-[10px] text-muted-foreground flex items-center gap-1">
                             <Clock className="w-3 h-3" />
                             {isLocked
                               ? `Unlocks ${new Date(stake.unlock_at).toLocaleDateString()}`
                               : "Unlocked"
                             }
                           </p>
+                        )}
+                        {stake.status === "active" && isLocked && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => requestEarlyUnlock(stake)}
+                            className="border-accent/30 text-accent hover:bg-accent/10 text-[10px] font-display h-6 px-2 mt-1"
+                          >
+                            <Unlock className="w-3 h-3 mr-1" /> Early Unlock
+                          </Button>
                         )}
                       </div>
                     </div>
