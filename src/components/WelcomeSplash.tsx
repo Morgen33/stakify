@@ -116,9 +116,9 @@ const WelcomeSplash = () => {
 
             {/* Title */}
             <motion.div key={`text-${current}`} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }}>
-              <p className={`font-display text-xs tracking-[0.3em] ${slide.color} mb-2`}>{slide.subtitle}</p>
-              <h2 className="font-display text-3xl text-foreground mb-4 tracking-wider">{slide.title}</h2>
-              <p className="text-muted-foreground text-sm max-w-sm mx-auto leading-relaxed">{slide.desc}</p>
+              <p className={`font-display text-sm tracking-[0.3em] ${slide.color} mb-3`}>{slide.subtitle}</p>
+              <h2 className="font-display text-4xl text-foreground mb-5 tracking-wider">{slide.title}</h2>
+              <p className="text-muted-foreground text-base max-w-sm mx-auto leading-relaxed">{slide.desc}</p>
             </motion.div>
 
             {/* Progress dots */}
