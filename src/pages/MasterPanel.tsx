@@ -308,7 +308,7 @@ const MasterPanel = () => {
             {/* Fee Collection Wallet */}
             <div className="rounded-lg border border-primary/30 bg-primary/5 p-6">
               <h3 className="font-display text-sm text-primary mb-4 tracking-wider flex items-center gap-2">
-                <DollarSign className="w-4 h-4" /> FEE COLLECTION WALLET (12¢ Network Fee)
+                <DollarSign className="w-4 h-4" /> FEE COLLECTION WALLET (${currentFee} Network Fee)
               </h3>
               {feeWallet ? (
                 <div className="mb-4">
