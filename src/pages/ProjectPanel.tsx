@@ -26,7 +26,10 @@ const ProjectPanel = () => {
   const [pools, setPools] = useState<any[]>([]);
   const [payments, setPayments] = useState<any[]>([]);
   const [stakes, setStakes] = useState<any[]>([]);
+  const [airdrops, setAirdrops] = useState<any[]>([]);
+  const [stakers, setStakers] = useState<any[]>([]);
   const [isProjectOwner, setIsProjectOwner] = useState(false);
+  const [newAirdrop, setNewAirdrop] = useState({ recipient_user_id: "", airdrop_type: "token", asset_name: "", asset_image_url: "", amount: "1", message: "" });
   const [loadingData, setLoadingData] = useState(true);
 
   // Calculator state
