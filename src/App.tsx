@@ -9,7 +9,9 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import Index from "./pages/Index.tsx";
 import Auth from "./pages/Auth.tsx";
 import Admin from "./pages/Admin.tsx";
+import Dashboard from "./pages/Dashboard.tsx";
 import ProjectPanel from "./pages/ProjectPanel.tsx";
+import ProjectPage from "./pages/ProjectPage.tsx";
 import OperatorPanel from "./pages/OperatorPanel.tsx";
 import Arcade from "./pages/Arcade.tsx";
 import NotFound from "./pages/NotFound.tsx";
@@ -29,8 +31,10 @@ const App = () => (
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/admin" element={<Admin />} />
+                <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/operator" element={<OperatorPanel />} />
                 <Route path="/project-panel" element={<ProjectPanel />} />
+                <Route path="/project/:slug" element={<ProjectPage />} />
                 <Route path="/arcade" element={<Arcade />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
