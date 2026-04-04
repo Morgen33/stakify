@@ -149,13 +149,32 @@ const Admin = () => {
     else { toast({ title: "🔓 Stake unlocked" }); fetchAll(); }
   };
 
-  const emergencyUnlockAll = async (poolId: string) => {
-    if (!window.confirm("🚨 CRITICAL: Unlock ALL stakes in this pool?")) return;
-    const poolStakes = stakes.filter((s) => s.pool_id === poolId && s.status === "active");
-    for (const s of poolStakes) {
-      await supabase.from("stakes").update({ status: "emergency_unlocked", unlock_at: new Date().toISOString() }).eq("id", s.id);
+  // ─── Process Early Unlock Request ───
+  const processEarlyUnlock = async (request: any, approved: boolean) => {
+    if (approved) {
+      // Unlock the stake
+      await supabase.from("stakes").update({ status: "early_unlocked", unlock_at: new Date().toISOString() }).eq("id", request.stake_id);
     }
-    toast({ title: `🔓 ${poolStakes.length} stakes unlocked` }); fetchAll();
+    await supabase.from("early_unlock_requests").update({
+      status: approved ? "approved" : "rejected",
+      processed_at: new Date().toISOString(),
+      processed_by: user?.id,
+    }).eq("id", request.id);
+    toast({ title: approved ? "🔓 Early unlock approved" : "❌ Request rejected" });
+    logAction(approved ? "Early unlock approved" : "Early unlock rejected", { request_id: request.id, stake_id: request.stake_id, fee: request.fee_amount });
+    fetchAll();
+  };
+
+  // ─── Award Project Kickback ───
+  const awardProjectKickback = async (projectId: string, amount: number, reason: string) => {
+    const { error } = await supabase.from("project_rewards").insert({
+      project_account_id: projectId,
+      reward_type: "points",
+      amount,
+      reason,
+    });
+    if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
+    else { toast({ title: "🎁 Kickback awarded!" }); fetchAll(); }
   };
 
   // ─── Settings ───
