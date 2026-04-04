@@ -1,23 +1,29 @@
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Info, Lock, Unlock, TrendingUp } from "lucide-react";
+import { Info, Lock, Unlock, TrendingUp, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
+import StakeModal from "./StakeModal";
 
 interface StakingCardProps {
+  id?: string;
   projectName: string;
   projectLogo?: string;
   apy: number;
   totalStaked: number;
   yourStake: number;
   lockPeriod: string;
+  lockPeriodDays?: number;
   rewardToken: string;
-  status: "active" | "locked" | "ended";
+  platformFeePct?: number;
+  status: "active" | "locked" | "ended" | "paused";
 }
 
-const statusStyles = {
+const statusStyles: Record<string, string> = {
   active: "bg-neon-green/10 text-neon-green border-neon-green/30",
   locked: "bg-neon-gold/10 text-neon-gold border-neon-gold/30",
+  paused: "bg-neon-gold/10 text-neon-gold border-neon-gold/30",
   ended: "bg-muted text-muted-foreground border-border",
 };
 
@@ -27,7 +33,9 @@ const StakingCard = ({
   totalStaked,
   yourStake,
   lockPeriod,
+  lockPeriodDays = 30,
   rewardToken,
+  platformFeePct = 2.5,
   status,
 }: StakingCardProps) => {
   return (
@@ -39,11 +47,19 @@ const StakingCard = ({
       <div className="flex items-start justify-between mb-4">
         <div>
           <h3 className="font-display text-lg text-foreground">{projectName}</h3>
-          <p className="text-muted-foreground text-sm">Reward: {rewardToken}</p>
+          <p className="text-muted-foreground text-sm flex items-center gap-1">
+            Reward: {rewardToken}
+            <Tooltip>
+              <TooltipTrigger><HelpCircle className="w-3 h-3" /></TooltipTrigger>
+              <TooltipContent className="max-w-xs">
+                <p className="text-xs">You earn {rewardToken} tokens as rewards for staking. Rewards are distributed proportionally based on your stake amount and duration.</p>
+              </TooltipContent>
+            </Tooltip>
+          </p>
         </div>
         <div className="flex items-center gap-2">
-          <Badge variant="outline" className={statusStyles[status]}>
-            {status === "locked" ? <Lock className="w-3 h-3 mr-1" /> : <Unlock className="w-3 h-3 mr-1" />}
+          <Badge variant="outline" className={statusStyles[status] || statusStyles.ended}>
+            {status === "active" ? <Unlock className="w-3 h-3 mr-1" /> : <Lock className="w-3 h-3 mr-1" />}
             {status}
           </Badge>
           <Tooltip>
@@ -54,9 +70,9 @@ const StakingCard = ({
             </TooltipTrigger>
             <TooltipContent className="bg-card border-border max-w-xs">
               <p className="text-xs">
-                ⚠️ Staking involves risks. Your NFTs will be locked for the duration of the staking period.
-                Rewards are subject to project terms. A small platform fee applies to all rewards.
-                Always DYOR before staking.
+                ⚠️ Staking involves risks. Your assets will be locked for the duration of the staking period.
+                Rewards are subject to project terms. A platform fee of {platformFeePct}% applies to rewards,
+                plus a fixed $0.03 micro-fee on each stake/unstake. Always DYOR before staking.
               </p>
             </TooltipContent>
           </Tooltip>
@@ -68,11 +84,21 @@ const StakingCard = ({
           <div className="flex items-center gap-1 mb-1">
             <TrendingUp className="w-3 h-3 text-neon-green" />
             <span className="text-xs text-muted-foreground">APY</span>
+            <Tooltip>
+              <TooltipTrigger><HelpCircle className="w-2.5 h-2.5 text-muted-foreground" /></TooltipTrigger>
+              <TooltipContent>Annual Percentage Yield — the estimated yearly return on your staked assets.</TooltipContent>
+            </Tooltip>
           </div>
           <p className="font-display text-xl text-neon-green">{apy}%</p>
         </div>
         <div className="bg-secondary/50 rounded-md p-3">
-          <p className="text-xs text-muted-foreground mb-1">Lock Period</p>
+          <p className="text-xs text-muted-foreground mb-1 flex items-center gap-1">
+            Lock Period
+            <Tooltip>
+              <TooltipTrigger><HelpCircle className="w-2.5 h-2.5" /></TooltipTrigger>
+              <TooltipContent>How long your assets stay locked. Soft stakes can be withdrawn anytime.</TooltipContent>
+            </Tooltip>
+          </p>
           <p className="font-display text-lg text-foreground">{lockPeriod}</p>
         </div>
         <div className="bg-secondary/50 rounded-md p-3">
@@ -86,13 +112,33 @@ const StakingCard = ({
       </div>
 
       <div className="flex gap-2">
-        <Button className="flex-1 bg-primary text-primary-foreground font-display hover:bg-primary/90 box-glow-cyan transition-shadow">
-          Stake Now
-        </Button>
-        <Button variant="outline" className="border-border text-foreground hover:bg-secondary font-display">
-          Details
-        </Button>
+        {status === "active" ? (
+          <StakeModal
+            poolName={projectName}
+            apy={apy}
+            rewardToken={rewardToken}
+            lockPeriodDays={lockPeriodDays}
+            platformFeePct={platformFeePct}
+          />
+        ) : (
+          <Button className="flex-1 font-display" disabled>
+            {status === "paused" ? "Paused" : status === "locked" ? "Locked" : "Ended"}
+          </Button>
+        )}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="outline" className="border-border text-foreground hover:bg-secondary font-display">
+              Details
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>View full pool details, history, and project information.</TooltipContent>
+        </Tooltip>
       </div>
+
+      {/* Fee notice */}
+      <p className="text-[9px] text-muted-foreground/50 mt-2 text-center">
+        Fee: {platformFeePct}% on rewards + $0.03/action
+      </p>
     </motion.div>
   );
 };
