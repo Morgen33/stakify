@@ -149,7 +149,8 @@ const WelcomeSplash = () => {
             {/* Disclaimer */}
             <p className="text-[9px] text-muted-foreground/40 mt-6">
               Points and rewards are subject to platform terms. Token conversion is not guaranteed.
-              All rewards, airdrops, and prize wheels are at the discretion of project owners and platform admins.
+              All rewards, airdrops, and prizes are at the discretion of project owners and platform operators.
+              Small maintenance fees support platform security and development.
             </p>
           </div>
         </motion.div>
