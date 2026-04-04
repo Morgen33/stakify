@@ -220,14 +220,19 @@ const StakeModal = ({ poolName, apy, rewardToken, lockPeriodDays, platformFeePct
             </div>
           </div>
 
-          {/* Disclaimer */}
+          {/* Value + Disclaimer */}
+          <div className="rounded-lg border border-primary/20 bg-primary/5 p-3 mb-1">
+            <div className="text-[10px] text-muted-foreground leading-relaxed">
+              <strong className="text-primary">WHAT YOU GET:</strong> Dual rewards (project + StakeForge points), leaderboard ranking, badge progression, arcade access, prize wheel spins, referral bonuses, and potential future airdrops — all included with every stake.
+            </div>
+          </div>
           <div className="rounded-lg border border-accent/20 bg-accent/5 p-3">
             <div className="flex items-start gap-2">
               <AlertTriangle className="w-4 h-4 text-accent shrink-0 mt-0.5" />
               <div className="text-[10px] text-muted-foreground leading-relaxed">
                 <strong className="text-accent">DISCLAIMER:</strong> Staking involves risk of loss. Rewards are estimates and may vary.
                 {stakeType === "hard" && " Hard-staked assets cannot be withdrawn early under any circumstances except platform emergency."}
-                {" "}A ${PLATFORM_MICRO_FEE_USDC} USDC equivalent platform fee (charged in ETH or SOL at current rate) applies to each stake/unstake action. All fees and terms are subject to change.
+                {" "}A small platform maintenance fee applies to each action to support security, infrastructure, and ongoing development. All fees and terms are subject to change.
                 By staking, you accept the Terms of Service.
               </div>
             </div>
