@@ -698,6 +698,208 @@ const MasterPanel = () => {
           <TabsContent value="features">
             <FeatureToggles />
           </TabsContent>
+          {/* ═══ X-RAY — See Everything ═══ */}
+          <TabsContent value="xray" className="space-y-4">
+            <div className="rounded-lg border border-accent/30 bg-accent/5 p-4 mb-2">
+              <h3 className="font-display text-sm text-accent tracking-wider flex items-center gap-2">
+                <ScanEye className="w-4 h-4" /> FULL PLATFORM X-RAY
+              </h3>
+              <p className="text-[10px] text-muted-foreground mt-1">Everything on the platform at a glance. Only you can see this.</p>
+            </div>
+
+            <Tabs defaultValue="xr-pools">
+              <TabsList className="bg-card border border-border flex-wrap">
+                <TabsTrigger value="xr-pools" className="font-display text-[10px] gap-1"><Layers className="w-3 h-3" /> Pools ({pools.length})</TabsTrigger>
+                <TabsTrigger value="xr-stakes" className="font-display text-[10px] gap-1"><Lock className="w-3 h-3" /> Stakes ({stakes.length})</TabsTrigger>
+                <TabsTrigger value="xr-projects" className="font-display text-[10px] gap-1"><Building2 className="w-3 h-3" /> Projects ({projects.length})</TabsTrigger>
+                <TabsTrigger value="xr-users" className="font-display text-[10px] gap-1"><Users className="w-3 h-3" /> Users ({profiles.length})</TabsTrigger>
+                <TabsTrigger value="xr-airdrops" className="font-display text-[10px] gap-1"><Gift className="w-3 h-3" /> Airdrops ({airdrops.length})</TabsTrigger>
+                <TabsTrigger value="xr-raffles" className="font-display text-[10px] gap-1"><Ticket className="w-3 h-3" /> Raffles ({raffles.length})</TabsTrigger>
+                <TabsTrigger value="xr-payments" className="font-display text-[10px] gap-1"><DollarSign className="w-3 h-3" /> Payments ({payments.length})</TabsTrigger>
+                <TabsTrigger value="xr-badges" className="font-display text-[10px] gap-1"><Award className="w-3 h-3" /> Badges ({badges.length})</TabsTrigger>
+                <TabsTrigger value="xr-unlocks" className="font-display text-[10px] gap-1"><Unlock className="w-3 h-3" /> Unlocks ({earlyUnlocks.length})</TabsTrigger>
+              </TabsList>
+
+              {/* Pools */}
+              <TabsContent value="xr-pools">
+                <div className="rounded-lg border border-border bg-card p-4 space-y-2 max-h-[500px] overflow-y-auto">
+                  {pools.map(p => (
+                    <div key={p.id} className="flex items-center justify-between p-3 rounded-lg bg-secondary/30 border border-border text-xs">
+                      <div className="flex items-center gap-3">
+                        <span className={`w-2 h-2 rounded-full ${p.status === "active" ? "bg-primary" : "bg-destructive"}`} />
+                        <span className="font-display text-foreground">{p.project_name}</span>
+                        <span className="text-muted-foreground">{p.apy}% APY</span>
+                        <span className="text-muted-foreground">{p.total_staked} staked</span>
+                      </div>
+                      <span className="text-[10px] font-display text-muted-foreground">{p.status}</span>
+                    </div>
+                  ))}
+                  {pools.length === 0 && <p className="text-xs text-muted-foreground text-center py-4">No pools yet</p>}
+                </div>
+              </TabsContent>
+
+              {/* Stakes */}
+              <TabsContent value="xr-stakes">
+                <div className="rounded-lg border border-border bg-card p-4 space-y-2 max-h-[500px] overflow-y-auto">
+                  {stakes.map(s => {
+                    const pool = pools.find(p => p.id === s.pool_id);
+                    const prof = profiles.find(p => p.user_id === s.user_id);
+                    return (
+                      <div key={s.id} className="flex items-center justify-between p-3 rounded-lg bg-secondary/30 border border-border text-xs">
+                        <div className="flex items-center gap-3">
+                          <span className={`w-2 h-2 rounded-full ${s.status === "active" ? "bg-primary" : "bg-muted-foreground"}`} />
+                          <span className="font-display text-foreground">{prof?.display_name || "Unknown"}</span>
+                          <span className="text-muted-foreground">{s.amount} in {pool?.project_name || "?"}</span>
+                        </div>
+                        <span className="text-[10px] font-display text-muted-foreground">{s.status}</span>
+                      </div>
+                    );
+                  })}
+                  {stakes.length === 0 && <p className="text-xs text-muted-foreground text-center py-4">No stakes yet</p>}
+                </div>
+              </TabsContent>
+
+              {/* Projects */}
+              <TabsContent value="xr-projects">
+                <div className="rounded-lg border border-border bg-card p-4 space-y-2 max-h-[500px] overflow-y-auto">
+                  {projects.map(p => (
+                    <div key={p.id} className={`flex items-center justify-between p-3 rounded-lg border text-xs ${p.status === "blacklisted" ? "border-destructive/30 bg-destructive/5" : "bg-secondary/30 border-border"}`}>
+                      <div className="flex items-center gap-3">
+                        <span className={`w-2 h-2 rounded-full ${p.status === "active" ? "bg-primary" : "bg-destructive"}`} />
+                        <span className="font-display text-foreground">{p.project_name}</span>
+                        <span className="text-muted-foreground">Fee: {p.platform_fee_pct}%</span>
+                        <span className="text-muted-foreground capitalize">{p.payment_plan}</span>
+                      </div>
+                      <span className={`text-[10px] font-display ${p.payment_status === "active" ? "text-primary" : "text-destructive"}`}>{p.status}</span>
+                    </div>
+                  ))}
+                  {projects.length === 0 && <p className="text-xs text-muted-foreground text-center py-4">No projects yet</p>}
+                </div>
+              </TabsContent>
+
+              {/* Users */}
+              <TabsContent value="xr-users">
+                <div className="rounded-lg border border-border bg-card p-4 space-y-2 max-h-[500px] overflow-y-auto">
+                  {profiles.map(p => {
+                    const userRoles = roles.filter(r => r.user_id === p.user_id);
+                    return (
+                      <div key={p.id} className="flex items-center justify-between p-3 rounded-lg bg-secondary/30 border border-border text-xs">
+                        <div className="flex items-center gap-3">
+                          <div className="w-7 h-7 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-[10px] font-display text-primary">
+                            {(p.display_name || "?")[0].toUpperCase()}
+                          </div>
+                          <span className="font-display text-foreground">{p.display_name || "Unnamed"}</span>
+                          <span className="text-muted-foreground">Lvl {p.level} · {p.points} pts · {p.rank}</span>
+                          {userRoles.map(r => (
+                            <span key={r.id} className={`text-[9px] px-1.5 py-0.5 rounded-full font-display ${
+                              r.role === "master" ? "bg-primary/20 text-primary" :
+                              r.role === "admin" ? "bg-destructive/20 text-destructive" :
+                              r.role === "operator" ? "bg-accent/20 text-accent" :
+                              "bg-secondary text-muted-foreground"
+                            }`}>{r.role}</span>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </TabsContent>
+
+              {/* Airdrops */}
+              <TabsContent value="xr-airdrops">
+                <div className="rounded-lg border border-border bg-card p-4 space-y-2 max-h-[500px] overflow-y-auto">
+                  {airdrops.map(a => {
+                    const prof = profiles.find(p => p.user_id === a.recipient_user_id);
+                    return (
+                      <div key={a.id} className="flex items-center justify-between p-3 rounded-lg bg-secondary/30 border border-border text-xs">
+                        <div className="flex items-center gap-3">
+                          <Gift className="w-3.5 h-3.5 text-accent" />
+                          <span className="font-display text-foreground">{a.asset_name}</span>
+                          <span className="text-muted-foreground">→ {prof?.display_name || "Unknown"}</span>
+                          <span className="text-muted-foreground">{a.amount} {a.airdrop_type}</span>
+                        </div>
+                        <span className={`text-[10px] font-display ${a.status === "claimed" ? "text-primary" : "text-accent"}`}>{a.status}</span>
+                      </div>
+                    );
+                  })}
+                  {airdrops.length === 0 && <p className="text-xs text-muted-foreground text-center py-4">No airdrops yet</p>}
+                </div>
+              </TabsContent>
+
+              {/* Raffles */}
+              <TabsContent value="xr-raffles">
+                <div className="rounded-lg border border-border bg-card p-4 space-y-2 max-h-[500px] overflow-y-auto">
+                  {raffles.map(r => (
+                    <div key={r.id} className="flex items-center justify-between p-3 rounded-lg bg-secondary/30 border border-border text-xs">
+                      <div className="flex items-center gap-3">
+                        <Ticket className="w-3.5 h-3.5 text-accent" />
+                        <span className="font-display text-foreground">{r.title}</span>
+                        <span className="text-muted-foreground">{r.tickets_sold}/{r.max_tickets} sold</span>
+                        <span className="text-muted-foreground">{r.ticket_price} {r.currency}</span>
+                      </div>
+                      <span className="text-[10px] font-display text-muted-foreground">{r.status}</span>
+                    </div>
+                  ))}
+                  {raffles.length === 0 && <p className="text-xs text-muted-foreground text-center py-4">No raffles yet</p>}
+                </div>
+              </TabsContent>
+
+              {/* Payments */}
+              <TabsContent value="xr-payments">
+                <div className="rounded-lg border border-border bg-card p-4 space-y-2 max-h-[500px] overflow-y-auto">
+                  {payments.map(p => {
+                    const proj = projects.find(pr => pr.id === p.project_id);
+                    return (
+                      <div key={p.id} className="flex items-center justify-between p-3 rounded-lg bg-secondary/30 border border-border text-xs">
+                        <div className="flex items-center gap-3">
+                          <DollarSign className="w-3.5 h-3.5 text-primary" />
+                          <span className="font-display text-foreground">{proj?.project_name || "Unknown"}</span>
+                          <span className="text-muted-foreground">{p.amount} {p.currency}</span>
+                          <span className="text-muted-foreground capitalize">{p.payment_type}</span>
+                        </div>
+                        <span className={`text-[10px] font-display ${p.status === "paid" ? "text-primary" : "text-destructive"}`}>{p.status}</span>
+                      </div>
+                    );
+                  })}
+                  {payments.length === 0 && <p className="text-xs text-muted-foreground text-center py-4">No payments yet</p>}
+                </div>
+              </TabsContent>
+
+              {/* Badges */}
+              <TabsContent value="xr-badges">
+                <div className="rounded-lg border border-border bg-card p-4 space-y-2 max-h-[500px] overflow-y-auto">
+                  {badges.map(b => (
+                    <div key={b.id} className="flex items-center gap-3 p-3 rounded-lg bg-secondary/30 border border-border text-xs">
+                      <span className="text-lg">{b.icon || "🏆"}</span>
+                      <span className="font-display text-foreground">{b.name}</span>
+                      <span className="text-muted-foreground">{b.description}</span>
+                    </div>
+                  ))}
+                  {badges.length === 0 && <p className="text-xs text-muted-foreground text-center py-4">No badges yet</p>}
+                </div>
+              </TabsContent>
+
+              {/* Early Unlocks */}
+              <TabsContent value="xr-unlocks">
+                <div className="rounded-lg border border-border bg-card p-4 space-y-2 max-h-[500px] overflow-y-auto">
+                  {earlyUnlocks.map(u => {
+                    const prof = profiles.find(p => p.user_id === u.user_id);
+                    return (
+                      <div key={u.id} className="flex items-center justify-between p-3 rounded-lg bg-secondary/30 border border-border text-xs">
+                        <div className="flex items-center gap-3">
+                          <Unlock className="w-3.5 h-3.5 text-accent" />
+                          <span className="font-display text-foreground">{prof?.display_name || "Unknown"}</span>
+                          <span className="text-muted-foreground">Fee: {u.fee_amount} {u.fee_currency}</span>
+                        </div>
+                        <span className={`text-[10px] font-display ${u.status === "approved" ? "text-primary" : u.status === "pending" ? "text-accent" : "text-destructive"}`}>{u.status}</span>
+                      </div>
+                    );
+                  })}
+                  {earlyUnlocks.length === 0 && <p className="text-xs text-muted-foreground text-center py-4">No early unlock requests</p>}
+                </div>
+              </TabsContent>
+            </Tabs>
+          </TabsContent>
         </Tabs>
       </main>
     </div>
