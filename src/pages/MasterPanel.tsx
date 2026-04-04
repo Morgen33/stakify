@@ -9,7 +9,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Shield, Wallet, AlertTriangle, Settings, Users, Zap,
   RefreshCw, Save, Trash2, Power, Eye, Lock, Unlock,
-  DollarSign, ScrollText, Search, UserX, Crown
+  DollarSign, ScrollText, Search, UserX, Crown,
+  Layers, Building2, Award, Gift, Ticket, Gamepad2, ScanEye
 } from "lucide-react";
 import {
   Tooltip, TooltipContent, TooltipTrigger,
