@@ -231,7 +231,7 @@ const Dashboard = () => {
                           </div>
                         </div>
                       </div>
-                      <div className="text-right">
+                      <div className="text-right flex flex-col items-end gap-1">
                         <Badge variant="outline" className={`text-[10px] font-display ${
                           stake.status === "active" ? "border-primary/30 text-primary" :
                           stake.status === "emergency_unlocked" ? "border-destructive/30 text-destructive" :
@@ -240,13 +240,23 @@ const Dashboard = () => {
                           {stake.status.toUpperCase().replace("_", " ")}
                         </Badge>
                         {stake.unlock_at && (
-                          <p className="text-[10px] text-muted-foreground mt-1 flex items-center gap-1 justify-end">
+                          <p className="text-[10px] text-muted-foreground flex items-center gap-1">
                             <Clock className="w-3 h-3" />
                             {isLocked
                               ? `Unlocks ${new Date(stake.unlock_at).toLocaleDateString()}`
                               : "Unlocked"
                             }
                           </p>
+                        )}
+                        {stake.status === "active" && isLocked && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => requestEarlyUnlock(stake)}
+                            className="border-accent/30 text-accent hover:bg-accent/10 text-[10px] font-display h-6 px-2 mt-1"
+                          >
+                            <Unlock className="w-3 h-3 mr-1" /> Early Unlock
+                          </Button>
                         )}
                       </div>
                     </div>
