@@ -10,13 +10,15 @@ import {
   Shield, Plus, Trash2, Settings, Users, Layers, Award,
   AlertTriangle, Unlock, Lock, DollarSign, RefreshCw,
   Wallet, Power, Save, Ban, Zap, FileText, Building2,
-  CreditCard, Calculator, XCircle, CheckCircle2
+  CreditCard, Calculator, XCircle, CheckCircle2, ScrollText
 } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import BattleLog from "@/components/BattleLog";
+import { logAction } from "@/lib/activity-logger";
 
 const Admin = () => {
   const { user, isAdmin, loading } = useAuth();
