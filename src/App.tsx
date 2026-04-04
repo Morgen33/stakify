@@ -37,6 +37,7 @@ const App = () => (
                 <Route path="/project-panel" element={<ProjectPanel />} />
                 <Route path="/project/:slug" element={<ProjectPage />} />
                 <Route path="/arcade" element={<Arcade />} />
+                <Route path="/raffle" element={<Raffle />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

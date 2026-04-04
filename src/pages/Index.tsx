@@ -77,6 +77,7 @@ const Index = () => {
             <a href="#pools" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-body">Pools</a>
             <a href="#leaderboard" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-body">Leaderboard</a>
             <Link to="/arcade" className="text-sm text-accent hover:text-accent/80 transition-colors font-display">Arcade</Link>
+            <Link to="/raffle" className="text-sm text-neon-purple hover:text-neon-purple/80 transition-colors font-display">Raffle</Link>
             <Tooltip>
               <TooltipTrigger asChild>
                 <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-body">Docs</a>
