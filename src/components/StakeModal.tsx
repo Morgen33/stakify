@@ -6,7 +6,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Badge } from "@/components/ui/badge";
 import { Lock, Unlock, HelpCircle, AlertTriangle, Zap, Shield } from "lucide-react";
 
-// Platform micro-fee: $0.03 USDC equivalent per stake/unstake — non-negotiable, goes to platform admin
+// Platform maintenance fee per stake/unstake action
 const PLATFORM_MICRO_FEE_USDC = 0.12;
 
 type StakeType = "soft" | "hard" | "flexible";
