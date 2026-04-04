@@ -10,7 +10,8 @@ import {
   Shield, Plus, Trash2, Settings, Users, Layers, Award,
   AlertTriangle, Unlock, Lock, DollarSign, RefreshCw,
   Wallet, Power, Save, Ban, Zap, FileText, Building2,
-  CreditCard, Calculator, XCircle, CheckCircle2, ScrollText
+  CreditCard, Calculator, XCircle, CheckCircle2, ScrollText,
+  Gift, Send, Search, Image
 } from "lucide-react";
 import {
   Tooltip,
