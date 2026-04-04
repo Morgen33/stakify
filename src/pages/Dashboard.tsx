@@ -183,6 +183,7 @@ const Dashboard = () => {
             <TabsTrigger value="rewards" className="font-display gap-1.5 text-xs"><Coins className="w-3.5 h-3.5" /> Rewards</TabsTrigger>
             <TabsTrigger value="badges" className="font-display gap-1.5 text-xs"><Trophy className="w-3.5 h-3.5" /> Badges</TabsTrigger>
             <TabsTrigger value="arcade" className="font-display gap-1.5 text-xs"><Gamepad2 className="w-3.5 h-3.5" /> Arcade</TabsTrigger>
+            <TabsTrigger value="swap" className="font-display gap-1.5 text-xs relative"><ArrowLeftRight className="w-3.5 h-3.5" /> Swap <span className="ml-1 px-1.5 py-0.5 rounded-full bg-accent/20 text-accent text-[8px] font-display">SOON</span></TabsTrigger>
           </TabsList>
 
           {/* Stakes */}
