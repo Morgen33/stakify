@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import {
   Ticket, Clock, Trophy, Users, Coins, Gift, ArrowLeft,
-  Sparkles, HelpCircle, Lock
+  Sparkles, HelpCircle, Lock, Share2
 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import WalletModal from "@/components/WalletModal";
