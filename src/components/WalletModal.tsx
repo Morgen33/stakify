@@ -8,6 +8,8 @@ import { useToast } from "@/hooks/use-toast";
 
 const walletOptions = [
   { name: "MetaMask", icon: "🦊", key: "metamask", action: "connectMetaMask" as const, tip: "Most popular EVM wallet. Works on desktop and mobile browsers." },
+  { name: "Phantom", icon: "👻", key: "phantom", action: "connectGenericEVM" as const, providerKey: "isPhantom", tip: "Multi-chain wallet popular in Solana & EVM ecosystems." },
+  { name: "Backpack", icon: "🎒", key: "backpack", action: "connectGenericEVM" as const, providerKey: "isBackpack", tip: "xNFT-powered wallet for Solana & EVM. Built for power users." },
   { name: "Coinbase Wallet", icon: "🔵", key: "coinbase", action: "connectCoinbase" as const, tip: "Coinbase's self-custody wallet. Great for beginners." },
   { name: "WalletConnect", icon: "🔗", key: "walletconnect", action: "connectWalletConnect" as const, tip: "Connect any mobile wallet by scanning a QR code." },
   { name: "Browser Wallet", icon: "🌐", key: "injected", action: "connectGenericEVM" as const, tip: "Use whatever wallet extension is installed in your browser." },
@@ -23,14 +25,14 @@ const WalletModal = ({ trigger }: WalletModalProps) => {
   const [showChains, setShowChains] = useState(false);
   const { toast } = useToast();
 
-  const handleConnect = async (action: typeof walletOptions[number]["action"]) => {
+  const handleConnect = async (wallet: typeof walletOptions[number]) => {
     try {
-      if (action === "connectMetaMask") await connectMetaMask();
-      else if (action === "connectCoinbase") await connectCoinbase();
-      else if (action === "connectWalletConnect") await connectWalletConnect();
-      else await connectGenericEVM("isMetaMask");
+      if (wallet.action === "connectMetaMask") await connectMetaMask();
+      else if (wallet.action === "connectCoinbase") await connectCoinbase();
+      else if (wallet.action === "connectWalletConnect") await connectWalletConnect();
+      else await connectGenericEVM((wallet as any).providerKey || "isMetaMask");
       setOpen(false);
-      toast({ title: "🔗 Wallet Connected", description: "You're now connected to StakeForge." });
+      toast({ title: "🔗 Wallet Connected", description: "You're now connected." });
     } catch (err: any) {
       toast({ title: "Connection Failed", description: err.message, variant: "destructive" });
     }
@@ -158,7 +160,7 @@ const WalletModal = ({ trigger }: WalletModalProps) => {
                 <Button
                   variant="outline"
                   className="w-full justify-start gap-3 h-14 font-display border-border hover:border-primary/40 hover:bg-primary/5 transition-all"
-                  onClick={() => handleConnect(w.action)}
+                  onClick={() => handleConnect(w)}
                   disabled={isConnecting}
                 >
                   <span className="text-2xl">{w.icon}</span>
