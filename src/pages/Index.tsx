@@ -139,7 +139,7 @@ const Index = () => {
                 <Tooltip>
                   <TooltipTrigger><HelpCircle className="w-4 h-4 text-muted-foreground" /></TooltipTrigger>
                   <TooltipContent className="max-w-xs">
-                    <p className="text-xs">Each pool is managed by a verified project. Stake your assets to earn rewards. Fees and terms are set by the project, with a small platform micro-fee on each action.</p>
+                    <p className="text-xs">Each pool is managed by a verified project. Stake to earn their rewards AND StakeForge points. Your points unlock arcade games, badges, leaderboard rankings, and future platform benefits.</p>
                   </TooltipContent>
                 </Tooltip>
               </h2>
