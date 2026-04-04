@@ -56,6 +56,66 @@ export type Database = {
         }
         Relationships: []
       }
+      airdrops: {
+        Row: {
+          airdrop_type: string
+          amount: number
+          asset_image_url: string | null
+          asset_name: string
+          claimed_at: string | null
+          created_at: string
+          id: string
+          message: string | null
+          pool_id: string | null
+          project_account_id: string
+          recipient_user_id: string
+          status: string
+        }
+        Insert: {
+          airdrop_type?: string
+          amount?: number
+          asset_image_url?: string | null
+          asset_name: string
+          claimed_at?: string | null
+          created_at?: string
+          id?: string
+          message?: string | null
+          pool_id?: string | null
+          project_account_id: string
+          recipient_user_id: string
+          status?: string
+        }
+        Update: {
+          airdrop_type?: string
+          amount?: number
+          asset_image_url?: string | null
+          asset_name?: string
+          claimed_at?: string | null
+          created_at?: string
+          id?: string
+          message?: string | null
+          pool_id?: string | null
+          project_account_id?: string
+          recipient_user_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "airdrops_pool_id_fkey"
+            columns: ["pool_id"]
+            isOneToOne: false
+            referencedRelation: "staking_pools"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "airdrops_project_account_id_fkey"
+            columns: ["project_account_id"]
+            isOneToOne: false
+            referencedRelation: "project_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       badges: {
         Row: {
           created_at: string
