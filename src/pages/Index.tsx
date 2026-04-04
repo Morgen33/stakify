@@ -18,6 +18,8 @@ const stakingPools = [
 ];
 
 const Index = () => {
+  const { user, isAdmin, signOut } = useAuth();
+
   return (
     <div className="min-h-screen bg-background">
       {/* Nav */}
@@ -31,6 +33,22 @@ const Index = () => {
             <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-body">Pools</a>
             <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-body">Leaderboard</a>
             <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-body">Docs</a>
+            {isAdmin && (
+              <Link to="/admin" className="text-sm text-neon-green hover:text-neon-green/80 transition-colors font-display">
+                Admin
+              </Link>
+            )}
+            {user ? (
+              <Button variant="outline" size="sm" onClick={signOut} className="font-display border-border">
+                Sign Out
+              </Button>
+            ) : (
+              <Link to="/auth">
+                <Button size="sm" className="font-display bg-primary text-primary-foreground box-glow-cyan">
+                  Sign In
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
       </nav>
