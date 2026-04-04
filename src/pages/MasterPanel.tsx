@@ -79,6 +79,14 @@ const MasterPanel = () => {
     }
   };
 
+  const [newMasterWallet, setNewMasterWallet] = useState({ label: "", address: "", wallet_purpose: "fee_collection", notes: "" });
+  const [newWaiver, setNewWaiver] = useState({ user_id: "", project_account_id: "", waiver_type: "full", reason: "" });
+  const [waiverSearch, setWaiverSearch] = useState("");
+  const [newSettingKey, setNewSettingKey] = useState("");
+  const [newSettingValue, setNewSettingValue] = useState("");
+  const [roleSearch, setRoleSearch] = useState("");
+  const [assignRole, setAssignRole] = useState({ user_id: "", role: "admin" });
+
   const fetchAll = useCallback(async () => {
     const [mwRes, fwRes, profRes, setRes, stakesRes, poolsRes, projRes, rolesRes, walletsRes, airdropsRes, paymentsRes, badgesRes, rafflesRes, earlyRes] = await Promise.all([
       supabase.from("master_wallets").select("*").order("created_at", { ascending: false }),
