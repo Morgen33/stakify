@@ -137,7 +137,7 @@ const StakingCard = ({
 
       {/* Fee notice */}
       <p className="text-[9px] text-muted-foreground/50 mt-2 text-center">
-        Fee: {platformFeePct}% on rewards + $0.03/action
+        Fee: {platformFeePct}% on rewards + $0.12/action
       </p>
     </motion.div>
   );
