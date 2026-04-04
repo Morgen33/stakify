@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Layers, Settings, Users, DollarSign, RefreshCw,
   Save, Calculator, FileText, AlertTriangle, CreditCard,
-  Eye
+  Eye, Gift, Send, Image
 } from "lucide-react";
 import {
   Tooltip,
@@ -26,7 +26,10 @@ const ProjectPanel = () => {
   const [pools, setPools] = useState<any[]>([]);
   const [payments, setPayments] = useState<any[]>([]);
   const [stakes, setStakes] = useState<any[]>([]);
+  const [airdrops, setAirdrops] = useState<any[]>([]);
+  const [stakers, setStakers] = useState<any[]>([]);
   const [isProjectOwner, setIsProjectOwner] = useState(false);
+  const [newAirdrop, setNewAirdrop] = useState({ recipient_user_id: "", airdrop_type: "token", asset_name: "", asset_image_url: "", amount: "1", message: "" });
   const [loadingData, setLoadingData] = useState(true);
 
   // Calculator state
@@ -84,17 +87,49 @@ const ProjectPanel = () => {
     setPools(fetchedPools);
     setPayments(paymentsRes.data || []);
 
-    // Fetch stakes for these pools
+    // Fetch stakes for these pools + airdrops
     if (fetchedPools.length > 0) {
       const poolIds = fetchedPools.map((p: any) => p.id);
-      const { data: stakesData } = await supabase
-        .from("stakes")
-        .select("*")
-        .in("pool_id", poolIds);
-      setStakes(stakesData || []);
+      const [stakesRes2, airdropsRes] = await Promise.all([
+        supabase.from("stakes").select("*").in("pool_id", poolIds),
+        supabase.from("airdrops").select("*").eq("project_account_id", projData.id).order("created_at", { ascending: false }),
+      ]);
+      setStakes(stakesRes2.data || []);
+      setAirdrops(airdropsRes.data || []);
+      // Get unique staker user IDs for the dropdown
+      const userIds = [...new Set((stakesRes2.data || []).map((s: any) => s.user_id))];
+      if (userIds.length > 0) {
+        const { data: profilesData } = await supabase.from("profiles").select("user_id, display_name").in("user_id", userIds);
+        setStakers(profilesData || []);
+      }
+    } else {
+      const { data: airdropsRes } = await supabase.from("airdrops").select("*").eq("project_account_id", projData.id).order("created_at", { ascending: false });
+      setAirdrops(airdropsRes || []);
     }
     setLoadingData(false);
   }, [user]);
+
+  const sendAirdrop = async () => {
+    if (!project || !newAirdrop.recipient_user_id || !newAirdrop.asset_name) {
+      toast({ title: "Missing fields", description: "Recipient and asset name are required.", variant: "destructive" }); return;
+    }
+    const { error } = await supabase.from("airdrops").insert({
+      project_account_id: project.id,
+      recipient_user_id: newAirdrop.recipient_user_id,
+      airdrop_type: newAirdrop.airdrop_type,
+      asset_name: newAirdrop.asset_name,
+      asset_image_url: newAirdrop.asset_image_url || null,
+      amount: parseFloat(newAirdrop.amount) || 1,
+      message: newAirdrop.message || null,
+      status: "pending",
+    });
+    if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
+    else {
+      toast({ title: "🎁 Airdrop sent!" });
+      setNewAirdrop({ recipient_user_id: "", airdrop_type: "token", asset_name: "", asset_image_url: "", amount: "1", message: "" });
+      fetchAll();
+    }
+  };
 
   const updateProjectInfo = async (field: string, value: string) => {
     if (!project) return;
@@ -208,6 +243,9 @@ const ProjectPanel = () => {
             </TabsTrigger>
             <TabsTrigger value="payments" className="font-display gap-1.5 text-xs">
               <CreditCard className="w-3.5 h-3.5" /> Payments
+            </TabsTrigger>
+            <TabsTrigger value="airdrops" className="font-display gap-1.5 text-xs">
+              <Gift className="w-3.5 h-3.5" /> Airdrops
             </TabsTrigger>
             <TabsTrigger value="calculator" className="font-display gap-1.5 text-xs">
               <Calculator className="w-3.5 h-3.5" /> Calculator
@@ -361,7 +399,100 @@ const ProjectPanel = () => {
             </div>
           </TabsContent>
 
-          {/* ═══ CALCULATOR ═══ */}
+          {/* ═══ AIRDROPS ═══ */}
+          <TabsContent value="airdrops" className="space-y-4">
+            {/* Send Airdrop Form */}
+            <div className="rounded-lg border border-accent/20 bg-card p-6">
+              <h3 className="font-display text-sm text-foreground mb-4 tracking-wider flex items-center gap-2">
+                <Send className="w-4 h-4 text-accent" /> SEND AIRDROP TO HOLDER
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                <div>
+                  <label className="text-[10px] text-muted-foreground font-display">RECIPIENT (STAKER)</label>
+                  <select
+                    value={newAirdrop.recipient_user_id}
+                    onChange={(e) => setNewAirdrop({ ...newAirdrop, recipient_user_id: e.target.value })}
+                    className="w-full rounded-md border border-border bg-secondary px-3 py-2 text-sm text-foreground mt-1"
+                  >
+                    <option value="">Select a staker...</option>
+                    {stakers.map((s: any) => (
+                      <option key={s.user_id} value={s.user_id}>{s.display_name || s.user_id.slice(0, 8)}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-[10px] text-muted-foreground font-display">TYPE</label>
+                  <select
+                    value={newAirdrop.airdrop_type}
+                    onChange={(e) => setNewAirdrop({ ...newAirdrop, airdrop_type: e.target.value })}
+                    className="w-full rounded-md border border-border bg-secondary px-3 py-2 text-sm text-foreground mt-1"
+                  >
+                    <option value="token">Token</option>
+                    <option value="nft">NFT</option>
+                    <option value="reward">Reward</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-[10px] text-muted-foreground font-display">ASSET NAME</label>
+                  <Input value={newAirdrop.asset_name} onChange={(e) => setNewAirdrop({ ...newAirdrop, asset_name: e.target.value })} placeholder="e.g. 500 $TOKEN or CoolNFT #42" className="bg-secondary border-border text-sm mt-1" />
+                </div>
+                <div>
+                  <label className="text-[10px] text-muted-foreground font-display">AMOUNT</label>
+                  <Input type="number" value={newAirdrop.amount} onChange={(e) => setNewAirdrop({ ...newAirdrop, amount: e.target.value })} className="bg-secondary border-border text-sm mt-1" />
+                </div>
+                <div>
+                  <label className="text-[10px] text-muted-foreground font-display">IMAGE URL (OPTIONAL)</label>
+                  <Input value={newAirdrop.asset_image_url} onChange={(e) => setNewAirdrop({ ...newAirdrop, asset_image_url: e.target.value })} placeholder="https://..." className="bg-secondary border-border text-sm mt-1" />
+                </div>
+                <div>
+                  <label className="text-[10px] text-muted-foreground font-display">MESSAGE (OPTIONAL)</label>
+                  <Input value={newAirdrop.message} onChange={(e) => setNewAirdrop({ ...newAirdrop, message: e.target.value })} placeholder="Thank you for staking!" className="bg-secondary border-border text-sm mt-1" />
+                </div>
+              </div>
+              <Button onClick={sendAirdrop} className="bg-accent text-accent-foreground font-display text-xs">
+                <Gift className="w-3.5 h-3.5 mr-1.5" /> Send Airdrop
+              </Button>
+            </div>
+
+            {/* Sent Airdrops History */}
+            <div className="rounded-lg border border-border bg-card p-6">
+              <h3 className="font-display text-sm text-foreground mb-4 tracking-wider">SENT AIRDROPS ({airdrops.length})</h3>
+              {airdrops.length === 0 ? (
+                <p className="text-muted-foreground text-sm text-center py-8">No airdrops sent yet. Send rewards to your community holders above!</p>
+              ) : (
+                <div className="space-y-2">
+                  {airdrops.map((a: any) => {
+                    const recipientName = stakers.find((s: any) => s.user_id === a.recipient_user_id)?.display_name || a.recipient_user_id.slice(0, 8);
+                    return (
+                      <div key={a.id} className="flex items-center justify-between p-3 rounded-lg bg-secondary/30 border border-border">
+                        <div className="flex items-center gap-3">
+                          {a.asset_image_url ? (
+                            <img src={a.asset_image_url} alt={a.asset_name} className="w-10 h-10 rounded-lg object-cover border border-border" />
+                          ) : (
+                            <div className="w-10 h-10 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center">
+                              {a.airdrop_type === "nft" ? <Image className="w-4 h-4 text-accent" /> : <Gift className="w-4 h-4 text-accent" />}
+                            </div>
+                          )}
+                          <div>
+                            <p className="font-display text-xs text-foreground">{a.asset_name}</p>
+                            <p className="text-[10px] text-muted-foreground">To: {recipientName} • {a.airdrop_type.toUpperCase()} • Qty: {a.amount}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <span className={`text-[10px] px-2 py-0.5 rounded-full border font-display ${
+                            a.status === "claimed" ? "border-primary/30 text-primary" : "border-accent/30 text-accent"
+                          }`}>{a.status.toUpperCase()}</span>
+                          <p className="text-[10px] text-muted-foreground mt-1">{new Date(a.created_at).toLocaleDateString()}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </TabsContent>
+
           <TabsContent value="calculator" className="space-y-4">
             <div className="rounded-lg border border-border bg-card p-6">
               <h3 className="font-display text-sm text-foreground mb-4 tracking-wider flex items-center gap-2">
