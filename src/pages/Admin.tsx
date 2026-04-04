@@ -66,7 +66,7 @@ const Admin = () => {
   }, [isAdmin]);
 
   const fetchAll = useCallback(async () => {
-    const [poolsRes, stakesRes, profilesRes, settingsRes, badgesRes, projectsRes, paymentsRes] = await Promise.all([
+    const [poolsRes, stakesRes, profilesRes, settingsRes, badgesRes, projectsRes, paymentsRes, walletsRes] = await Promise.all([
       supabase.from("staking_pools").select("*").order("created_at", { ascending: false }),
       supabase.from("stakes").select("*").order("staked_at", { ascending: false }),
       supabase.from("profiles").select("*").order("points", { ascending: false }),
@@ -74,6 +74,7 @@ const Admin = () => {
       supabase.from("badges").select("*"),
       supabase.from("project_accounts").select("*").order("created_at", { ascending: false }),
       supabase.from("project_payments").select("*").order("created_at", { ascending: false }),
+      supabase.from("platform_wallets").select("*").order("created_at", { ascending: false }),
     ]);
     setPools(poolsRes.data || []);
     setStakes(stakesRes.data || []);
@@ -82,6 +83,7 @@ const Admin = () => {
     setBadges(badgesRes.data || []);
     setProjects(projectsRes.data || []);
     setPayments(paymentsRes.data || []);
+    setWallets(walletsRes.data || []);
   }, []);
 
   // ─── Pool CRUD ───
