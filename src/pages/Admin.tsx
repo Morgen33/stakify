@@ -39,6 +39,7 @@ const Admin = () => {
   const [earlyUnlocks, setEarlyUnlocks] = useState<any[]>([]);
   const [projectRewards, setProjectRewards] = useState<any[]>([]);
   const [editingPool, setEditingPool] = useState<string | null>(null);
+  const [editPoolData, setEditPoolData] = useState<any>({});
 
   const [newPool, setNewPool] = useState({
     project_name: "", apy: "45", lock_period_days: "30", reward_token: "", platform_fee_pct: "2.5", project_account_id: "",
