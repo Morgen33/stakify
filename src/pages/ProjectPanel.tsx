@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Layers, Settings, Users, DollarSign, RefreshCw,
   Save, Calculator, FileText, AlertTriangle, CreditCard,
-  Eye
+  Eye, Gift, Send, Image
 } from "lucide-react";
 import {
   Tooltip,
