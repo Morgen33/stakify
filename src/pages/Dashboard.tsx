@@ -1,0 +1,254 @@
+import { useEffect, useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useWallet } from "@/contexts/WalletContext";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Layers, TrendingUp, Trophy, Coins, Gift, HelpCircle,
+  Clock, Unlock, Lock, RefreshCw, ExternalLink, Zap
+} from "lucide-react";
+import { motion } from "framer-motion";
+import WalletModal from "@/components/WalletModal";
+import { Badge } from "@/components/ui/badge";
+
+const Dashboard = () => {
+  const { user, loading } = useAuth();
+  const { isConnected, shortAddress, address } = useWallet();
+  const navigate = useNavigate();
+
+  const [profile, setProfile] = useState<any>(null);
+  const [stakes, setStakes] = useState<any[]>([]);
+  const [pools, setPools] = useState<any[]>([]);
+  const [badges, setBadges] = useState<any[]>([]);
+  const [userBadges, setUserBadges] = useState<any[]>([]);
+  const [loadingData, setLoadingData] = useState(true);
+
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate("/auth", { replace: true });
+      return;
+    }
+    if (user) fetchAll();
+  }, [user, loading]);
+
+  const fetchAll = async () => {
+    setLoadingData(true);
+    const [profileRes, stakesRes, poolsRes, badgesRes, userBadgesRes] = await Promise.all([
+      supabase.from("profiles").select("*").eq("user_id", user!.id).maybeSingle(),
+      supabase.from("stakes").select("*").eq("user_id", user!.id).order("staked_at", { ascending: false }),
+      supabase.from("staking_pools").select("*"),
+      supabase.from("badges").select("*"),
+      supabase.from("user_badges").select("*, badges(*)").eq("user_id", user!.id),
+    ]);
+    setProfile(profileRes.data);
+    setStakes(stakesRes.data || []);
+    setPools(poolsRes.data || []);
+    setBadges(badgesRes.data || []);
+    setUserBadges(userBadgesRes.data || []);
+    setLoadingData(false);
+  };
+
+  const getPool = (poolId: string) => pools.find(p => p.id === poolId);
+
+  if (loading) return null;
+
+  const activeStakes = stakes.filter(s => s.status === "active");
+  const totalStaked = stakes.reduce((sum, s) => sum + Number(s.amount), 0);
+  const totalRewards = stakes.reduce((sum, s) => sum + Number(s.rewards_earned), 0);
+
+  return (
+    <div className="min-h-screen bg-background bg-grid">
+      <nav className="border-b border-border bg-card/80 backdrop-blur-md sticky top-0 z-50">
+        <div className="container max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Layers className="w-5 h-5 text-primary" />
+            <h2 className="font-display text-xl text-primary tracking-widest text-glow-cyan">
+              MY DASHBOARD
+            </h2>
+          </div>
+          <div className="flex items-center gap-3">
+            <WalletModal />
+            <Button variant="outline" size="sm" onClick={() => navigate("/")} className="font-display text-xs">
+              ← Home
+            </Button>
+          </div>
+        </div>
+      </nav>
+
+      <main className="container max-w-6xl mx-auto px-4 py-6 space-y-6">
+        {/* Profile Card */}
+        <motion.div
+          className="rounded-xl border border-border bg-card p-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <div className="flex items-center gap-6">
+            <div className="w-16 h-16 rounded-full bg-primary/10 border-2 border-primary/30 flex items-center justify-center text-2xl font-display text-primary">
+              {(profile?.display_name || "?")[0].toUpperCase()}
+            </div>
+            <div className="flex-1">
+              <h2 className="font-display text-xl text-foreground">{profile?.display_name || "Staker"}</h2>
+              <div className="flex items-center gap-4 mt-1">
+                <Badge variant="outline" className="border-accent/30 text-accent font-display text-xs">
+                  {profile?.rank || "Bronze"}
+                </Badge>
+                <span className="text-xs text-muted-foreground font-display">Level {profile?.level || 1}</span>
+                {isConnected && (
+                  <span className="text-xs text-primary font-display">{shortAddress}</span>
+                )}
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="font-display text-3xl text-primary">{profile?.points || 0}</p>
+              <p className="text-[10px] text-muted-foreground font-display tracking-wider">TOTAL POINTS</p>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Quick Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {[
+            { label: "Active Stakes", value: activeStakes.length, icon: Zap, color: "text-primary" },
+            { label: "Total Staked", value: totalStaked, icon: Layers, color: "text-accent" },
+            { label: "Rewards Earned", value: totalRewards.toFixed(4), icon: TrendingUp, color: "text-neon-green" },
+            { label: "Badges", value: userBadges.length, icon: Trophy, color: "text-neon-gold" },
+          ].map((stat) => (
+            <div key={stat.label} className="rounded-lg border border-border bg-card p-4 text-center">
+              <stat.icon className={`w-5 h-5 mx-auto mb-2 ${stat.color}`} />
+              <p className="font-display text-xl text-foreground">{stat.value}</p>
+              <p className="text-[10px] text-muted-foreground font-display tracking-wide">{stat.label}</p>
+            </div>
+          ))}
+        </div>
+
+        <Tabs defaultValue="stakes">
+          <TabsList className="bg-card border border-border mb-4">
+            <TabsTrigger value="stakes" className="font-display gap-1.5 text-xs"><Layers className="w-3.5 h-3.5" /> My Stakes</TabsTrigger>
+            <TabsTrigger value="rewards" className="font-display gap-1.5 text-xs"><Coins className="w-3.5 h-3.5" /> Rewards</TabsTrigger>
+            <TabsTrigger value="badges" className="font-display gap-1.5 text-xs"><Trophy className="w-3.5 h-3.5" /> Badges</TabsTrigger>
+          </TabsList>
+
+          {/* Stakes */}
+          <TabsContent value="stakes" className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="font-display text-sm text-foreground tracking-wider">YOUR STAKING POSITIONS</h3>
+              <Button variant="ghost" size="sm" onClick={fetchAll} className="text-xs">
+                <RefreshCw className="w-3 h-3 mr-1" /> Refresh
+              </Button>
+            </div>
+            {stakes.length === 0 ? (
+              <div className="rounded-lg border border-border bg-card p-12 text-center">
+                <Layers className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+                <p className="font-display text-sm text-muted-foreground">No stakes yet</p>
+                <p className="text-xs text-muted-foreground mt-1">Head to the dashboard to stake in a pool!</p>
+                <Button variant="outline" size="sm" className="mt-4 font-display" onClick={() => navigate("/")}>
+                  Browse Pools
+                </Button>
+              </div>
+            ) : (
+              stakes.map((stake) => {
+                const pool = getPool(stake.pool_id);
+                const isLocked = stake.unlock_at && new Date(stake.unlock_at) > new Date();
+                return (
+                  <motion.div
+                    key={stake.id}
+                    className={`rounded-lg border p-4 ${
+                      stake.status === "active"
+                        ? "border-primary/30 bg-primary/5"
+                        : stake.status === "emergency_unlocked"
+                        ? "border-destructive/30 bg-destructive/5"
+                        : "border-border bg-card"
+                    }`}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        {isLocked ? <Lock className="w-4 h-4 text-accent" /> : <Unlock className="w-4 h-4 text-primary" />}
+                        <div>
+                          <p className="font-display text-sm text-foreground">{pool?.project_name || "Unknown Pool"}</p>
+                          <div className="flex items-center gap-3 text-[11px] text-muted-foreground mt-0.5">
+                            <span>Amount: <strong className="text-foreground">{stake.amount}</strong></span>
+                            <span>Rewards: <strong className="text-neon-green">{Number(stake.rewards_earned).toFixed(4)}</strong></span>
+                            {pool && <span>Token: <strong className="text-accent">{pool.reward_token}</strong></span>}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <Badge variant="outline" className={`text-[10px] font-display ${
+                          stake.status === "active" ? "border-primary/30 text-primary" :
+                          stake.status === "emergency_unlocked" ? "border-destructive/30 text-destructive" :
+                          "border-border text-muted-foreground"
+                        }`}>
+                          {stake.status.toUpperCase().replace("_", " ")}
+                        </Badge>
+                        {stake.unlock_at && (
+                          <p className="text-[10px] text-muted-foreground mt-1 flex items-center gap-1 justify-end">
+                            <Clock className="w-3 h-3" />
+                            {isLocked
+                              ? `Unlocks ${new Date(stake.unlock_at).toLocaleDateString()}`
+                              : "Unlocked"
+                            }
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })
+            )}
+          </TabsContent>
+
+          {/* Rewards */}
+          <TabsContent value="rewards">
+            <div className="rounded-lg border border-border bg-card p-6 text-center">
+              <TrendingUp className="w-10 h-10 text-neon-green mx-auto mb-3" />
+              <p className="font-display text-3xl text-neon-green">{totalRewards.toFixed(4)}</p>
+              <p className="text-xs text-muted-foreground font-display mt-1 tracking-wider">TOTAL REWARDS EARNED</p>
+              <p className="text-[10px] text-muted-foreground mt-4 max-w-md mx-auto">
+                Rewards accumulate from your staking positions. They are distributed according to each pool's APY and your staking duration.
+                A platform fee is deducted before distribution.
+              </p>
+            </div>
+          </TabsContent>
+
+          {/* Badges */}
+          <TabsContent value="badges">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {badges.map((badge) => {
+                const earned = userBadges.some((ub: any) => ub.badge_id === badge.id);
+                return (
+                  <div
+                    key={badge.id}
+                    className={`rounded-lg border p-4 text-center ${
+                      earned ? "border-accent/30 bg-accent/5" : "border-border bg-card opacity-40"
+                    }`}
+                  >
+                    <span className="text-3xl">{badge.icon || "🏆"}</span>
+                    <p className="font-display text-xs text-foreground mt-2">{badge.name}</p>
+                    <p className="text-[10px] text-muted-foreground mt-1">{badge.description}</p>
+                    {earned ? (
+                      <Badge variant="outline" className="mt-2 text-[9px] border-accent/30 text-accent">EARNED</Badge>
+                    ) : (
+                      <Badge variant="outline" className="mt-2 text-[9px] border-border text-muted-foreground">LOCKED</Badge>
+                    )}
+                  </div>
+                );
+              })}
+              {badges.length === 0 && (
+                <div className="col-span-full text-center py-8 text-muted-foreground text-sm">
+                  No badges available yet. Check back soon!
+                </div>
+              )}
+            </div>
+          </TabsContent>
+        </Tabs>
+      </main>
+    </div>
+  );
+};
+
+export default Dashboard;

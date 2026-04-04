@@ -71,24 +71,9 @@ const Index = () => {
             STAKEFORGE
           </h2>
           <div className="flex items-center gap-6">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-body">Dashboard</a>
-              </TooltipTrigger>
-              <TooltipContent>View your personal staking dashboard with all your active positions.</TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-body">Pools</a>
-              </TooltipTrigger>
-              <TooltipContent>Browse all available staking pools from verified projects.</TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-body">Leaderboard</a>
-              </TooltipTrigger>
-              <TooltipContent>See top stakers and compete for badges and rewards.</TooltipContent>
-            </Tooltip>
+            <Link to="/dashboard" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-body">Dashboard</Link>
+            <a href="#pools" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-body">Pools</a>
+            <a href="#leaderboard" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-body">Leaderboard</a>
             <Link to="/arcade" className="text-sm text-accent hover:text-accent/80 transition-colors font-display">Arcade</Link>
             <Tooltip>
               <TooltipTrigger asChild>
