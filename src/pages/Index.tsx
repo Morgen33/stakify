@@ -17,6 +17,7 @@ import DisclaimerBanner from "@/components/DisclaimerBanner";
 import StartupDisclaimer from "@/components/StartupDisclaimer";
 import WalletModal from "@/components/WalletModal";
 import WelcomeSplash from "@/components/WelcomeSplash";
+import SeasonalBanner from "@/components/SeasonalBanner";
 
 const Index = () => {
   const { user, isAdmin, isOperator, signOut } = useAuth();
