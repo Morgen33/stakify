@@ -32,6 +32,7 @@ const Admin = () => {
   const [badges, setBadges] = useState<any[]>([]);
   const [projects, setProjects] = useState<any[]>([]);
   const [payments, setPayments] = useState<any[]>([]);
+  const [wallets, setWallets] = useState<any[]>([]);
   const [editingPool, setEditingPool] = useState<string | null>(null);
   const [editPoolData, setEditPoolData] = useState<any>({});
 
@@ -47,6 +48,7 @@ const Admin = () => {
   const [newPayment, setNewPayment] = useState({
     project_id: "", amount: "", currency: "ETH", payment_type: "platform_fee", status: "pending", notes: "", due_date: "",
   });
+  const [newWallet, setNewWallet] = useState({ label: "", address: "", wallet_type: "primary", notes: "" });
 
   // Calculator
   const [calcStakers, setCalcStakers] = useState("100");
@@ -64,7 +66,7 @@ const Admin = () => {
   }, [isAdmin]);
 
   const fetchAll = useCallback(async () => {
-    const [poolsRes, stakesRes, profilesRes, settingsRes, badgesRes, projectsRes, paymentsRes] = await Promise.all([
+    const [poolsRes, stakesRes, profilesRes, settingsRes, badgesRes, projectsRes, paymentsRes, walletsRes] = await Promise.all([
       supabase.from("staking_pools").select("*").order("created_at", { ascending: false }),
       supabase.from("stakes").select("*").order("staked_at", { ascending: false }),
       supabase.from("profiles").select("*").order("points", { ascending: false }),
@@ -72,6 +74,7 @@ const Admin = () => {
       supabase.from("badges").select("*"),
       supabase.from("project_accounts").select("*").order("created_at", { ascending: false }),
       supabase.from("project_payments").select("*").order("created_at", { ascending: false }),
+      supabase.from("platform_wallets").select("*").order("created_at", { ascending: false }),
     ]);
     setPools(poolsRes.data || []);
     setStakes(stakesRes.data || []);
@@ -80,6 +83,7 @@ const Admin = () => {
     setBadges(badgesRes.data || []);
     setProjects(projectsRes.data || []);
     setPayments(paymentsRes.data || []);
+    setWallets(walletsRes.data || []);
   }, []);
 
   // ─── Pool CRUD ───
@@ -240,6 +244,45 @@ const Admin = () => {
     toast({ title: "✅ Marked as paid" }); fetchAll();
   };
 
+  // ─── Wallets ───
+  const createWallet = async () => {
+    if (!newWallet.label || !newWallet.address) {
+      toast({ title: "Missing fields", description: "Label and address required.", variant: "destructive" }); return;
+    }
+    const { error } = await supabase.from("platform_wallets").insert({
+      ...newWallet, created_by: user?.id,
+      is_active: wallets.length === 0,
+    });
+    if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
+    else {
+      logAction("Wallet created", { label: newWallet.label, type: newWallet.wallet_type });
+      toast({ title: "✅ Wallet added" });
+      setNewWallet({ label: "", address: "", wallet_type: "primary", notes: "" });
+      fetchAll();
+    }
+  };
+
+  const setActiveWallet = async (id: string) => {
+    if (!window.confirm("⚠️ Switch the active receiving wallet? All future fees will go to this wallet.")) return;
+    // Deactivate all first
+    for (const w of wallets) {
+      if (w.is_active) await supabase.from("platform_wallets").update({ is_active: false }).eq("id", w.id);
+    }
+    await supabase.from("platform_wallets").update({ is_active: true }).eq("id", id);
+    const wallet = wallets.find(w => w.id === id);
+    logAction("Active wallet switched", { wallet_id: id, label: wallet?.label, address: wallet?.address });
+    toast({ title: "🔄 Active wallet switched" }); fetchAll();
+  };
+
+  const deleteWallet = async (id: string) => {
+    const wallet = wallets.find(w => w.id === id);
+    if (wallet?.is_active) { toast({ title: "Cannot delete active wallet", variant: "destructive" }); return; }
+    if (!window.confirm("Delete this wallet?")) return;
+    await supabase.from("platform_wallets").delete().eq("id", id);
+    logAction("Wallet deleted", { wallet_id: id });
+    toast({ title: "Wallet deleted" }); fetchAll();
+  };
+
   // Calculator
   const calcResults = () => {
     const s = parseInt(calcStakers) || 0, a = parseFloat(calcAvgStake) || 0;
@@ -302,6 +345,7 @@ const Admin = () => {
             <TabsTrigger value="stakes" className="font-display gap-1.5 text-xs"><Lock className="w-3.5 h-3.5" /> Stakes</TabsTrigger>
             <TabsTrigger value="users" className="font-display gap-1.5 text-xs"><Users className="w-3.5 h-3.5" /> Users</TabsTrigger>
             <TabsTrigger value="fees" className="font-display gap-1.5 text-xs"><DollarSign className="w-3.5 h-3.5" /> Fees</TabsTrigger>
+            <TabsTrigger value="wallets" className="font-display gap-1.5 text-xs"><Wallet className="w-3.5 h-3.5" /> Wallets</TabsTrigger>
             <TabsTrigger value="badges" className="font-display gap-1.5 text-xs"><Award className="w-3.5 h-3.5" /> Badges</TabsTrigger>
             <TabsTrigger value="calculator" className="font-display gap-1.5 text-xs"><Calculator className="w-3.5 h-3.5" /> Calculator</TabsTrigger>
             <TabsTrigger value="battlelog" className="font-display gap-1.5 text-xs text-primary"><ScrollText className="w-3.5 h-3.5" /> Battle Log</TabsTrigger>
@@ -649,6 +693,112 @@ const Admin = () => {
                 <Input placeholder="Key" value={newSettingKey} onChange={(e) => setNewSettingKey(e.target.value)} className="bg-background border-border text-xs" />
                 <Input placeholder="Value" value={newSettingValue} onChange={(e) => setNewSettingValue(e.target.value)} className="bg-background border-border text-xs" />
                 <Button onClick={createSetting} size="sm" className="bg-primary text-primary-foreground font-display text-xs"><Plus className="w-3 h-3 mr-1" /> Add</Button>
+              </div>
+            </div>
+          </TabsContent>
+
+          {/* ═══ WALLETS ═══ */}
+          <TabsContent value="wallets" className="space-y-6">
+            <div className="rounded-lg border border-accent/20 bg-accent/5 p-4 flex items-start gap-3">
+              <Wallet className="w-5 h-5 text-accent shrink-0 mt-0.5" />
+              <div>
+                <p className="font-display text-sm text-accent">Wallet Management</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Your platform fee ({`10%`}) goes directly to the <strong className="text-foreground">active wallet</strong>.
+                  Keep a backup wallet ready — you can switch instantly in an emergency.
+                </p>
+              </div>
+            </div>
+
+            {/* Active wallet highlight */}
+            {wallets.filter(w => w.is_active).map(w => (
+              <div key={w.id} className="rounded-lg border-2 border-primary/40 bg-primary/5 p-5 box-glow-cyan">
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="w-3 h-3 rounded-full bg-primary animate-pulse" />
+                  <span className="font-display text-sm text-primary tracking-wider">ACTIVE RECEIVING WALLET</span>
+                </div>
+                <p className="font-display text-lg text-foreground tracking-wider">{w.label}</p>
+                <code className="text-xs text-primary/80 break-all">{w.address}</code>
+                {w.notes && <p className="text-[10px] text-muted-foreground mt-1">{w.notes}</p>}
+              </div>
+            ))}
+            {wallets.filter(w => w.is_active).length === 0 && (
+              <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-4 text-center">
+                <AlertTriangle className="w-5 h-5 text-destructive mx-auto mb-2" />
+                <p className="font-display text-sm text-destructive">NO ACTIVE WALLET SET</p>
+                <p className="text-xs text-muted-foreground mt-1">Add a wallet and activate it below.</p>
+              </div>
+            )}
+
+            {/* Add wallet */}
+            <div className="rounded-lg border border-border bg-card p-6">
+              <h3 className="font-display text-sm text-foreground mb-4 tracking-wider flex items-center gap-2">
+                <Plus className="w-4 h-4 text-primary" /> ADD WALLET
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <Input placeholder="Label (e.g. Main Wallet)" value={newWallet.label} onChange={(e) => setNewWallet({ ...newWallet, label: e.target.value })} className="bg-secondary border-border text-sm" />
+                <Input placeholder="Wallet Address (0x...)" value={newWallet.address} onChange={(e) => setNewWallet({ ...newWallet, address: e.target.value })} className="bg-secondary border-border text-sm font-mono" />
+                <select value={newWallet.wallet_type} onChange={(e) => setNewWallet({ ...newWallet, wallet_type: e.target.value })} className="bg-secondary border border-border rounded-md text-sm text-foreground px-3">
+                  <option value="primary">Primary</option>
+                  <option value="backup">Backup</option>
+                  <option value="emergency">Emergency</option>
+                </select>
+                <Input placeholder="Notes (optional)" value={newWallet.notes} onChange={(e) => setNewWallet({ ...newWallet, notes: e.target.value })} className="bg-secondary border-border text-sm" />
+              </div>
+              <Button onClick={createWallet} className="mt-3 bg-primary text-primary-foreground font-display text-xs box-glow-cyan">
+                <Plus className="w-3.5 h-3.5 mr-1" /> Add Wallet
+              </Button>
+            </div>
+
+            {/* All wallets */}
+            <div className="rounded-lg border border-border bg-card p-6">
+              <h3 className="font-display text-sm text-foreground mb-4 tracking-wider">ALL WALLETS ({wallets.length})</h3>
+              <div className="space-y-3">
+                {wallets.map((w) => (
+                  <div key={w.id} className={`rounded-lg border p-4 ${w.is_active ? "border-primary/30 bg-primary/5" : "border-border bg-secondary/30"}`}>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-3">
+                        <span className={`w-2 h-2 rounded-full ${w.is_active ? "bg-primary animate-pulse" : "bg-muted-foreground"}`} />
+                        <span className="font-display text-sm text-foreground">{w.label}</span>
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full border font-display ${
+                          w.wallet_type === "primary" ? "border-primary/30 text-primary" :
+                          w.wallet_type === "backup" ? "border-accent/30 text-accent" :
+                          "border-destructive/30 text-destructive"
+                        }`}>{w.wallet_type.toUpperCase()}</span>
+                        {w.is_active && <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-display">ACTIVE</span>}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        {!w.is_active && (
+                          <Tooltip><TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setActiveWallet(w.id)}>
+                              <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
+                            </Button>
+                          </TooltipTrigger><TooltipContent>Set as Active</TooltipContent></Tooltip>
+                        )}
+                        <Tooltip><TooltipTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => deleteWallet(w.id)}>
+                            <Trash2 className="w-3.5 h-3.5 text-destructive" />
+                          </Button>
+                        </TooltipTrigger><TooltipContent>Delete</TooltipContent></Tooltip>
+                      </div>
+                    </div>
+                    <code className="text-xs text-muted-foreground break-all font-mono">{w.address}</code>
+                    {w.notes && <p className="text-[10px] text-muted-foreground mt-1">{w.notes}</p>}
+                  </div>
+                ))}
+                {wallets.length === 0 && <p className="text-muted-foreground text-sm text-center py-8">No wallets configured.</p>}
+              </div>
+            </div>
+
+            {/* Emergency switch */}
+            <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-4 flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-destructive shrink-0 mt-0.5" />
+              <div>
+                <p className="font-display text-sm text-destructive">EMERGENCY WALLET SWITCH</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  If you suspect your active wallet is compromised, immediately activate a backup wallet above.
+                  All future fee collections will redirect to the new active wallet. This action is logged in the Battle Log.
+                </p>
               </div>
             </div>
           </TabsContent>

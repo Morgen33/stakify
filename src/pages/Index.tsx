@@ -19,7 +19,7 @@ const stakingPools = [
 ];
 
 const Index = () => {
-  const { user, isAdmin, signOut } = useAuth();
+  const { user, isAdmin, isOperator, signOut } = useAuth();
 
   return (
     <div className="min-h-screen bg-background">
@@ -36,6 +36,11 @@ const Index = () => {
             <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-body">Leaderboard</a>
             <Link to="/arcade" className="text-sm text-accent hover:text-accent/80 transition-colors font-display">Arcade</Link>
             <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-body">Docs</a>
+            {isOperator && !isAdmin && (
+              <Link to="/operator" className="text-sm text-accent hover:text-accent/80 transition-colors font-display">
+                Operator
+              </Link>
+            )}
             {isAdmin && (
               <Link to="/admin" className="text-sm text-neon-green hover:text-neon-green/80 transition-colors font-display">
                 Admin

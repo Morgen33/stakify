@@ -104,6 +104,42 @@ export type Database = {
         }
         Relationships: []
       }
+      platform_wallets: {
+        Row: {
+          address: string
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean
+          label: string
+          notes: string | null
+          updated_at: string
+          wallet_type: string
+        }
+        Insert: {
+          address: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          label: string
+          notes?: string | null
+          updated_at?: string
+          wallet_type?: string
+        }
+        Update: {
+          address?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          label?: string
+          notes?: string | null
+          updated_at?: string
+          wallet_type?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -429,7 +465,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "user" | "project_owner"
+      app_role: "admin" | "user" | "project_owner" | "operator"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -557,7 +593,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "user", "project_owner"],
+      app_role: ["admin", "user", "project_owner", "operator"],
     },
   },
 } as const
