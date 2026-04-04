@@ -8,7 +8,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Layers, TrendingUp, Trophy, Coins, Gift, HelpCircle,
-  Clock, Unlock, Lock, RefreshCw, ExternalLink, Zap, Image, CheckCircle2, Gamepad2, AlertTriangle, DollarSign
+  Clock, Unlock, Lock, RefreshCw, ExternalLink, Zap, Image, CheckCircle2, Gamepad2, AlertTriangle, DollarSign, ArrowLeftRight, Sparkles
 } from "lucide-react";
 import { motion } from "framer-motion";
 import WalletModal from "@/components/WalletModal";
@@ -183,6 +183,7 @@ const Dashboard = () => {
             <TabsTrigger value="rewards" className="font-display gap-1.5 text-xs"><Coins className="w-3.5 h-3.5" /> Rewards</TabsTrigger>
             <TabsTrigger value="badges" className="font-display gap-1.5 text-xs"><Trophy className="w-3.5 h-3.5" /> Badges</TabsTrigger>
             <TabsTrigger value="arcade" className="font-display gap-1.5 text-xs"><Gamepad2 className="w-3.5 h-3.5" /> Arcade</TabsTrigger>
+            <TabsTrigger value="swap" className="font-display gap-1.5 text-xs relative"><ArrowLeftRight className="w-3.5 h-3.5" /> Swap <span className="ml-1 px-1.5 py-0.5 rounded-full bg-accent/20 text-accent text-[8px] font-display">SOON</span></TabsTrigger>
           </TabsList>
 
           {/* Stakes */}
@@ -426,6 +427,43 @@ const Dashboard = () => {
                 <Gamepad2 className="w-3.5 h-3.5 mr-1.5" /> Go to Arcade
               </Button>
             </div>
+          </TabsContent>
+          {/* ── Swap (Coming Soon) ── */}
+          <TabsContent value="swap">
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="rounded-xl border border-border bg-card p-8 text-center space-y-6">
+              <div className="mx-auto w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
+                <ArrowLeftRight className="w-10 h-10 text-primary" />
+              </div>
+              <div>
+                <h3 className="font-display text-2xl text-foreground tracking-wider flex items-center justify-center gap-2">
+                  TOKEN SWAP <Sparkles className="w-5 h-5 text-accent animate-pulse" />
+                </h3>
+                <p className="text-muted-foreground mt-2 max-w-md mx-auto text-sm leading-relaxed">
+                  A brand new, intuitive way to swap tokens — right from your dashboard. 
+                  Trade across chains with lightning speed and ultra-low fees that are barely noticeable.
+                </p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-lg mx-auto">
+                <div className="rounded-lg border border-border bg-secondary/30 p-4">
+                  <Zap className="w-5 h-5 text-accent mx-auto mb-1" />
+                  <p className="font-display text-xs text-foreground">Instant Swaps</p>
+                  <p className="text-[10px] text-muted-foreground">Cross-chain routing</p>
+                </div>
+                <div className="rounded-lg border border-border bg-secondary/30 p-4">
+                  <DollarSign className="w-5 h-5 text-primary mx-auto mb-1" />
+                  <p className="font-display text-xs text-foreground">Micro Fees</p>
+                  <p className="text-[10px] text-muted-foreground">Fractions of a penny</p>
+                </div>
+                <div className="rounded-lg border border-border bg-secondary/30 p-4">
+                  <TrendingUp className="w-5 h-5 text-accent mx-auto mb-1" />
+                  <p className="font-display text-xs text-foreground">Best Rates</p>
+                  <p className="text-[10px] text-muted-foreground">DEX aggregation</p>
+                </div>
+              </div>
+              <Badge variant="outline" className="font-display text-xs border-accent/40 text-accent px-4 py-1.5 animate-pulse">
+                🚀 COMING SOON — Something big is brewing
+              </Badge>
+            </motion.div>
           </TabsContent>
         </Tabs>
       </main>
