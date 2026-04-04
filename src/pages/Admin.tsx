@@ -423,6 +423,13 @@ const Admin = () => {
             <TabsTrigger value="emergency" className="font-display gap-1.5 text-xs text-destructive"><AlertTriangle className="w-3.5 h-3.5" /> Emergency</TabsTrigger>
             <TabsTrigger value="features" className="font-display gap-1.5 text-xs text-neon-purple"><Power className="w-3.5 h-3.5" /> Features</TabsTrigger>
             <TabsTrigger value="livealerts" className="font-display gap-1.5 text-xs text-neon-green"><Zap className="w-3.5 h-3.5 animate-pulse" /> Live Alerts</TabsTrigger>
+            <TabsTrigger value="earlyunlocks" className="font-display gap-1.5 text-xs text-accent relative">
+              <Unlock className="w-3.5 h-3.5" /> Early Unlocks
+              {earlyUnlocks.filter(r => r.status === "pending").length > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-accent text-[9px] text-accent-foreground flex items-center justify-center font-display">{earlyUnlocks.filter(r => r.status === "pending").length}</span>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="kickbacks" className="font-display gap-1.5 text-xs text-neon-gold"><Award className="w-3.5 h-3.5" /> Kickbacks</TabsTrigger>
           </TabsList>
 
           {/* ═══ POOLS ═══ */}
