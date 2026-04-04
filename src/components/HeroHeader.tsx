@@ -6,9 +6,10 @@ import heroBg from "@/assets/hero-bg.jpg";
 
 const HeroHeader = () => {
   return (
-    <div className="relative overflow-hidden rounded-xl border border-border bg-card p-8">
-      {/* Grid overlay */}
-      <div className="absolute inset-0 bg-grid opacity-30" />
+    <div className="relative overflow-hidden rounded-xl border border-border bg-card">
+      {/* Hero background */}
+      <img src={heroBg} alt="" className="absolute inset-0 w-full h-full object-cover opacity-30" width={1920} height={800} />
+      <div className="relative p-8">
 
       {/* Glow effects */}
       <div className="absolute top-0 left-1/4 w-64 h-64 bg-primary/10 rounded-full blur-[100px]" />
