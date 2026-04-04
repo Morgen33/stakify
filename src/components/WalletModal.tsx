@@ -8,6 +8,8 @@ import { useToast } from "@/hooks/use-toast";
 
 const walletOptions = [
   { name: "MetaMask", icon: "🦊", key: "metamask", action: "connectMetaMask" as const, tip: "Most popular EVM wallet. Works on desktop and mobile browsers." },
+  { name: "Phantom", icon: "👻", key: "phantom", action: "connectGenericEVM" as const, providerKey: "isPhantom", tip: "Multi-chain wallet popular in Solana & EVM ecosystems." },
+  { name: "Backpack", icon: "🎒", key: "backpack", action: "connectGenericEVM" as const, providerKey: "isBackpack", tip: "xNFT-powered wallet for Solana & EVM. Built for power users." },
   { name: "Coinbase Wallet", icon: "🔵", key: "coinbase", action: "connectCoinbase" as const, tip: "Coinbase's self-custody wallet. Great for beginners." },
   { name: "WalletConnect", icon: "🔗", key: "walletconnect", action: "connectWalletConnect" as const, tip: "Connect any mobile wallet by scanning a QR code." },
   { name: "Browser Wallet", icon: "🌐", key: "injected", action: "connectGenericEVM" as const, tip: "Use whatever wallet extension is installed in your browser." },
