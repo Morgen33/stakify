@@ -53,6 +53,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         } else {
           setIsAdmin(false);
           setIsOperator(false);
+          setIsMaster(false);
         }
         setLoading(false);
       }
