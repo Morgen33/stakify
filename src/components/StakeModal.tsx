@@ -208,13 +208,15 @@ const StakeModal = ({ poolName, apy, rewardToken, lockPeriodDays, platformFeePct
             </div>
             <div className="flex justify-between text-[10px]">
               <span className="text-muted-foreground/60 flex items-center gap-1">
-                Platform micro-fee
+                Network maintenance
                 <Tooltip>
                   <TooltipTrigger><HelpCircle className="w-2.5 h-2.5" /></TooltipTrigger>
-                  <TooltipContent>A fixed $0.12 USDC equivalent is charged on every stake and unstake action (converted to ETH or SOL at current market rate). This fee goes to the platform admin and is non-negotiable.</TooltipContent>
+                  <TooltipContent className="max-w-xs">
+                    <p className="text-xs">A small maintenance fee keeps the platform running, secure, and continuously improved — including leaderboard tracking, badge systems, arcade access, and real-time monitoring that protect your assets 24/7.</p>
+                  </TooltipContent>
                 </Tooltip>
               </span>
-              <span className="text-muted-foreground/60">${PLATFORM_MICRO_FEE_USDC} per action</span>
+              <span className="text-muted-foreground/60">${PLATFORM_MICRO_FEE_USDC}</span>
             </div>
           </div>
 
