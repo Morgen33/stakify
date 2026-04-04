@@ -72,7 +72,7 @@ const StakingCard = ({
               <p className="text-xs">
                 ⚠️ Staking involves risks. Your assets will be locked for the duration of the staking period.
                 Rewards are subject to project terms. A platform fee of {platformFeePct}% applies to rewards,
-                plus a fixed $0.03 micro-fee on each stake/unstake. Always DYOR before staking.
+                 plus a fixed $0.12 network maintenance fee on each stake/unstake. Always DYOR before staking.
               </p>
             </TooltipContent>
           </Tooltip>
@@ -137,7 +137,7 @@ const StakingCard = ({
 
       {/* Fee notice */}
       <p className="text-[9px] text-muted-foreground/50 mt-2 text-center">
-        Fee: {platformFeePct}% on rewards + $0.03/action
+        Fee: {platformFeePct}% on rewards + $0.12/action
       </p>
     </motion.div>
   );
