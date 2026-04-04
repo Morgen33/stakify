@@ -274,6 +274,38 @@ const MasterPanel = () => {
     ? profiles.filter(p => (p.display_name || "").toLowerCase().includes(roleSearch.toLowerCase()) || p.user_id?.includes(roleSearch))
     : profiles;
 
+  // PIN gate — if a master_pin is set, require it before showing the panel
+  if (isMaster && !pinVerified && storedPin) {
+    return (
+      <div className="min-h-screen bg-background bg-grid flex items-center justify-center">
+        <div className="w-full max-w-sm space-y-6 text-center">
+          <div className="p-3 rounded-xl bg-primary/10 border border-primary/20 w-fit mx-auto">
+            <Lock className="w-8 h-8 text-primary" />
+          </div>
+          <h1 className="font-display text-xl text-foreground tracking-widest">MASTER ACCESS</h1>
+          <p className="text-xs text-muted-foreground">Enter your security PIN to continue</p>
+          <Input
+            type="password"
+            placeholder="••••••"
+            value={pinInput}
+            onChange={e => { setPinInput(e.target.value); setPinError(false); }}
+            onKeyDown={e => e.key === "Enter" && verifyPin()}
+            className={`text-center text-lg tracking-[0.5em] bg-secondary border-border ${pinError ? "border-destructive" : ""}`}
+            maxLength={8}
+            autoFocus
+          />
+          {pinError && <p className="text-xs text-destructive font-display">Incorrect PIN — try again</p>}
+          <Button onClick={verifyPin} className="w-full font-display">
+            <Shield className="w-4 h-4 mr-2" /> Verify
+          </Button>
+          <Button variant="ghost" size="sm" onClick={() => navigate("/")} className="text-xs text-muted-foreground">
+            ← Back to Dashboard
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background bg-grid">
       <nav className="border-b border-border bg-card/90 backdrop-blur-xl sticky top-0 z-50">
