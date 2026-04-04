@@ -78,6 +78,8 @@ const Index = () => {
             <a href="#leaderboard" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-body">Leaderboard</a>
             <Link to="/arcade" className="text-sm text-accent hover:text-accent/80 transition-colors font-display">Arcade</Link>
             <Link to="/raffle" className="text-sm text-neon-purple hover:text-neon-purple/80 transition-colors font-display">Raffle</Link>
+            <Link to="/pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-body">Pricing</Link>
+            <Link to="/about" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-body">About</Link>
             <Tooltip>
               <TooltipTrigger asChild>
                 <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-body">Docs</a>
@@ -86,7 +88,7 @@ const Index = () => {
             </Tooltip>
             {isOperator && !isAdmin && (
               <Link to="/operator" className="text-sm text-accent hover:text-accent/80 transition-colors font-display">
-                Operator
+                Command Center
               </Link>
             )}
             {isAdmin && (
