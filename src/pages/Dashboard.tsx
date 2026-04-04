@@ -428,6 +428,43 @@ const Dashboard = () => {
               </Button>
             </div>
           </TabsContent>
+          {/* ── Swap (Coming Soon) ── */}
+          <TabsContent value="swap">
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="rounded-xl border border-border bg-card p-8 text-center space-y-6">
+              <div className="mx-auto w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
+                <ArrowLeftRight className="w-10 h-10 text-primary" />
+              </div>
+              <div>
+                <h3 className="font-display text-2xl text-foreground tracking-wider flex items-center justify-center gap-2">
+                  TOKEN SWAP <Sparkles className="w-5 h-5 text-accent animate-pulse" />
+                </h3>
+                <p className="text-muted-foreground mt-2 max-w-md mx-auto text-sm leading-relaxed">
+                  A brand new, intuitive way to swap tokens — right from your dashboard. 
+                  Trade across chains with lightning speed and ultra-low fees that are barely noticeable.
+                </p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-lg mx-auto">
+                <div className="rounded-lg border border-border bg-secondary/30 p-4">
+                  <Zap className="w-5 h-5 text-accent mx-auto mb-1" />
+                  <p className="font-display text-xs text-foreground">Instant Swaps</p>
+                  <p className="text-[10px] text-muted-foreground">Cross-chain routing</p>
+                </div>
+                <div className="rounded-lg border border-border bg-secondary/30 p-4">
+                  <DollarSign className="w-5 h-5 text-primary mx-auto mb-1" />
+                  <p className="font-display text-xs text-foreground">Micro Fees</p>
+                  <p className="text-[10px] text-muted-foreground">Fractions of a penny</p>
+                </div>
+                <div className="rounded-lg border border-border bg-secondary/30 p-4">
+                  <TrendingUp className="w-5 h-5 text-accent mx-auto mb-1" />
+                  <p className="font-display text-xs text-foreground">Best Rates</p>
+                  <p className="text-[10px] text-muted-foreground">DEX aggregation</p>
+                </div>
+              </div>
+              <Badge variant="outline" className="font-display text-xs border-accent/40 text-accent px-4 py-1.5 animate-pulse">
+                🚀 COMING SOON — Something big is brewing
+              </Badge>
+            </motion.div>
+          </TabsContent>
         </Tabs>
       </main>
     </div>
