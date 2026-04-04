@@ -32,6 +32,7 @@ const Admin = () => {
   const [badges, setBadges] = useState<any[]>([]);
   const [projects, setProjects] = useState<any[]>([]);
   const [payments, setPayments] = useState<any[]>([]);
+  const [wallets, setWallets] = useState<any[]>([]);
   const [editingPool, setEditingPool] = useState<string | null>(null);
   const [editPoolData, setEditPoolData] = useState<any>({});
 
