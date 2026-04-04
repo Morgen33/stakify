@@ -149,6 +149,15 @@ const Admin = () => {
     else { toast({ title: "🔓 Stake unlocked" }); fetchAll(); }
   };
 
+  const emergencyUnlockAll = async (poolId: string) => {
+    if (!window.confirm("🚨 CRITICAL: Unlock ALL stakes in this pool?")) return;
+    const poolStakes = stakes.filter((s) => s.pool_id === poolId && s.status === "active");
+    for (const s of poolStakes) {
+      await supabase.from("stakes").update({ status: "emergency_unlocked", unlock_at: new Date().toISOString() }).eq("id", s.id);
+    }
+    toast({ title: `🔓 ${poolStakes.length} stakes unlocked` }); fetchAll();
+  };
+
   // ─── Process Early Unlock Request ───
   const processEarlyUnlock = async (request: any, approved: boolean) => {
     if (approved) {
