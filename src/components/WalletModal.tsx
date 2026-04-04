@@ -25,14 +25,14 @@ const WalletModal = ({ trigger }: WalletModalProps) => {
   const [showChains, setShowChains] = useState(false);
   const { toast } = useToast();
 
-  const handleConnect = async (action: typeof walletOptions[number]["action"]) => {
+  const handleConnect = async (wallet: typeof walletOptions[number]) => {
     try {
-      if (action === "connectMetaMask") await connectMetaMask();
-      else if (action === "connectCoinbase") await connectCoinbase();
-      else if (action === "connectWalletConnect") await connectWalletConnect();
-      else await connectGenericEVM("isMetaMask");
+      if (wallet.action === "connectMetaMask") await connectMetaMask();
+      else if (wallet.action === "connectCoinbase") await connectCoinbase();
+      else if (wallet.action === "connectWalletConnect") await connectWalletConnect();
+      else await connectGenericEVM((wallet as any).providerKey || "isMetaMask");
       setOpen(false);
-      toast({ title: "🔗 Wallet Connected", description: "You're now connected to StakeForge." });
+      toast({ title: "🔗 Wallet Connected", description: "You're now connected." });
     } catch (err: any) {
       toast({ title: "Connection Failed", description: err.message, variant: "destructive" });
     }
