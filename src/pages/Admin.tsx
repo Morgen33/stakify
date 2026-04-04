@@ -304,6 +304,7 @@ const Admin = () => {
             <TabsTrigger value="fees" className="font-display gap-1.5 text-xs"><DollarSign className="w-3.5 h-3.5" /> Fees</TabsTrigger>
             <TabsTrigger value="badges" className="font-display gap-1.5 text-xs"><Award className="w-3.5 h-3.5" /> Badges</TabsTrigger>
             <TabsTrigger value="calculator" className="font-display gap-1.5 text-xs"><Calculator className="w-3.5 h-3.5" /> Calculator</TabsTrigger>
+            <TabsTrigger value="battlelog" className="font-display gap-1.5 text-xs text-primary"><ScrollText className="w-3.5 h-3.5" /> Battle Log</TabsTrigger>
             <TabsTrigger value="emergency" className="font-display gap-1.5 text-xs text-destructive"><AlertTriangle className="w-3.5 h-3.5" /> Emergency</TabsTrigger>
           </TabsList>
 
