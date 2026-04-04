@@ -290,6 +290,34 @@ const Admin = () => {
     toast({ title: "Wallet deleted" }); fetchAll();
   };
 
+  // ─── Admin Airdrop ───
+  const adminSendAirdrop = async () => {
+    if (!adminAirdrop.recipient_user_id || !adminAirdrop.asset_name) {
+      toast({ title: "Missing fields", description: "Select a recipient and enter asset name.", variant: "destructive" }); return;
+    }
+    const insertData: any = {
+      recipient_user_id: adminAirdrop.recipient_user_id,
+      airdrop_type: adminAirdrop.airdrop_type,
+      asset_name: adminAirdrop.asset_name,
+      asset_image_url: adminAirdrop.asset_image_url || null,
+      amount: parseFloat(adminAirdrop.amount) || 1,
+      message: adminAirdrop.message || null,
+      status: "pending",
+      project_account_id: adminAirdrop.project_account_id || projects[0]?.id,
+    };
+    if (!insertData.project_account_id) {
+      toast({ title: "No project", description: "Create a project account first to link airdrops.", variant: "destructive" }); return;
+    }
+    const { error } = await supabase.from("airdrops").insert(insertData);
+    if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
+    else {
+      toast({ title: "🎁 Airdrop sent!" });
+      setAdminAirdrop({ recipient_user_id: "", airdrop_type: "token", asset_name: "", asset_image_url: "", amount: "1", message: "", project_account_id: "" });
+      setAirdropSearch("");
+      fetchAll();
+    }
+  };
+
   // Calculator
   const calcResults = () => {
     const s = parseInt(calcStakers) || 0, a = parseFloat(calcAvgStake) || 0;
