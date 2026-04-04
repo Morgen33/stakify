@@ -9,6 +9,7 @@ import TopNFTProjects from "@/components/TopNFTProjects";
 import BadgesPanel from "@/components/BadgesPanel";
 import ReferralPanel from "@/components/ReferralPanel";
 import DisclaimerBanner from "@/components/DisclaimerBanner";
+import StartupDisclaimer from "@/components/StartupDisclaimer";
 
 const stakingPools = [
   { projectName: "Bored Ape Yacht Club", apy: 45, totalStaked: 1243, yourStake: 0, lockPeriod: "30 Days", rewardToken: "$APE", status: "active" as const },
@@ -22,6 +23,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <StartupDisclaimer />
       {/* Nav */}
       <nav className="border-b border-border bg-card/80 backdrop-blur-md sticky top-0 z-50">
         <div className="container max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
