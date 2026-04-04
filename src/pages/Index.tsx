@@ -144,7 +144,7 @@ const Index = () => {
                 </Tooltip>
               </h2>
               <span className="text-xs text-muted-foreground font-body">
-                Platform fee: variable per pool + $0.03/action
+                Earn dual rewards on every stake ✨
               </span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
