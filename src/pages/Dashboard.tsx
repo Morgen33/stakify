@@ -62,6 +62,25 @@ const Dashboard = () => {
     else { toast({ title: "🎁 Airdrop claimed!" }); fetchAll(); }
   };
 
+  const requestEarlyUnlock = async (stake: any) => {
+    const pool = getPool(stake.pool_id);
+    if (!pool) return;
+    const feePct = pool.early_unlock_fee_pct || 5;
+    const feeAmount = (Number(stake.amount) * feePct / 100).toFixed(4);
+    if (!window.confirm(`⚠️ Early unlock fee: ${feeAmount} (${feePct}% of staked amount) will be charged. This goes to the platform admin and operator. Proceed?`)) return;
+    const { error } = await supabase.from("early_unlock_requests").insert({
+      stake_id: stake.id,
+      user_id: user!.id,
+      pool_id: stake.pool_id,
+      fee_amount: parseFloat(feeAmount),
+      fee_currency: "ETH",
+      admin_share: parseFloat(feeAmount) * 0.5,
+      operator_share: parseFloat(feeAmount) * 0.5,
+    });
+    if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
+    else toast({ title: "🔓 Early unlock requested!", description: "The admin will process your request shortly." });
+  };
+
   const getPool = (poolId: string) => pools.find(p => p.id === poolId);
 
   if (loading) return null;
