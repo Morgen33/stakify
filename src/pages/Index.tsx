@@ -19,7 +19,7 @@ const stakingPools = [
 ];
 
 const Index = () => {
-  const { user, isAdmin, signOut } = useAuth();
+  const { user, isAdmin, isOperator, signOut } = useAuth();
 
   return (
     <div className="min-h-screen bg-background">
