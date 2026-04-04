@@ -173,9 +173,9 @@ const About = () => {
                   </div>
                 ) : (
                   <>
-                    <h3 className="font-display text-lg text-foreground mb-1">{founder.name}</h3>
+                    <h3 className="font-display text-lg text-foreground mb-1">{founder.name || <span className="text-muted-foreground italic">Name not set</span>}</h3>
                     <p className="text-xs text-accent font-display tracking-wider mb-3">{founder.title}</p>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{founder.bio}</p>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{founder.bio || <span className="italic">Bio coming soon — check back later!</span>}</p>
                   </>
                 )}
               </div>
