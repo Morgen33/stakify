@@ -244,6 +244,45 @@ const Admin = () => {
     toast({ title: "✅ Marked as paid" }); fetchAll();
   };
 
+  // ─── Wallets ───
+  const createWallet = async () => {
+    if (!newWallet.label || !newWallet.address) {
+      toast({ title: "Missing fields", description: "Label and address required.", variant: "destructive" }); return;
+    }
+    const { error } = await supabase.from("platform_wallets").insert({
+      ...newWallet, created_by: user?.id,
+      is_active: wallets.length === 0,
+    });
+    if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
+    else {
+      logAction("Wallet created", { label: newWallet.label, type: newWallet.wallet_type });
+      toast({ title: "✅ Wallet added" });
+      setNewWallet({ label: "", address: "", wallet_type: "primary", notes: "" });
+      fetchAll();
+    }
+  };
+
+  const setActiveWallet = async (id: string) => {
+    if (!window.confirm("⚠️ Switch the active receiving wallet? All future fees will go to this wallet.")) return;
+    // Deactivate all first
+    for (const w of wallets) {
+      if (w.is_active) await supabase.from("platform_wallets").update({ is_active: false }).eq("id", w.id);
+    }
+    await supabase.from("platform_wallets").update({ is_active: true }).eq("id", id);
+    const wallet = wallets.find(w => w.id === id);
+    logAction("Active wallet switched", { wallet_id: id, label: wallet?.label, address: wallet?.address });
+    toast({ title: "🔄 Active wallet switched" }); fetchAll();
+  };
+
+  const deleteWallet = async (id: string) => {
+    const wallet = wallets.find(w => w.id === id);
+    if (wallet?.is_active) { toast({ title: "Cannot delete active wallet", variant: "destructive" }); return; }
+    if (!window.confirm("Delete this wallet?")) return;
+    await supabase.from("platform_wallets").delete().eq("id", id);
+    logAction("Wallet deleted", { wallet_id: id });
+    toast({ title: "Wallet deleted" }); fetchAll();
+  };
+
   // Calculator
   const calcResults = () => {
     const s = parseInt(calcStakers) || 0, a = parseFloat(calcAvgStake) || 0;
