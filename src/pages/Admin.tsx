@@ -970,6 +970,11 @@ const Admin = () => {
               </div>
             </div>
           </TabsContent>
+
+          {/* ═══ LIVE ALERTS ═══ */}
+          <TabsContent value="livealerts">
+            <LiveAlertsPanel maxAlerts={100} />
+          </TabsContent>
         </Tabs>
       </main>
     </div>
