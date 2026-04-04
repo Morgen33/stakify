@@ -87,17 +87,49 @@ const ProjectPanel = () => {
     setPools(fetchedPools);
     setPayments(paymentsRes.data || []);
 
-    // Fetch stakes for these pools
+    // Fetch stakes for these pools + airdrops
     if (fetchedPools.length > 0) {
       const poolIds = fetchedPools.map((p: any) => p.id);
-      const { data: stakesData } = await supabase
-        .from("stakes")
-        .select("*")
-        .in("pool_id", poolIds);
-      setStakes(stakesData || []);
+      const [stakesRes2, airdropsRes] = await Promise.all([
+        supabase.from("stakes").select("*").in("pool_id", poolIds),
+        supabase.from("airdrops").select("*").eq("project_account_id", projData.id).order("created_at", { ascending: false }),
+      ]);
+      setStakes(stakesRes2.data || []);
+      setAirdrops(airdropsRes.data || []);
+      // Get unique staker user IDs for the dropdown
+      const userIds = [...new Set((stakesRes2.data || []).map((s: any) => s.user_id))];
+      if (userIds.length > 0) {
+        const { data: profilesData } = await supabase.from("profiles").select("user_id, display_name").in("user_id", userIds);
+        setStakers(profilesData || []);
+      }
+    } else {
+      const { data: airdropsRes } = await supabase.from("airdrops").select("*").eq("project_account_id", projData.id).order("created_at", { ascending: false });
+      setAirdrops(airdropsRes || []);
     }
     setLoadingData(false);
   }, [user]);
+
+  const sendAirdrop = async () => {
+    if (!project || !newAirdrop.recipient_user_id || !newAirdrop.asset_name) {
+      toast({ title: "Missing fields", description: "Recipient and asset name are required.", variant: "destructive" }); return;
+    }
+    const { error } = await supabase.from("airdrops").insert({
+      project_account_id: project.id,
+      recipient_user_id: newAirdrop.recipient_user_id,
+      airdrop_type: newAirdrop.airdrop_type,
+      asset_name: newAirdrop.asset_name,
+      asset_image_url: newAirdrop.asset_image_url || null,
+      amount: parseFloat(newAirdrop.amount) || 1,
+      message: newAirdrop.message || null,
+      status: "pending",
+    });
+    if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
+    else {
+      toast({ title: "🎁 Airdrop sent!" });
+      setNewAirdrop({ recipient_user_id: "", airdrop_type: "token", asset_name: "", asset_image_url: "", amount: "1", message: "" });
+      fetchAll();
+    }
+  };
 
   const updateProjectInfo = async (field: string, value: string) => {
     if (!project) return;
