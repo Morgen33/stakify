@@ -347,7 +347,7 @@ const MasterPanel = () => {
 
       <main className="container max-w-7xl mx-auto px-4 pb-10">
         <Tabs defaultValue="wallets">
-          <TabsList className="bg-card border border-border mb-6 flex-wrap">
+          <TabsList className="bg-card border border-border mb-6 flex-wrap h-auto gap-1 p-2">
             <TabsTrigger value="wallets" className="font-display gap-1.5 text-xs"><Wallet className="w-3.5 h-3.5" /> My Wallets</TabsTrigger>
             <TabsTrigger value="fees" className="font-display gap-1.5 text-xs"><DollarSign className="w-3.5 h-3.5" /> Fee Control</TabsTrigger>
             <TabsTrigger value="waivers" className="font-display gap-1.5 text-xs"><UserX className="w-3.5 h-3.5" /> Fee Waivers</TabsTrigger>
