@@ -36,7 +36,8 @@ const Admin = () => {
   const [projects, setProjects] = useState<any[]>([]);
   const [payments, setPayments] = useState<any[]>([]);
   const [wallets, setWallets] = useState<any[]>([]);
-  const [editingPool, setEditingPool] = useState<string | null>(null);
+  const [earlyUnlocks, setEarlyUnlocks] = useState<any[]>([]);
+  const [projectRewards, setProjectRewards] = useState<any[]>([]);
   const [editPoolData, setEditPoolData] = useState<any>({});
 
   const [newPool, setNewPool] = useState({
