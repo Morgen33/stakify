@@ -312,6 +312,11 @@ const OperatorPanel = () => {
               <BattleLog />
             </div>
           </TabsContent>
+
+          {/* Features */}
+          <TabsContent value="features">
+            <FeatureToggles />
+          </TabsContent>
         </Tabs>
       </main>
     </div>

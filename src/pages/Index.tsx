@@ -152,6 +152,17 @@ const Index = () => {
           {/* Right column */}
           <div className="lg:col-span-3 space-y-6">
             <Leaderboard />
+
+            {/* Raffle Promo Box */}
+            <Link to="/raffle" className="block">
+              <div className="rounded-xl border border-neon-purple/20 bg-gradient-to-br from-neon-purple/5 to-accent/5 p-5 text-center hover:border-neon-purple/40 transition-colors">
+                <span className="text-3xl mb-2 block">🎟️</span>
+                <p className="font-display text-sm text-foreground tracking-wider mb-1">RAFFLE HOUSE</p>
+                <p className="text-[10px] text-neon-purple font-display tracking-widest mb-2">COMING SOON</p>
+                <p className="text-[10px] text-muted-foreground">Win NFTs, tokens & ETH. Buy tickets with ETH, USDC, or SOL!</p>
+              </div>
+            </Link>
+
             <ReferralPanel />
           </div>
         </div>
