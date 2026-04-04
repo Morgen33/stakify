@@ -18,6 +18,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import BattleLog from "@/components/BattleLog";
+import LiveAlertsPanel from "@/components/LiveAlertsPanel";
 import { logAction } from "@/lib/activity-logger";
 
 const Admin = () => {
