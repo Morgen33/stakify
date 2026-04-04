@@ -26,6 +26,10 @@ const MasterPanel = () => {
   const { toast } = useToast();
 
   const [isMaster, setIsMaster] = useState(false);
+  const [pinVerified, setPinVerified] = useState(false);
+  const [pinInput, setPinInput] = useState("");
+  const [storedPin, setStoredPin] = useState<string | null>(null);
+  const [pinError, setPinError] = useState(false);
   const [masterWallets, setMasterWallets] = useState<any[]>([]);
   const [feeWaivers, setFeeWaivers] = useState<any[]>([]);
   const [profiles, setProfiles] = useState<any[]>([]);
@@ -41,14 +45,6 @@ const MasterPanel = () => {
   const [raffles, setRaffles] = useState<any[]>([]);
   const [earlyUnlocks, setEarlyUnlocks] = useState<any[]>([]);
 
-  const [newMasterWallet, setNewMasterWallet] = useState({ label: "", address: "", wallet_purpose: "fee_collection", notes: "" });
-  const [newWaiver, setNewWaiver] = useState({ user_id: "", project_account_id: "", waiver_type: "full", reason: "" });
-  const [waiverSearch, setWaiverSearch] = useState("");
-  const [newSettingKey, setNewSettingKey] = useState("");
-  const [newSettingValue, setNewSettingValue] = useState("");
-  const [roleSearch, setRoleSearch] = useState("");
-  const [assignRole, setAssignRole] = useState({ user_id: "", role: "admin" });
-
   useEffect(() => {
     if (!loading && !user) { navigate("/auth", { replace: true }); return; }
     if (user) checkAccess();
@@ -60,7 +56,27 @@ const MasterPanel = () => {
       .eq("user_id", user!.id).eq("role", "master").maybeSingle();
     if (!data) { navigate("/", { replace: true }); return; }
     setIsMaster(true);
+    // Fetch master PIN from platform_settings
+    const { data: pinSetting } = await supabase
+      .from("platform_settings").select("value")
+      .eq("key", "master_pin").maybeSingle();
+    if (pinSetting?.value) {
+      setStoredPin(pinSetting.value);
+    } else {
+      // No PIN set yet — skip PIN gate
+      setPinVerified(true);
+    }
     fetchAll();
+  };
+
+  const verifyPin = () => {
+    if (pinInput === storedPin) {
+      setPinVerified(true);
+      setPinError(false);
+    } else {
+      setPinError(true);
+      setPinInput("");
+    }
   };
 
   const fetchAll = useCallback(async () => {
