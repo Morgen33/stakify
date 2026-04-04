@@ -86,6 +86,7 @@ const HeroHeader = () => {
           <p className="text-xs text-primary">Connect wallet to begin</p>
         </motion.div>
       </div>
+      </div>
     </div>
   );
 };
