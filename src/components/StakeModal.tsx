@@ -6,7 +6,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Badge } from "@/components/ui/badge";
 import { Lock, Unlock, HelpCircle, AlertTriangle, Zap, Shield } from "lucide-react";
 
-// Platform micro-fee: $0.03 USDC equivalent per stake/unstake — non-negotiable, goes to platform admin
+// Platform maintenance fee per stake/unstake action
 const PLATFORM_MICRO_FEE_USDC = 0.12;
 
 type StakeType = "soft" | "hard" | "flexible";
@@ -208,24 +208,31 @@ const StakeModal = ({ poolName, apy, rewardToken, lockPeriodDays, platformFeePct
             </div>
             <div className="flex justify-between text-[10px]">
               <span className="text-muted-foreground/60 flex items-center gap-1">
-                Platform micro-fee
+                Network maintenance
                 <Tooltip>
                   <TooltipTrigger><HelpCircle className="w-2.5 h-2.5" /></TooltipTrigger>
-                  <TooltipContent>A fixed $0.12 USDC equivalent is charged on every stake and unstake action (converted to ETH or SOL at current market rate). This fee goes to the platform admin and is non-negotiable.</TooltipContent>
+                  <TooltipContent className="max-w-xs">
+                    <p className="text-xs">A small maintenance fee keeps the platform running, secure, and continuously improved — including leaderboard tracking, badge systems, arcade access, and real-time monitoring that protect your assets 24/7.</p>
+                  </TooltipContent>
                 </Tooltip>
               </span>
-              <span className="text-muted-foreground/60">${PLATFORM_MICRO_FEE_USDC} per action</span>
+              <span className="text-muted-foreground/60">${PLATFORM_MICRO_FEE_USDC}</span>
             </div>
           </div>
 
-          {/* Disclaimer */}
+          {/* Value + Disclaimer */}
+          <div className="rounded-lg border border-primary/20 bg-primary/5 p-3 mb-1">
+            <div className="text-[10px] text-muted-foreground leading-relaxed">
+              <strong className="text-primary">WHAT YOU GET:</strong> Dual rewards (project + StakeForge points), leaderboard ranking, badge progression, arcade access, prize wheel spins, referral bonuses, and potential future airdrops — all included with every stake.
+            </div>
+          </div>
           <div className="rounded-lg border border-accent/20 bg-accent/5 p-3">
             <div className="flex items-start gap-2">
               <AlertTriangle className="w-4 h-4 text-accent shrink-0 mt-0.5" />
               <div className="text-[10px] text-muted-foreground leading-relaxed">
                 <strong className="text-accent">DISCLAIMER:</strong> Staking involves risk of loss. Rewards are estimates and may vary.
                 {stakeType === "hard" && " Hard-staked assets cannot be withdrawn early under any circumstances except platform emergency."}
-                {" "}A ${PLATFORM_MICRO_FEE_USDC} USDC equivalent platform fee (charged in ETH or SOL at current rate) applies to each stake/unstake action. All fees and terms are subject to change.
+                {" "}A small platform maintenance fee applies to each action to support security, infrastructure, and ongoing development. All fees and terms are subject to change.
                 By staking, you accept the Terms of Service.
               </div>
             </div>
