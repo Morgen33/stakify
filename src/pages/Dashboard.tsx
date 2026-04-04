@@ -8,22 +8,25 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Layers, TrendingUp, Trophy, Coins, Gift, HelpCircle,
-  Clock, Unlock, Lock, RefreshCw, ExternalLink, Zap
+  Clock, Unlock, Lock, RefreshCw, ExternalLink, Zap, Image, CheckCircle2
 } from "lucide-react";
 import { motion } from "framer-motion";
 import WalletModal from "@/components/WalletModal";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
 
 const Dashboard = () => {
   const { user, loading } = useAuth();
   const { isConnected, shortAddress, address } = useWallet();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const [profile, setProfile] = useState<any>(null);
   const [stakes, setStakes] = useState<any[]>([]);
   const [pools, setPools] = useState<any[]>([]);
   const [badges, setBadges] = useState<any[]>([]);
   const [userBadges, setUserBadges] = useState<any[]>([]);
+  const [airdrops, setAirdrops] = useState<any[]>([]);
   const [loadingData, setLoadingData] = useState(true);
 
   useEffect(() => {
@@ -36,19 +39,27 @@ const Dashboard = () => {
 
   const fetchAll = async () => {
     setLoadingData(true);
-    const [profileRes, stakesRes, poolsRes, badgesRes, userBadgesRes] = await Promise.all([
+    const [profileRes, stakesRes, poolsRes, badgesRes, userBadgesRes, airdropsRes] = await Promise.all([
       supabase.from("profiles").select("*").eq("user_id", user!.id).maybeSingle(),
       supabase.from("stakes").select("*").eq("user_id", user!.id).order("staked_at", { ascending: false }),
       supabase.from("staking_pools").select("*"),
       supabase.from("badges").select("*"),
       supabase.from("user_badges").select("*, badges(*)").eq("user_id", user!.id),
+      supabase.from("airdrops").select("*").eq("recipient_user_id", user!.id).order("created_at", { ascending: false }),
     ]);
     setProfile(profileRes.data);
     setStakes(stakesRes.data || []);
     setPools(poolsRes.data || []);
     setBadges(badgesRes.data || []);
     setUserBadges(userBadgesRes.data || []);
+    setAirdrops(airdropsRes.data || []);
     setLoadingData(false);
+  };
+
+  const claimAirdrop = async (id: string) => {
+    const { error } = await supabase.from("airdrops").update({ status: "claimed", claimed_at: new Date().toISOString() }).eq("id", id);
+    if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
+    else { toast({ title: "🎁 Airdrop claimed!" }); fetchAll(); }
   };
 
   const getPool = (poolId: string) => pools.find(p => p.id === poolId);
@@ -58,6 +69,7 @@ const Dashboard = () => {
   const activeStakes = stakes.filter(s => s.status === "active");
   const totalStaked = stakes.reduce((sum, s) => sum + Number(s.amount), 0);
   const totalRewards = stakes.reduce((sum, s) => sum + Number(s.rewards_earned), 0);
+  const pendingAirdrops = airdrops.filter(a => a.status === "pending");
 
   return (
     <div className="min-h-screen bg-background bg-grid">
@@ -108,13 +120,29 @@ const Dashboard = () => {
           </div>
         </motion.div>
 
+        {/* Airdrop Alert Banner */}
+        {pendingAirdrops.length > 0 && (
+          <motion.div
+            className="rounded-lg border border-accent/30 bg-accent/10 p-4 flex items-center gap-3 cursor-pointer"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+          >
+            <Gift className="w-6 h-6 text-accent animate-bounce" />
+            <div className="flex-1">
+              <p className="font-display text-sm text-accent">🎁 You have {pendingAirdrops.length} unclaimed airdrop{pendingAirdrops.length > 1 ? "s" : ""}!</p>
+              <p className="text-[10px] text-muted-foreground">Go to the Airdrops tab to claim your rewards</p>
+            </div>
+          </motion.div>
+        )}
+
         {/* Quick Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
           {[
             { label: "Active Stakes", value: activeStakes.length, icon: Zap, color: "text-primary" },
             { label: "Total Staked", value: totalStaked, icon: Layers, color: "text-accent" },
             { label: "Rewards Earned", value: totalRewards.toFixed(4), icon: TrendingUp, color: "text-neon-green" },
             { label: "Badges", value: userBadges.length, icon: Trophy, color: "text-neon-gold" },
+            { label: "Airdrops", value: pendingAirdrops.length, icon: Gift, color: pendingAirdrops.length > 0 ? "text-accent" : "text-muted-foreground" },
           ].map((stat) => (
             <div key={stat.label} className="rounded-lg border border-border bg-card p-4 text-center">
               <stat.icon className={`w-5 h-5 mx-auto mb-2 ${stat.color}`} />
@@ -127,6 +155,12 @@ const Dashboard = () => {
         <Tabs defaultValue="stakes">
           <TabsList className="bg-card border border-border mb-4">
             <TabsTrigger value="stakes" className="font-display gap-1.5 text-xs"><Layers className="w-3.5 h-3.5" /> My Stakes</TabsTrigger>
+            <TabsTrigger value="airdrops" className="font-display gap-1.5 text-xs relative">
+              <Gift className="w-3.5 h-3.5" /> Airdrops
+              {pendingAirdrops.length > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-accent text-[9px] text-accent-foreground flex items-center justify-center font-display">{pendingAirdrops.length}</span>
+              )}
+            </TabsTrigger>
             <TabsTrigger value="rewards" className="font-display gap-1.5 text-xs"><Coins className="w-3.5 h-3.5" /> Rewards</TabsTrigger>
             <TabsTrigger value="badges" className="font-display gap-1.5 text-xs"><Trophy className="w-3.5 h-3.5" /> Badges</TabsTrigger>
           </TabsList>
@@ -199,6 +233,83 @@ const Dashboard = () => {
                   </motion.div>
                 );
               })
+            )}
+          </TabsContent>
+
+          {/* Airdrops */}
+          <TabsContent value="airdrops" className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="font-display text-sm text-foreground tracking-wider">YOUR AIRDROPS</h3>
+              <Button variant="ghost" size="sm" onClick={fetchAll} className="text-xs">
+                <RefreshCw className="w-3 h-3 mr-1" /> Refresh
+              </Button>
+            </div>
+            {airdrops.length === 0 ? (
+              <div className="rounded-lg border border-border bg-card p-12 text-center">
+                <Gift className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+                <p className="font-display text-sm text-muted-foreground">No airdrops yet</p>
+                <p className="text-xs text-muted-foreground mt-1">Stake in pools to receive airdrops from projects!</p>
+              </div>
+            ) : (
+              airdrops.map((airdrop) => (
+                <motion.div
+                  key={airdrop.id}
+                  className={`rounded-lg border p-4 ${
+                    airdrop.status === "pending"
+                      ? "border-accent/30 bg-accent/5"
+                      : "border-border bg-card"
+                  }`}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  <div className="flex items-center gap-4">
+                    {/* Airdrop visual */}
+                    {airdrop.asset_image_url ? (
+                      <img src={airdrop.asset_image_url} alt={airdrop.asset_name} className="w-14 h-14 rounded-lg object-cover border-2 border-accent/20 shadow-lg" />
+                    ) : (
+                      <div className={`w-14 h-14 rounded-lg flex items-center justify-center border-2 ${
+                        airdrop.airdrop_type === "nft" ? "bg-purple-500/10 border-purple-500/20" :
+                        airdrop.airdrop_type === "token" ? "bg-primary/10 border-primary/20" :
+                        "bg-accent/10 border-accent/20"
+                      }`}>
+                        {airdrop.airdrop_type === "nft" ? (
+                          <Image className="w-6 h-6 text-purple-400" />
+                        ) : airdrop.airdrop_type === "token" ? (
+                          <Coins className="w-6 h-6 text-primary" />
+                        ) : (
+                          <Gift className="w-6 h-6 text-accent" />
+                        )}
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <p className="font-display text-sm text-foreground">{airdrop.asset_name}</p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded border font-display ${
+                          airdrop.airdrop_type === "nft" ? "border-purple-500/30 text-purple-400" :
+                          airdrop.airdrop_type === "token" ? "border-primary/30 text-primary" :
+                          "border-accent/30 text-accent"
+                        }`}>{airdrop.airdrop_type.toUpperCase()}</span>
+                        <span className="text-[10px] text-muted-foreground">Qty: {airdrop.amount}</span>
+                        <span className="text-[10px] text-muted-foreground">• {new Date(airdrop.created_at).toLocaleDateString()}</span>
+                      </div>
+                      {airdrop.message && (
+                        <p className="text-[11px] text-muted-foreground mt-1 italic">"{airdrop.message}"</p>
+                      )}
+                    </div>
+                    <div>
+                      {airdrop.status === "pending" ? (
+                        <Button size="sm" onClick={() => claimAirdrop(airdrop.id)} className="bg-accent text-accent-foreground font-display text-xs">
+                          <Gift className="w-3 h-3 mr-1" /> Claim
+                        </Button>
+                      ) : (
+                        <Badge variant="outline" className="border-primary/30 text-primary text-[10px] font-display">
+                          <CheckCircle2 className="w-3 h-3 mr-1" /> CLAIMED
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
+              ))
             )}
           </TabsContent>
 
