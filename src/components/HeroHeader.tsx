@@ -14,8 +14,9 @@ const HeroHeader = () => {
     <div className="relative overflow-hidden rounded-xl border border-border bg-card">
       <img src={heroBg} alt="" className="absolute inset-0 w-full h-full object-cover opacity-30" width={1920} height={800} />
       <div className="relative p-8">
-        <div className="absolute top-0 left-1/4 w-64 h-64 bg-primary/10 rounded-full blur-[100px]" />
-        <div className="absolute bottom-0 right-1/4 w-48 h-48 bg-neon-purple/10 rounded-full blur-[80px]" />
+        <div className="absolute top-0 left-1/4 w-64 h-64 bg-primary/10 rounded-full blur-[100px] animate-pulse" />
+        <div className="absolute bottom-0 right-1/4 w-48 h-48 bg-neon-purple/10 rounded-full blur-[80px] animate-pulse" style={{ animationDelay: "1s" }} />
+        <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-accent/5 rounded-full blur-[60px] animate-pulse" style={{ animationDelay: "2s" }} />
 
         <div className="relative flex flex-col lg:flex-row items-center justify-between gap-6">
           <div className="flex-1">
