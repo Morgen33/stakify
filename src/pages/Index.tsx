@@ -9,6 +9,7 @@ import TopNFTProjects from "@/components/TopNFTProjects";
 import BadgesPanel from "@/components/BadgesPanel";
 import ReferralPanel from "@/components/ReferralPanel";
 import DisclaimerBanner from "@/components/DisclaimerBanner";
+import StartupDisclaimer from "@/components/StartupDisclaimer";
 
 const stakingPools = [
   { projectName: "Bored Ape Yacht Club", apy: 45, totalStaked: 1243, yourStake: 0, lockPeriod: "30 Days", rewardToken: "$APE", status: "active" as const },
