@@ -244,6 +244,9 @@ const ProjectPanel = () => {
             <TabsTrigger value="payments" className="font-display gap-1.5 text-xs">
               <CreditCard className="w-3.5 h-3.5" /> Payments
             </TabsTrigger>
+            <TabsTrigger value="airdrops" className="font-display gap-1.5 text-xs">
+              <Gift className="w-3.5 h-3.5" /> Airdrops
+            </TabsTrigger>
             <TabsTrigger value="calculator" className="font-display gap-1.5 text-xs">
               <Calculator className="w-3.5 h-3.5" /> Calculator
             </TabsTrigger>
