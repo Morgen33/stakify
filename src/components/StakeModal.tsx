@@ -225,7 +225,7 @@ const StakeModal = ({ poolName, apy, rewardToken, lockPeriodDays, platformFeePct
               <div className="text-[10px] text-muted-foreground leading-relaxed">
                 <strong className="text-accent">DISCLAIMER:</strong> Staking involves risk of loss. Rewards are estimates and may vary.
                 {stakeType === "hard" && " Hard-staked assets cannot be withdrawn early under any circumstances except platform emergency."}
-                {" "}A ${PLATFORM_MICRO_FEE_USDC} USDC platform fee applies to each stake/unstake action. All fees and terms are subject to change.
+                {" "}A ${PLATFORM_MICRO_FEE_USDC} USDC equivalent platform fee (charged in ETH or SOL at current rate) applies to each stake/unstake action. All fees and terms are subject to change.
                 By staking, you accept the Terms of Service.
               </div>
             </div>
