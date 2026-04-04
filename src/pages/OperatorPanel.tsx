@@ -15,6 +15,7 @@ import {
   Tooltip, TooltipContent, TooltipTrigger,
 } from "@/components/ui/tooltip";
 import BattleLog from "@/components/BattleLog";
+import FeatureToggles from "@/components/FeatureToggles";
 
 const OperatorPanel = () => {
   const { user, loading } = useAuth();
