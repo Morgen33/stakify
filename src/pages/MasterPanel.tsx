@@ -190,20 +190,36 @@ const MasterPanel = () => {
     toast({ title: "Role removed" }); fetchAll();
   };
 
-  // ─── Take All Fees (override) ───
-  const setMasterFeeOverride = async (takesAll: boolean) => {
-    const existing = settings.find(s => s.key === "master_takes_all_fees");
+  // ─── Adjustable Network Fee ───
+  const currentFee = settings.find(s => s.key === "master_network_fee")?.value || "0.12";
+  
+  const updateNetworkFee = async (newFee: string) => {
+    const existing = settings.find(s => s.key === "master_network_fee");
     if (existing) {
-      await supabase.from("platform_settings").update({ value: takesAll ? "true" : "false" }).eq("id", existing.id);
+      await supabase.from("platform_settings").update({ value: newFee }).eq("id", existing.id);
     } else {
-      await supabase.from("platform_settings").insert({ key: "master_takes_all_fees", value: takesAll ? "true" : "false" });
+      await supabase.from("platform_settings").insert({ key: "master_network_fee", value: newFee });
     }
-    logAction("Master fee override", { takes_all: takesAll });
-    toast({ title: takesAll ? "💰 All fees routed to Master" : "Fees restored to normal split" });
+    logAction("Network fee updated", { new_fee: newFee });
+    toast({ title: `✅ Network fee updated to $${newFee}` });
     fetchAll();
   };
 
-  const masterTakesAll = settings.find(s => s.key === "master_takes_all_fees")?.value === "true";
+  // ─── Emergency Routing Toggle ───
+  const emergencyRoutingActive = settings.find(s => s.key === "emergency_routing_active")?.value === "true";
+
+  const toggleEmergencyRouting = async () => {
+    const newVal = !emergencyRoutingActive;
+    const existing = settings.find(s => s.key === "emergency_routing_active");
+    if (existing) {
+      await supabase.from("platform_settings").update({ value: newVal ? "true" : "false" }).eq("id", existing.id);
+    } else {
+      await supabase.from("platform_settings").insert({ key: "emergency_routing_active", value: newVal ? "true" : "false" });
+    }
+    logAction("Emergency routing toggled", { active: newVal });
+    toast({ title: newVal ? "🚨 Funds routing to EMERGENCY wallet" : "✅ Funds routing to normal wallet" });
+    fetchAll();
+  };
 
   if (loading || !isMaster) return null;
 
