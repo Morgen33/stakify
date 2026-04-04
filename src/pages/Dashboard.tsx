@@ -163,6 +163,7 @@ const Dashboard = () => {
             </TabsTrigger>
             <TabsTrigger value="rewards" className="font-display gap-1.5 text-xs"><Coins className="w-3.5 h-3.5" /> Rewards</TabsTrigger>
             <TabsTrigger value="badges" className="font-display gap-1.5 text-xs"><Trophy className="w-3.5 h-3.5" /> Badges</TabsTrigger>
+            <TabsTrigger value="arcade" className="font-display gap-1.5 text-xs"><Gamepad2 className="w-3.5 h-3.5" /> Arcade</TabsTrigger>
           </TabsList>
 
           {/* Stakes */}
