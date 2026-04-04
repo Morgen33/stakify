@@ -160,7 +160,7 @@ const WalletModal = ({ trigger }: WalletModalProps) => {
                 <Button
                   variant="outline"
                   className="w-full justify-start gap-3 h-14 font-display border-border hover:border-primary/40 hover:bg-primary/5 transition-all"
-                  onClick={() => handleConnect(w.action)}
+                  onClick={() => handleConnect(w)}
                   disabled={isConnecting}
                 >
                   <span className="text-2xl">{w.icon}</span>
