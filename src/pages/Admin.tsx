@@ -75,7 +75,7 @@ const Admin = () => {
   }, [isAdmin]);
 
   const fetchAll = useCallback(async () => {
-    const [poolsRes, stakesRes, profilesRes, settingsRes, badgesRes, projectsRes, paymentsRes, walletsRes, airdropsRes, earlyUnlocksRes, projectRewardsRes] = await Promise.all([
+    const [poolsRes, stakesRes, profilesRes, settingsRes, badgesRes, projectsRes, paymentsRes, walletsRes, airdropsRes, earlyUnlocksRes, projectRewardsRes, rafflesRes] = await Promise.all([
       supabase.from("staking_pools").select("*").order("created_at", { ascending: false }),
       supabase.from("stakes").select("*").order("staked_at", { ascending: false }),
       supabase.from("profiles").select("*").order("points", { ascending: false }),
@@ -87,6 +87,7 @@ const Admin = () => {
       supabase.from("airdrops").select("*").order("created_at", { ascending: false }),
       supabase.from("early_unlock_requests").select("*").order("requested_at", { ascending: false }),
       supabase.from("project_rewards").select("*").order("created_at", { ascending: false }),
+      supabase.from("raffles").select("*").order("created_at", { ascending: false }),
     ]);
     setPools(poolsRes.data || []);
     setStakes(stakesRes.data || []);
@@ -99,6 +100,7 @@ const Admin = () => {
     setAirdrops(airdropsRes.data || []);
     setEarlyUnlocks(earlyUnlocksRes.data || []);
     setProjectRewards(projectRewardsRes.data || []);
+    setRaffles(rafflesRes.data || []);
   }, []);
 
   // ─── Pool CRUD ───
