@@ -58,6 +58,13 @@ const Index = () => {
       <WelcomeSplash />
       <StartupDisclaimer />
       {/* Nav */}
+      {/* Beta banner */}
+      <div className="bg-primary/5 border-b border-primary/10 py-1.5 text-center">
+        <p className="text-[11px] text-muted-foreground font-body tracking-wide">
+          <span className="font-display text-primary/80 text-[10px] mr-1.5">BETA</span>
+          Platform is in early access — features &amp; fees are subject to change as we refine the experience.
+        </p>
+      </div>
       <nav className="border-b border-border bg-card/80 backdrop-blur-md sticky top-0 z-50">
         <div className="container max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
           <h2 className="font-display text-xl text-primary tracking-widest text-glow-cyan">
