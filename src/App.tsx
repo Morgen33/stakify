@@ -14,6 +14,7 @@ import ProjectPanel from "./pages/ProjectPanel.tsx";
 import ProjectPage from "./pages/ProjectPage.tsx";
 import OperatorPanel from "./pages/OperatorPanel.tsx";
 import Arcade from "./pages/Arcade.tsx";
+import Raffle from "./pages/Raffle.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -36,6 +37,7 @@ const App = () => (
                 <Route path="/project-panel" element={<ProjectPanel />} />
                 <Route path="/project/:slug" element={<ProjectPage />} />
                 <Route path="/arcade" element={<Arcade />} />
+                <Route path="/raffle" element={<Raffle />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

@@ -17,6 +17,7 @@ import DisclaimerBanner from "@/components/DisclaimerBanner";
 import StartupDisclaimer from "@/components/StartupDisclaimer";
 import WalletModal from "@/components/WalletModal";
 import WelcomeSplash from "@/components/WelcomeSplash";
+import SeasonalBanner from "@/components/SeasonalBanner";
 
 const Index = () => {
   const { user, isAdmin, isOperator, signOut } = useAuth();
@@ -57,6 +58,7 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <WelcomeSplash />
       <StartupDisclaimer />
+      <SeasonalBanner />
       {/* Nav */}
       {/* Beta banner */}
       <div className="bg-primary/5 border-b border-primary/10 py-1.5 text-center">
@@ -75,6 +77,7 @@ const Index = () => {
             <a href="#pools" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-body">Pools</a>
             <a href="#leaderboard" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-body">Leaderboard</a>
             <Link to="/arcade" className="text-sm text-accent hover:text-accent/80 transition-colors font-display">Arcade</Link>
+            <Link to="/raffle" className="text-sm text-neon-purple hover:text-neon-purple/80 transition-colors font-display">Raffle</Link>
             <Tooltip>
               <TooltipTrigger asChild>
                 <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-body">Docs</a>
@@ -149,6 +152,17 @@ const Index = () => {
           {/* Right column */}
           <div className="lg:col-span-3 space-y-6">
             <Leaderboard />
+
+            {/* Raffle Promo Box */}
+            <Link to="/raffle" className="block">
+              <div className="rounded-xl border border-neon-purple/20 bg-gradient-to-br from-neon-purple/5 to-accent/5 p-5 text-center hover:border-neon-purple/40 transition-colors">
+                <span className="text-3xl mb-2 block">🎟️</span>
+                <p className="font-display text-sm text-foreground tracking-wider mb-1">RAFFLE HOUSE</p>
+                <p className="text-[10px] text-neon-purple font-display tracking-widest mb-2">COMING SOON</p>
+                <p className="text-[10px] text-muted-foreground">Win NFTs, tokens & ETH. Buy tickets with ETH, USDC, or SOL!</p>
+              </div>
+            </Link>
+
             <ReferralPanel />
           </div>
         </div>

@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/tooltip";
 import BattleLog from "@/components/BattleLog";
 import LiveAlertsPanel from "@/components/LiveAlertsPanel";
+import FeatureToggles from "@/components/FeatureToggles";
 import { logAction } from "@/lib/activity-logger";
 
 const Admin = () => {
@@ -386,6 +387,7 @@ const Admin = () => {
             <TabsTrigger value="airdrops" className="font-display gap-1.5 text-xs text-accent"><Gift className="w-3.5 h-3.5" /> Airdrops</TabsTrigger>
             <TabsTrigger value="battlelog" className="font-display gap-1.5 text-xs text-primary"><ScrollText className="w-3.5 h-3.5" /> Battle Log</TabsTrigger>
             <TabsTrigger value="emergency" className="font-display gap-1.5 text-xs text-destructive"><AlertTriangle className="w-3.5 h-3.5" /> Emergency</TabsTrigger>
+            <TabsTrigger value="features" className="font-display gap-1.5 text-xs text-neon-purple"><Power className="w-3.5 h-3.5" /> Features</TabsTrigger>
             <TabsTrigger value="livealerts" className="font-display gap-1.5 text-xs text-neon-green"><Zap className="w-3.5 h-3.5 animate-pulse" /> Live Alerts</TabsTrigger>
           </TabsList>
 
@@ -1158,6 +1160,11 @@ const Admin = () => {
                 </div>
               </div>
             </div>
+          </TabsContent>
+
+          {/* ═══ FEATURES ═══ */}
+          <TabsContent value="features">
+            <FeatureToggles isAdmin={true} />
           </TabsContent>
 
           {/* ═══ LIVE ALERTS ═══ */}

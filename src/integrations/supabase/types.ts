@@ -343,6 +343,124 @@ export type Database = {
           },
         ]
       }
+      raffle_tickets: {
+        Row: {
+          created_at: string
+          currency: string
+          id: string
+          paid_amount: number
+          raffle_id: string
+          ticket_count: number
+          tx_hash: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          id?: string
+          paid_amount?: number
+          raffle_id: string
+          ticket_count?: number
+          tx_hash?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          id?: string
+          paid_amount?: number
+          raffle_id?: string
+          ticket_count?: number
+          tx_hash?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "raffle_tickets_raffle_id_fkey"
+            columns: ["raffle_id"]
+            isOneToOne: false
+            referencedRelation: "raffles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      raffles: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          currency: string
+          description: string | null
+          end_date: string | null
+          id: string
+          image_url: string | null
+          listing_fee: number
+          max_tickets: number
+          prize_description: string
+          prize_image_url: string | null
+          prize_type: string
+          project_account_id: string | null
+          start_date: string
+          status: string
+          ticket_price: number
+          tickets_sold: number
+          title: string
+          updated_at: string
+          winner_user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          image_url?: string | null
+          listing_fee?: number
+          max_tickets?: number
+          prize_description: string
+          prize_image_url?: string | null
+          prize_type?: string
+          project_account_id?: string | null
+          start_date?: string
+          status?: string
+          ticket_price?: number
+          tickets_sold?: number
+          title: string
+          updated_at?: string
+          winner_user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          image_url?: string | null
+          listing_fee?: number
+          max_tickets?: number
+          prize_description?: string
+          prize_image_url?: string | null
+          prize_type?: string
+          project_account_id?: string | null
+          start_date?: string
+          status?: string
+          ticket_price?: number
+          tickets_sold?: number
+          title?: string
+          updated_at?: string
+          winner_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "raffles_project_account_id_fkey"
+            columns: ["project_account_id"]
+            isOneToOne: false
+            referencedRelation: "project_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       referrals: {
         Row: {
           bonus_points: number

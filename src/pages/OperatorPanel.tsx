@@ -15,6 +15,7 @@ import {
   Tooltip, TooltipContent, TooltipTrigger,
 } from "@/components/ui/tooltip";
 import BattleLog from "@/components/BattleLog";
+import FeatureToggles from "@/components/FeatureToggles";
 
 const OperatorPanel = () => {
   const { user, loading } = useAuth();
@@ -142,6 +143,7 @@ const OperatorPanel = () => {
             <TabsTrigger value="users" className="font-display gap-1.5 text-xs"><Users className="w-3.5 h-3.5" /> Users</TabsTrigger>
             <TabsTrigger value="calculator" className="font-display gap-1.5 text-xs"><Calculator className="w-3.5 h-3.5" /> Calculator</TabsTrigger>
             <TabsTrigger value="battlelog" className="font-display gap-1.5 text-xs text-primary"><ScrollText className="w-3.5 h-3.5" /> Battle Log</TabsTrigger>
+            <TabsTrigger value="features" className="font-display gap-1.5 text-xs"><Settings className="w-3.5 h-3.5" /> Features</TabsTrigger>
           </TabsList>
 
           {/* Overview */}
@@ -309,6 +311,11 @@ const OperatorPanel = () => {
             <div className="rounded-lg border border-border bg-card p-6">
               <BattleLog />
             </div>
+          </TabsContent>
+
+          {/* Features */}
+          <TabsContent value="features">
+            <FeatureToggles />
           </TabsContent>
         </Tabs>
       </main>
