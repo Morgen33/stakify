@@ -104,7 +104,7 @@ const OperatorPanel = () => {
               <Shield className="w-5 h-5 text-accent" />
             </div>
             <h2 className="font-display text-lg text-foreground tracking-widest">
-              STAKEFORGE <span className="text-accent">OPERATOR</span>
+              STAKEFORGE <span className="text-accent">COMMAND CENTER</span>
             </h2>
           </div>
           <div className="flex items-center gap-3">
