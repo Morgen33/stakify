@@ -16,6 +16,7 @@ import ReferralPanel from "@/components/ReferralPanel";
 import DisclaimerBanner from "@/components/DisclaimerBanner";
 import StartupDisclaimer from "@/components/StartupDisclaimer";
 import WalletModal from "@/components/WalletModal";
+import WelcomeSplash from "@/components/WelcomeSplash";
 
 const Index = () => {
   const { user, isAdmin, isOperator, signOut } = useAuth();
