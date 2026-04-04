@@ -20,7 +20,7 @@ import WelcomeSplash from "@/components/WelcomeSplash";
 import SeasonalBanner from "@/components/SeasonalBanner";
 
 const Index = () => {
-  const { user, isAdmin, isOperator, signOut } = useAuth();
+  const { user, isAdmin, isOperator, isMaster, signOut } = useAuth();
   const { isConnected, shortAddress } = useWallet();
   const [pools, setPools] = useState<any[]>([]);
 
