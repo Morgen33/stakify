@@ -1212,6 +1212,176 @@ const Admin = () => {
           <TabsContent value="livealerts">
             <LiveAlertsPanel maxAlerts={100} />
           </TabsContent>
+
+          {/* ═══ EARLY UNLOCKS ═══ */}
+          <TabsContent value="earlyunlocks" className="space-y-6">
+            <div className="rounded-lg border border-accent/20 bg-accent/5 p-4 flex items-start gap-3">
+              <Unlock className="w-5 h-5 text-accent shrink-0 mt-0.5" />
+              <div>
+                <p className="font-display text-sm text-accent">Early Unlock Requests</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Users with locked stakes can request early unlocks for a fee. You (admin) are the <strong className="text-foreground">only one</strong> who can approve or reject these.
+                  Fees are split between admin and operator.
+                </p>
+              </div>
+            </div>
+
+            {/* Pending requests */}
+            <div className="rounded-lg border border-border bg-card p-6">
+              <h3 className="font-display text-sm text-foreground mb-4 tracking-wider">
+                PENDING REQUESTS ({earlyUnlocks.filter(r => r.status === "pending").length})
+              </h3>
+              <div className="space-y-3">
+                {earlyUnlocks.filter(r => r.status === "pending").map((req) => {
+                  const stake = stakes.find(s => s.id === req.stake_id);
+                  const pool = pools.find(p => p.id === req.pool_id);
+                  const requester = profiles.find(p => p.user_id === req.user_id);
+                  return (
+                    <div key={req.id} className="rounded-lg border border-accent/20 bg-accent/5 p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <div>
+                          <p className="font-display text-sm text-foreground">
+                            {requester?.display_name || req.user_id.slice(0, 10)} → {pool?.project_name || "Unknown Pool"}
+                          </p>
+                          <div className="flex gap-3 text-[11px] text-muted-foreground mt-1">
+                            <span>Staked: <strong className="text-foreground">{stake?.amount || "?"}</strong></span>
+                            <span>Fee: <strong className="text-accent">{req.fee_amount} {req.fee_currency}</strong></span>
+                            <span>Admin: <strong className="text-primary">{req.admin_share}</strong></span>
+                            <span>Operator: <strong className="text-foreground">{req.operator_share}</strong></span>
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button size="sm" onClick={() => processEarlyUnlock(req, true)} className="bg-primary text-primary-foreground font-display text-xs h-8">
+                            <CheckCircle2 className="w-3 h-3 mr-1" /> Approve
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={() => processEarlyUnlock(req, false)} className="border-destructive/30 text-destructive font-display text-xs h-8">
+                            <XCircle className="w-3 h-3 mr-1" /> Reject
+                          </Button>
+                        </div>
+                      </div>
+                      <p className="text-[10px] text-muted-foreground">Requested {new Date(req.requested_at).toLocaleString()}</p>
+                    </div>
+                  );
+                })}
+                {earlyUnlocks.filter(r => r.status === "pending").length === 0 && (
+                  <p className="text-muted-foreground text-sm text-center py-8">No pending early unlock requests.</p>
+                )}
+              </div>
+            </div>
+
+            {/* History */}
+            <div className="rounded-lg border border-border bg-card p-6">
+              <h3 className="font-display text-sm text-foreground mb-4 tracking-wider">ALL REQUESTS ({earlyUnlocks.length})</h3>
+              <div className="space-y-2">
+                {earlyUnlocks.map((req) => {
+                  const requester = profiles.find(p => p.user_id === req.user_id);
+                  const pool = pools.find(p => p.id === req.pool_id);
+                  return (
+                    <div key={req.id} className="flex items-center justify-between p-3 rounded-lg bg-secondary/30 border border-border">
+                      <div>
+                        <p className="font-display text-xs text-foreground">{requester?.display_name || req.user_id.slice(0, 10)} → {pool?.project_name || "?"}</p>
+                        <p className="text-[10px] text-muted-foreground">Fee: {req.fee_amount} {req.fee_currency} • {new Date(req.requested_at).toLocaleDateString()}</p>
+                      </div>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full border font-display ${
+                        req.status === "approved" ? "border-primary/30 text-primary" :
+                        req.status === "rejected" ? "border-destructive/30 text-destructive" :
+                        "border-accent/30 text-accent"
+                      }`}>{req.status.toUpperCase()}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </TabsContent>
+
+          {/* ═══ KICKBACKS ═══ */}
+          <TabsContent value="kickbacks" className="space-y-6">
+            <div className="rounded-lg border border-neon-gold/20 bg-neon-gold/5 p-4 flex items-start gap-3">
+              <Award className="w-5 h-5 text-neon-gold shrink-0 mt-0.5" />
+              <div>
+                <p className="font-display text-sm text-neon-gold">Project Revenue Kickbacks</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Reward projects that bring value to the platform — successful raffles, high staking volume, and community engagement.
+                  These rewards can be in points (future tokens) to incentivize growth.
+                </p>
+              </div>
+            </div>
+
+            {/* Award kickback */}
+            <div className="rounded-lg border border-border bg-card p-6">
+              <h3 className="font-display text-sm text-foreground mb-4 tracking-wider flex items-center gap-2">
+                <Gift className="w-4 h-4 text-neon-gold" /> AWARD KICKBACK
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                <select id="kickback-project" className="bg-secondary border border-border rounded-md text-sm text-foreground px-3">
+                  <option value="">Select project</option>
+                  {projects.filter(p => p.status === "active").map(p => (
+                    <option key={p.id} value={p.id}>{p.project_name}</option>
+                  ))}
+                </select>
+                <Input id="kickback-amount" type="number" placeholder="Points amount" className="bg-secondary border-border text-sm" />
+                <Input id="kickback-reason" placeholder="Reason (e.g. Raffle success)" className="bg-secondary border-border text-sm" />
+                <Button onClick={() => {
+                  const proj = (document.getElementById("kickback-project") as HTMLSelectElement)?.value;
+                  const amt = parseFloat((document.getElementById("kickback-amount") as HTMLInputElement)?.value) || 0;
+                  const reason = (document.getElementById("kickback-reason") as HTMLInputElement)?.value || "";
+                  if (proj && amt > 0) awardProjectKickback(proj, amt, reason);
+                }} className="bg-neon-gold/80 text-background font-display text-xs hover:bg-neon-gold">
+                  <Gift className="w-3.5 h-3.5 mr-1" /> Award
+                </Button>
+              </div>
+            </div>
+
+            {/* Kickback history */}
+            <div className="rounded-lg border border-border bg-card p-6">
+              <h3 className="font-display text-sm text-foreground mb-4 tracking-wider">KICKBACK HISTORY ({projectRewards.length})</h3>
+              <div className="space-y-2">
+                {projectRewards.map((r) => {
+                  const proj = projects.find(p => p.id === r.project_account_id);
+                  return (
+                    <div key={r.id} className="flex items-center justify-between p-3 rounded-lg bg-secondary/30 border border-border">
+                      <div>
+                        <p className="font-display text-xs text-foreground">{proj?.project_name || "Unknown"}</p>
+                        <p className="text-[10px] text-muted-foreground">{r.reason || "No reason"} • {new Date(r.created_at).toLocaleDateString()}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-display text-sm text-neon-gold">+{r.amount}</p>
+                        <p className="text-[10px] text-muted-foreground font-display">{r.reward_type.toUpperCase()}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+                {projectRewards.length === 0 && <p className="text-muted-foreground text-sm text-center py-8">No kickbacks awarded yet.</p>}
+              </div>
+            </div>
+
+            {/* Project leaderboard */}
+            <div className="rounded-lg border border-border bg-card p-6">
+              <h3 className="font-display text-sm text-foreground mb-4 tracking-wider">PROJECT REVENUE LEADERBOARD</h3>
+              <div className="space-y-2">
+                {projects.filter(p => p.status === "active").map((proj) => {
+                  const totalKickback = projectRewards.filter(r => r.project_account_id === proj.id).reduce((sum, r) => sum + Number(r.amount), 0);
+                  const projRaffles = (raffles || []).filter((r: any) => r.project_account_id === proj.id);
+                  const projStakes = stakes.filter(s => {
+                    const pool = pools.find(p => p.id === s.pool_id);
+                    return pool?.project_account_id === proj.id;
+                  });
+                  return (
+                    <div key={proj.id} className="flex items-center justify-between p-3 rounded-lg bg-secondary/30 border border-border">
+                      <div className="flex items-center gap-3">
+                        <span className="font-display text-sm text-foreground">{proj.project_name}</span>
+                      </div>
+                      <div className="flex gap-4 text-[11px] text-muted-foreground">
+                        <span>Stakes: <strong className="text-foreground">{projStakes.length}</strong></span>
+                        <span>Raffles: <strong className="text-foreground">{projRaffles.length}</strong></span>
+                        <span>Kickback: <strong className="text-neon-gold">{totalKickback} pts</strong></span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </TabsContent>
         </Tabs>
       </main>
     </div>
