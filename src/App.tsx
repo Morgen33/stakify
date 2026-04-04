@@ -13,6 +13,7 @@ import Dashboard from "./pages/Dashboard.tsx";
 import ProjectPanel from "./pages/ProjectPanel.tsx";
 import ProjectPage from "./pages/ProjectPage.tsx";
 import OperatorPanel from "./pages/OperatorPanel.tsx";
+import MasterPanel from "./pages/MasterPanel.tsx";
 import Arcade from "./pages/Arcade.tsx";
 import Raffle from "./pages/Raffle.tsx";
 import Pricing from "./pages/Pricing.tsx";
