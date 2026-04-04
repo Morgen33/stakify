@@ -97,11 +97,7 @@ const Index = () => {
                 Admin
               </Link>
             )}
-            {isMaster && (
-              <Link to="/master" className="text-sm text-primary hover:text-primary/80 transition-colors font-display">
-                👑 Master
-              </Link>
-            )}
+            {/* Master access is hidden — navigate to /master directly */}
 
             {/* Wallet connect or status */}
             <WalletModal />
