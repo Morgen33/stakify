@@ -51,6 +51,9 @@ const Admin = () => {
     project_id: "", amount: "", currency: "ETH", payment_type: "platform_fee", status: "pending", notes: "", due_date: "",
   });
   const [newWallet, setNewWallet] = useState({ label: "", address: "", wallet_type: "primary", notes: "" });
+  const [adminAirdrop, setAdminAirdrop] = useState({ recipient_user_id: "", airdrop_type: "token", asset_name: "", asset_image_url: "", amount: "1", message: "", project_account_id: "" });
+  const [airdropSearch, setAirdropSearch] = useState("");
+  const [airdrops, setAirdrops] = useState<any[]>([]);
 
   // Calculator
   const [calcStakers, setCalcStakers] = useState("100");
