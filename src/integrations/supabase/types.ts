@@ -104,6 +104,107 @@ export type Database = {
         }
         Relationships: []
       }
+      project_accounts: {
+        Row: {
+          blacklist_reason: string | null
+          blacklisted_at: string | null
+          contact_email: string | null
+          created_at: string
+          description: string | null
+          id: string
+          logo_url: string | null
+          owner_id: string
+          payment_plan: string
+          payment_status: string
+          platform_fee_pct: number
+          project_name: string
+          slug: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          blacklist_reason?: string | null
+          blacklisted_at?: string | null
+          contact_email?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          logo_url?: string | null
+          owner_id: string
+          payment_plan?: string
+          payment_status?: string
+          platform_fee_pct?: number
+          project_name: string
+          slug: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          blacklist_reason?: string | null
+          blacklisted_at?: string | null
+          contact_email?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          logo_url?: string | null
+          owner_id?: string
+          payment_plan?: string
+          payment_status?: string
+          platform_fee_pct?: number
+          project_name?: string
+          slug?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      project_payments: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          due_date: string | null
+          id: string
+          notes: string | null
+          paid_at: string | null
+          payment_type: string
+          project_id: string
+          status: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          due_date?: string | null
+          id?: string
+          notes?: string | null
+          paid_at?: string | null
+          payment_type?: string
+          project_id: string
+          status?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          due_date?: string | null
+          id?: string
+          notes?: string | null
+          paid_at?: string | null
+          payment_type?: string
+          project_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_payments_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "project_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       referrals: {
         Row: {
           bonus_points: number
@@ -177,6 +278,7 @@ export type Database = {
           id: string
           lock_period_days: number
           platform_fee_pct: number
+          project_account_id: string | null
           project_logo: string | null
           project_name: string
           reward_token: string
@@ -191,6 +293,7 @@ export type Database = {
           id?: string
           lock_period_days?: number
           platform_fee_pct?: number
+          project_account_id?: string | null
           project_logo?: string | null
           project_name: string
           reward_token: string
@@ -205,6 +308,7 @@ export type Database = {
           id?: string
           lock_period_days?: number
           platform_fee_pct?: number
+          project_account_id?: string | null
           project_logo?: string | null
           project_name?: string
           reward_token?: string
@@ -212,7 +316,15 @@ export type Database = {
           total_staked?: number
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "staking_pools_project_account_id_fkey"
+            columns: ["project_account_id"]
+            isOneToOne: false
+            referencedRelation: "project_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_badges: {
         Row: {
@@ -275,7 +387,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "user"
+      app_role: "admin" | "user" | "project_owner"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -403,7 +515,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "user"],
+      app_role: ["admin", "user", "project_owner"],
     },
   },
 } as const
