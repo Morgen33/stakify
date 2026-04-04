@@ -58,6 +58,7 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <WelcomeSplash />
       <StartupDisclaimer />
+      <SeasonalBanner />
       {/* Nav */}
       {/* Beta banner */}
       <div className="bg-primary/5 border-b border-primary/10 py-1.5 text-center">
