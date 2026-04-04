@@ -1,3 +1,6 @@
+import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
 import HeroHeader from "@/components/HeroHeader";
 import StatsBar from "@/components/StatsBar";
 import StakingCard from "@/components/StakingCard";
