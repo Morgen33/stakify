@@ -384,7 +384,7 @@ const Admin = () => {
             </h2>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-xs text-muted-foreground font-display">🔒 OWNER ONLY</span>
+            <span className="text-xs text-muted-foreground font-display">🔒 SITE OWNER</span>
             <Button variant="outline" size="sm" onClick={() => navigate("/")} className="font-display text-xs">← Dashboard</Button>
           </div>
         </div>
