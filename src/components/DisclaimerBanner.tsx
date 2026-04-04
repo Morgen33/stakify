@@ -49,10 +49,11 @@ const DisclaimerBanner = () => {
                 >
                   <p>• NFTs locked during staking cannot be traded or transferred until the lock period ends.</p>
                   <p>• Rewards are determined by individual project teams and may vary.</p>
-                  <p>• A small platform fee is applied to all staking rewards.</p>
+                  <p>• A small platform maintenance fee supports security, infrastructure, and ecosystem development.</p>
                   <p>• Smart contracts are audited but no system is 100% risk-free.</p>
                   <p>• Past performance does not guarantee future results.</p>
                   <p>• This platform does not provide financial advice.</p>
+                  <p>• No guarantees are made regarding future token launches, airdrops, or point conversions.</p>
                 </motion.div>
               )}
             </AnimatePresence>

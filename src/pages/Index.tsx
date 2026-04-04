@@ -139,12 +139,12 @@ const Index = () => {
                 <Tooltip>
                   <TooltipTrigger><HelpCircle className="w-4 h-4 text-muted-foreground" /></TooltipTrigger>
                   <TooltipContent className="max-w-xs">
-                    <p className="text-xs">Each pool is managed by a verified project. Stake your assets to earn rewards. Fees and terms are set by the project, with a small platform micro-fee on each action.</p>
+                    <p className="text-xs">Each pool is managed by a verified project. Stake to earn their rewards AND StakeForge points. Your points unlock arcade games, badges, leaderboard rankings, and future platform benefits.</p>
                   </TooltipContent>
                 </Tooltip>
               </h2>
               <span className="text-xs text-muted-foreground font-body">
-                Platform fee: variable per pool + $0.03/action
+                Earn dual rewards on every stake ✨
               </span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -163,13 +163,17 @@ const Index = () => {
 
         {/* Footer disclaimer */}
         <footer className="border-t border-border pt-6 pb-8 text-center">
+          <p className="text-xs text-primary/60 max-w-2xl mx-auto mb-3 font-display tracking-wide">
+            Every stake earns you points. Points unlock games, badges, prizes, and who knows what else down the road. The earlier you join, the more you accumulate. 🚀
+          </p>
           <p className="text-xs text-muted-foreground max-w-2xl mx-auto">
             ⚠️ <span className="font-display text-foreground/60">DISCLAIMER:</span> Staking digital assets involves significant risk including possible loss of principal.
             This platform facilitates staking services and does not provide financial advice.
-            All rewards and APY figures are estimates and subject to change. A fixed platform micro-fee of $0.03 USDC equivalent
-            applies to every stake and unstake action. Smart contracts have been audited
+            All rewards and APY figures are estimates and subject to change. A small platform maintenance fee
+            applies to each action to support security, infrastructure, and ongoing development. Smart contracts have been audited
             but are used at your own risk. By using this platform, you agree to our Terms of Service
-            and acknowledge the inherent risks of DeFi protocols. Fees and terms are subject to change.
+            and acknowledge the inherent risks of DeFi protocols. Fees, terms, and platform features are subject to change.
+            No guarantees are made regarding future token launches, airdrops, or conversion of points.
           </p>
           <p className="text-[10px] text-muted-foreground/60 mt-3 font-display tracking-wider">
             STAKEFORGE © 2026 — ALL RIGHTS RESERVED

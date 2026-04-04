@@ -34,8 +34,8 @@ const HeroHeader = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
             >
-              The ultimate NFT staking platform. Lock your assets, earn rewards, climb the ranks.
-              Built for projects. Powered by the community.
+              The ultimate NFT staking platform. Lock your assets, earn dual rewards, climb the ranks.
+              Your points today could mean something big tomorrow.
             </motion.p>
             <motion.div
               className="flex flex-wrap gap-3"

@@ -18,8 +18,9 @@ const StartupDisclaimer = () => {
     "I understand that locked assets cannot be withdrawn until the lock period expires, except in platform-authorized emergency situations.",
     "I accept that smart contracts, while audited, carry inherent risks and I use this platform at my own discretion.",
     "I confirm that STAKEFORGE is a staking facilitation platform and does not provide financial, investment, or legal advice.",
-    "I acknowledge that STAKEFORGE charges a platform fee on staking rewards and that fee rates may be adjusted by the platform operator.",
-    "I understand that individual project teams control their own reward distribution and STAKEFORGE is not liable for any project's actions, including potential rug pulls.",
+    "I acknowledge that platform maintenance fees support security, infrastructure, and ongoing development of the ecosystem, and that fee structures may be adjusted.",
+    "I understand that individual project teams control their own reward distribution and STAKEFORGE is not liable for any project's actions.",
+    "I understand that accumulated points, potential future benefits, and any platform features are subject to change and no guarantees are made regarding token launches, airdrops, or conversions.",
   ];
 
   const allChecked = disclaimerPoints.every((_, i) => checkedItems[i]);
