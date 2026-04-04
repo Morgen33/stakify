@@ -16,6 +16,7 @@ import ReferralPanel from "@/components/ReferralPanel";
 import DisclaimerBanner from "@/components/DisclaimerBanner";
 import StartupDisclaimer from "@/components/StartupDisclaimer";
 import WalletModal from "@/components/WalletModal";
+import WelcomeSplash from "@/components/WelcomeSplash";
 
 const Index = () => {
   const { user, isAdmin, isOperator, signOut } = useAuth();
@@ -54,6 +55,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <WelcomeSplash />
       <StartupDisclaimer />
       {/* Nav */}
       <nav className="border-b border-border bg-card/80 backdrop-blur-md sticky top-0 z-50">
