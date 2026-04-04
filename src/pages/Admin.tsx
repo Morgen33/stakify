@@ -57,6 +57,7 @@ const Admin = () => {
   const [adminAirdrop, setAdminAirdrop] = useState({ recipient_user_id: "", airdrop_type: "token", asset_name: "", asset_image_url: "", amount: "1", message: "", project_account_id: "" });
   const [airdropSearch, setAirdropSearch] = useState("");
   const [airdrops, setAirdrops] = useState<any[]>([]);
+  const [raffles, setRaffles] = useState<any[]>([]);
 
   // Calculator
   const [calcStakers, setCalcStakers] = useState("100");
