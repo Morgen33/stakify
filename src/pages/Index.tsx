@@ -34,6 +34,7 @@ const Index = () => {
             <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-body">Dashboard</a>
             <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-body">Pools</a>
             <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-body">Leaderboard</a>
+            <Link to="/arcade" className="text-sm text-accent hover:text-accent/80 transition-colors font-display">Arcade</Link>
             <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-body">Docs</a>
             {isAdmin && (
               <Link to="/admin" className="text-sm text-neon-green hover:text-neon-green/80 transition-colors font-display">
