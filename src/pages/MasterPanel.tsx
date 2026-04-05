@@ -1126,28 +1126,69 @@ const MasterPanel = () => {
                 </div>
               </TabsContent>
 
-              {/* Users */}
+              {/* Users — Editable */}
               <TabsContent value="xr-users">
-                <div className="rounded-lg border border-border bg-card p-4 space-y-2 max-h-[500px] overflow-y-auto">
+                <div className="rounded-lg border border-border bg-card p-4 space-y-2 max-h-[600px] overflow-y-auto">
                   {profiles.map(p => {
                     const userRoles = roles.filter(r => r.user_id === p.user_id);
+                    const isEditing = editingUser === p.user_id;
                     return (
-                      <div key={p.id} className="flex items-center justify-between p-3 rounded-lg bg-secondary/30 border border-border text-xs">
-                        <div className="flex items-center gap-3">
-                          <div className="w-7 h-7 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-[10px] font-display text-primary">
-                            {(p.display_name || "?")[0].toUpperCase()}
+                      <div key={p.id} className="rounded-lg bg-secondary/30 border border-border text-xs">
+                        <div className="flex items-center justify-between p-3">
+                          <div className="flex items-center gap-3">
+                            <div className="w-7 h-7 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-[10px] font-display text-primary">
+                              {(p.display_name || "?")[0].toUpperCase()}
+                            </div>
+                            <span className="font-display text-foreground">{p.display_name || "Unnamed"}</span>
+                            <span className="text-muted-foreground">Lvl {p.level} · {p.points} pts · {p.rank}</span>
+                            {userRoles.map(r => (
+                              <span key={r.id} className={`text-[9px] px-1.5 py-0.5 rounded-full font-display ${
+                                r.role === "master" ? "bg-primary/20 text-primary" :
+                                r.role === "admin" ? "bg-destructive/20 text-destructive" :
+                                r.role === "operator" ? "bg-accent/20 text-accent" :
+                                "bg-secondary text-muted-foreground"
+                              }`}>{r.role}</span>
+                            ))}
                           </div>
-                          <span className="font-display text-foreground">{p.display_name || "Unnamed"}</span>
-                          <span className="text-muted-foreground">Lvl {p.level} · {p.points} pts · {p.rank}</span>
-                          {userRoles.map(r => (
-                            <span key={r.id} className={`text-[9px] px-1.5 py-0.5 rounded-full font-display ${
-                              r.role === "master" ? "bg-primary/20 text-primary" :
-                              r.role === "admin" ? "bg-destructive/20 text-destructive" :
-                              r.role === "operator" ? "bg-accent/20 text-accent" :
-                              "bg-secondary text-muted-foreground"
-                            }`}>{r.role}</span>
-                          ))}
+                          <Button variant="ghost" size="sm" className="text-[10px] h-6" onClick={() => {
+                            if (isEditing) { setEditingUser(null); } else {
+                              setEditingUser(p.user_id);
+                              setEditUserData({ display_name: p.display_name || "", rank: p.rank, points: p.points, level: p.level });
+                            }
+                          }}>
+                            {isEditing ? "Cancel" : "✏️ Edit"}
+                          </Button>
                         </div>
+                        {isEditing && (
+                          <div className="px-3 pb-3 pt-1 border-t border-border/50 space-y-2">
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                              <div>
+                                <label className="text-[9px] text-muted-foreground font-display">DISPLAY NAME</label>
+                                <Input value={editUserData.display_name} onChange={e => setEditUserData({...editUserData, display_name: e.target.value})} className="bg-background border-border text-xs h-7 mt-0.5" />
+                              </div>
+                              <div>
+                                <label className="text-[9px] text-muted-foreground font-display">RANK</label>
+                                <select value={editUserData.rank} onChange={e => setEditUserData({...editUserData, rank: e.target.value})} className="w-full bg-background border border-border rounded-md text-xs h-7 mt-0.5 px-2 text-foreground">
+                                  {["Bronze","Silver","Gold","Platinum","Diamond","Legend"].map(r => <option key={r} value={r}>{r}</option>)}
+                                </select>
+                              </div>
+                              <div>
+                                <label className="text-[9px] text-muted-foreground font-display">POINTS</label>
+                                <Input type="number" value={editUserData.points} onChange={e => setEditUserData({...editUserData, points: Number(e.target.value)})} className="bg-background border-border text-xs h-7 mt-0.5" />
+                              </div>
+                              <div>
+                                <label className="text-[9px] text-muted-foreground font-display">LEVEL</label>
+                                <Input type="number" value={editUserData.level} onChange={e => setEditUserData({...editUserData, level: Number(e.target.value)})} className="bg-background border-border text-xs h-7 mt-0.5" />
+                              </div>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button size="sm" className="text-[10px] h-6 font-display" onClick={() => saveUserEdit(p.user_id)}>
+                                <Save className="w-3 h-3 mr-1" /> Save Changes
+                              </Button>
+                            </div>
+                            <p className="text-[9px] text-muted-foreground">⚠️ Points/Rank changes do NOT affect leaderboard position (leaderboard = staking only)</p>
+                          </div>
+                        )}
                       </div>
                     );
                   })}
