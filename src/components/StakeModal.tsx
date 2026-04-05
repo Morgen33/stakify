@@ -42,7 +42,7 @@ const stakeTypes: { type: StakeType; mode: StakeMode; label: string; icon: typeo
   {
     type: "flexible", mode: 2,
     label: "Flexible", icon: Zap,
-    tip: "Choose your own lock duration. Longer locks earn higher APY boosts.",
+    tip: "Choose your own lock duration. Longer locks earn higher reward boosts.",
     desc: "Custom duration • Scaled rewards",
   },
 ];
