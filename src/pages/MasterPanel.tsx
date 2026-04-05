@@ -907,10 +907,110 @@ const MasterPanel = () => {
                 <Save className="w-3 h-3 mr-1" /> Update PIN
               </Button>
             </div>
+
+            {/* Password Change */}
+            <div className="rounded-lg border border-border bg-card p-6">
+              <h3 className="font-display text-sm text-foreground mb-4 tracking-wider flex items-center gap-2">
+                <KeyRound className="w-4 h-4 text-accent" /> CHANGE LOGIN PASSWORD
+              </h3>
+              <p className="text-[10px] text-muted-foreground mb-4">Update your email/password login credentials. This is separate from your PIN.</p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
+                <div>
+                  <label className="text-[10px] text-muted-foreground font-display tracking-wider">NEW PASSWORD</label>
+                  <Input type="password" value={changePwdNew} onChange={e => setChangePwdNew(e.target.value)} placeholder="••••••••" className="bg-secondary border-border text-sm mt-1" />
+                </div>
+                <div>
+                  <label className="text-[10px] text-muted-foreground font-display tracking-wider">CONFIRM NEW PASSWORD</label>
+                  <Input type="password" value={changePwdConfirm} onChange={e => setChangePwdConfirm(e.target.value)} placeholder="••••••••" className="bg-secondary border-border text-sm mt-1" />
+                </div>
+                <div className="flex items-end">
+                  <Button size="sm" onClick={handleChangePassword} className="font-display text-xs w-full">
+                    <Save className="w-3 h-3 mr-1" /> Update Password
+                  </Button>
+                </div>
+              </div>
+            </div>
           </TabsContent>
 
           {/* ═══ DIAGNOSTICS ═══ */}
           <TabsContent value="diagnostics" className="space-y-6">
+            {/* System Health Check */}
+            <div className="rounded-lg border border-primary/30 bg-primary/5 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-display text-sm text-primary tracking-wider flex items-center gap-2">
+                  <Activity className="w-4 h-4" /> SYSTEM HEALTH CHECK
+                </h3>
+                <Button onClick={runSystemHealthCheck} disabled={runningHealth} size="sm" className="font-display text-xs">
+                  <RefreshCw className={`w-3 h-3 mr-1 ${runningHealth ? "animate-spin" : ""}`} />
+                  {runningHealth ? "Running..." : "Run Full Check"}
+                </Button>
+              </div>
+              {healthChecks.length > 0 && (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-4 mb-3">
+                    <span className="text-xs font-display text-primary">{healthChecks.filter(c => c.status === "pass").length}/{healthChecks.length} passed</span>
+                    {healthChecks.some(c => c.status === "fail") && <span className="text-xs font-display text-destructive">{healthChecks.filter(c => c.status === "fail").length} failed</span>}
+                    {healthChecks.some(c => c.status === "warn") && <span className="text-xs font-display text-accent">{healthChecks.filter(c => c.status === "warn").length} warnings</span>}
+                  </div>
+                  {healthChecks.map((check, i) => (
+                    <div key={i} className={`flex items-center justify-between p-3 rounded-lg border text-xs ${
+                      check.status === "pass" ? "border-primary/20 bg-primary/5" :
+                      check.status === "warn" ? "border-accent/20 bg-accent/5" :
+                      "border-destructive/20 bg-destructive/5"
+                    }`}>
+                      <div className="flex items-center gap-3">
+                        {check.status === "pass" ? <CheckCircle2 className="w-4 h-4 text-primary" /> :
+                         check.status === "warn" ? <AlertTriangle className="w-4 h-4 text-accent" /> :
+                         <XCircle className="w-4 h-4 text-destructive" />}
+                        <span className="font-display text-foreground">{check.label}</span>
+                      </div>
+                      <span className={`font-display ${
+                        check.status === "pass" ? "text-primary" : check.status === "warn" ? "text-accent" : "text-destructive"
+                      }`}>{check.detail}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {healthChecks.length === 0 && !runningHealth && (
+                <p className="text-xs text-muted-foreground text-center py-4">Click "Run Full Check" to scan all systems</p>
+              )}
+            </div>
+
+            {/* Error Log */}
+            <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-6">
+              <h3 className="font-display text-sm text-destructive mb-4 tracking-wider flex items-center gap-2">
+                <XCircle className="w-4 h-4" /> ERROR LOG ({errorLogs.length} unresolved)
+              </h3>
+              {errorLogs.length === 0 ? (
+                <p className="text-xs text-muted-foreground text-center py-4">
+                  {healthChecks.length > 0 ? "✅ No unresolved errors — system clean!" : "Run a health check to scan for errors"}
+                </p>
+              ) : (
+                <div className="space-y-2 max-h-[400px] overflow-y-auto">
+                  {errorLogs.map(err => (
+                    <div key={err.id} className="flex items-center justify-between p-3 rounded-lg bg-card border border-border text-xs">
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <span className={`w-2 h-2 rounded-full flex-shrink-0 ${err.severity === "critical" ? "bg-destructive animate-pulse" : "bg-accent"}`} />
+                        <div className="min-w-0">
+                          <p className="font-display text-foreground truncate">{err.message}</p>
+                          <div className="flex gap-2 text-[10px] text-muted-foreground">
+                            <span>{err.severity}</span>
+                            <span>{err.event_type}</span>
+                            {err.error_code && <code className="text-destructive">{err.error_code}</code>}
+                            <span>{new Date(err.created_at).toLocaleString()}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <Button variant="ghost" size="sm" className="text-[10px] text-primary flex-shrink-0" onClick={() => resolveError(err.id)}>
+                        <CheckCircle2 className="w-3 h-3 mr-1" /> Resolve
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Battle Log & Live Alerts */}
             <BattleLog />
             <LiveAlertsPanel />
           </TabsContent>
