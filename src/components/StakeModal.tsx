@@ -264,7 +264,7 @@ const StakeModal = ({ poolName, poolId, nftContract, apy, rewardToken, lockPerio
             {/* Breakdown */}
             <div className="rounded-lg border border-border bg-secondary/20 p-4 space-y-2">
               <div className="flex justify-between text-xs">
-                <span className="text-muted-foreground">Effective APY</span>
+                <span className="text-muted-foreground">Effective Reward Rate</span>
                 <span className="font-display text-neon-green">{effectiveApy.toFixed(1)}%</span>
               </div>
               <div className="flex justify-between text-xs">
