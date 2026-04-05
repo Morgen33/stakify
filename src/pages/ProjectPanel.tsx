@@ -511,7 +511,7 @@ const ProjectPanel = () => {
                   <Input type="number" value={calcAvgStake} onChange={(e) => setCalcAvgStake(e.target.value)} className="bg-secondary border-border text-sm mt-1" />
                 </div>
                 <div>
-                  <label className="text-[10px] text-muted-foreground font-display tracking-wider">APY %</label>
+                  <label className="text-[10px] text-muted-foreground font-display tracking-wider">REWARD RATE %</label>
                   <Input type="number" value={calcApy} onChange={(e) => setCalcApy(e.target.value)} className="bg-secondary border-border text-sm mt-1" />
                 </div>
                 <div>

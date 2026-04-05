@@ -161,7 +161,7 @@ const ProjectPage = () => {
                     <div className="bg-secondary/50 rounded-md p-3">
                       <div className="flex items-center gap-1 mb-1">
                         <TrendingUp className="w-3 h-3 text-neon-green" />
-                        <span className="text-xs text-muted-foreground">APY</span>
+                        <span className="text-xs text-muted-foreground">Reward Rate</span>
                       </div>
                       <p className="font-display text-xl text-neon-green">{pool.apy}%</p>
                     </div>

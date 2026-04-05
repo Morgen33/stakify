@@ -286,7 +286,7 @@ const OperatorPanel = () => {
               <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
                 <div><label className="text-[10px] text-muted-foreground font-display">STAKERS</label><Input type="number" value={calcStakers} onChange={e => setCalcStakers(e.target.value)} className="bg-secondary border-border text-sm mt-1" /></div>
                 <div><label className="text-[10px] text-muted-foreground font-display">AVG STAKE</label><Input type="number" value={calcAvgStake} onChange={e => setCalcAvgStake(e.target.value)} className="bg-secondary border-border text-sm mt-1" /></div>
-                <div><label className="text-[10px] text-muted-foreground font-display">APY %</label><Input type="number" value={calcApy} onChange={e => setCalcApy(e.target.value)} className="bg-secondary border-border text-sm mt-1" /></div>
+                <div><label className="text-[10px] text-muted-foreground font-display">REWARD RATE %</label><Input type="number" value={calcApy} onChange={e => setCalcApy(e.target.value)} className="bg-secondary border-border text-sm mt-1" /></div>
                 <div><label className="text-[10px] text-muted-foreground font-display">DAYS</label><Input type="number" value={calcDays} onChange={e => setCalcDays(e.target.value)} className="bg-secondary border-border text-sm mt-1" /></div>
                 <div><label className="text-[10px] text-muted-foreground font-display">FEE %</label><Input type="number" value={calcFee} onChange={e => setCalcFee(e.target.value)} className="bg-secondary border-border text-sm mt-1" /></div>
               </div>
