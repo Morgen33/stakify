@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import {
   DollarSign, Shield, Zap, Trophy, ArrowLeft, CheckCircle2,
-  Sparkles, Users, Layers, Gift, Ticket, TrendingUp, Lock
+  Sparkles, Users, Layers, Gift, Ticket, TrendingUp, Lock, Info
 } from "lucide-react";
 import WalletModal from "@/components/WalletModal";
 import { Badge } from "@/components/ui/badge";
@@ -195,8 +195,8 @@ const Pricing = () => {
 
             {/* Master fee lock notice */}
             <div className="mt-6 flex items-center justify-center gap-2 text-[10px] text-muted-foreground">
-              <Lock className="w-3 h-3" />
-              <span>Platform network fee ($0.12/action) is locked and non-negotiable. Project fees are customizable.</span>
+              <Info className="w-3 h-3" />
+              <span>All fees are subject to change at any time. Project fees are customizable by project owners.</span>
             </div>
 
             <Button asChild className="mt-4 bg-accent text-accent-foreground font-display">
