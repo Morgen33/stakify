@@ -776,10 +776,11 @@ const MasterPanel = () => {
                 <div>
                   <label className="text-[10px] text-muted-foreground font-display">ROLE</label>
                   <select value={assignRole.role} onChange={e => setAssignRole({ ...assignRole, role: e.target.value })} className="w-full bg-secondary border border-border rounded-md text-sm text-foreground px-3 py-2 mt-1">
-                    <option value="admin">Admin (Site Owner)</option>
-                    <option value="operator">Operator</option>
-                    <option value="project_owner">Project Owner</option>
-                    <option value="user">User</option>
+                    <option value="master">👑 Master (Dev Only)</option>
+                    <option value="admin">🛡️ Admin (Site Owner)</option>
+                    <option value="operator">⚙️ Operator</option>
+                    <option value="project_owner">🏗️ Project Owner</option>
+                    <option value="user">👤 User</option>
                   </select>
                 </div>
                 <div className="flex items-end">
