@@ -288,9 +288,29 @@ const Dashboard = () => {
         {/* ── Profile Card ── */}
         <motion.div className="rounded-xl border border-border bg-card p-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center gap-6">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 border-2 border-primary/30 flex items-center justify-center text-2xl font-display text-primary shadow-lg">
-              {(profile?.display_name || "?")[0].toUpperCase()}
-            </div>
+            {/* Avatar with upload */}
+            <input type="file" ref={fileInputRef} accept="image/*" className="hidden" onChange={handleAvatarUpload} />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploadingAvatar}
+              className="relative w-16 h-16 rounded-full border-2 border-primary/30 overflow-hidden group flex-shrink-0 shadow-lg hover:border-primary/60 transition-colors"
+              title="Change profile picture"
+            >
+              {profile?.avatar_url ? (
+                <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center text-2xl font-display text-primary">
+                  {(profile?.display_name || "?")[0].toUpperCase()}
+                </div>
+              )}
+              <div className="absolute inset-0 bg-background/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                {uploadingAvatar ? (
+                  <RefreshCw className="w-5 h-5 text-primary animate-spin" />
+                ) : (
+                  <Palette className="w-5 h-5 text-primary" />
+                )}
+              </div>
+            </button>
             <div className="flex-1">
               <h2 className="font-display text-xl text-foreground">{profile?.display_name || "Staker"}</h2>
               <div className="flex items-center gap-4 mt-1 flex-wrap">
