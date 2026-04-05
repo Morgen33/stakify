@@ -1029,7 +1029,7 @@ const MasterPanel = () => {
             </div>
 
             <Tabs defaultValue="xr-pools">
-              <TabsList className="bg-card border border-border flex-wrap">
+              <TabsList className="bg-card border border-border flex-wrap h-auto gap-1 p-2">
                 <TabsTrigger value="xr-pools" className="font-display text-[10px] gap-1"><Layers className="w-3 h-3" /> Pools ({pools.length})</TabsTrigger>
                 <TabsTrigger value="xr-stakes" className="font-display text-[10px] gap-1"><Lock className="w-3 h-3" /> Stakes ({stakes.length})</TabsTrigger>
                 <TabsTrigger value="xr-projects" className="font-display text-[10px] gap-1"><Building2 className="w-3 h-3" /> Projects ({projects.length})</TabsTrigger>
