@@ -781,7 +781,7 @@ const MasterPanel = () => {
             <div className="rounded-lg border border-border bg-card p-6">
               <h3 className="font-display text-sm text-foreground mb-4 tracking-wider">PLATFORM SETTINGS</h3>
               <div className="space-y-2 mb-4">
-                {settings.map(s => (
+                {settings.filter(s => s.key !== "master_pin").map(s => (
                   <div key={s.id} className="flex items-center gap-3 p-3 rounded-lg bg-secondary/30 border border-border">
                     <span className="font-display text-xs text-foreground min-w-[180px] tracking-wider">{s.key}</span>
                     <Input defaultValue={s.value} id={`ms-${s.id}`} className="bg-background border-border text-xs flex-1" />
