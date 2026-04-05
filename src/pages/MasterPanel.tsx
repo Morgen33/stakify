@@ -51,7 +51,13 @@ const MasterPanel = () => {
   const [earlyUnlocks, setEarlyUnlocks] = useState<any[]>([]);
   const [changePinOld, setChangePinOld] = useState("");
   const [changePinNew, setChangePinNew] = useState("");
-  const [changePinConfirm, setChangePinConfirm] = useState("");
+  const [changePwdCurrent, setChangePwdCurrent] = useState("");
+  const [changePwdNew, setChangePwdNew] = useState("");
+  const [changePwdConfirm, setChangePwdConfirm] = useState("");
+  const [healthChecks, setHealthChecks] = useState<{label: string; status: "pass"|"fail"|"warn"; detail: string}[]>([]);
+  const [runningHealth, setRunningHealth] = useState(false);
+  const [errorLogs, setErrorLogs] = useState<any[]>([]);
+  const [xrayOpen, setXrayOpen] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     if (!loading && !user) { navigate("/auth", { replace: true }); return; }
