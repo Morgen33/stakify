@@ -661,34 +661,6 @@ const MasterPanel = () => {
               </div>
             </div>
 
-            {/* Emergency Routing */}
-            <div className={`rounded-lg border p-6 ${emergencyRoutingActive ? "border-destructive/50 bg-destructive/10" : "border-border bg-card"}`}>
-              <h3 className={`font-display text-sm mb-4 tracking-wider flex items-center gap-2 ${emergencyRoutingActive ? "text-destructive" : "text-foreground"}`}>
-                <AlertTriangle className="w-4 h-4" /> EMERGENCY FUND ROUTING
-              </h3>
-              <p className="text-xs text-muted-foreground mb-4">
-                When activated, <strong className="text-foreground">all incoming funds</strong> are routed to your emergency wallet instead of the
-                normal fee collection wallet. Use this if you need to exit quickly.
-              </p>
-              <div className="flex items-center gap-4">
-                <Button
-                  onClick={toggleEmergencyRouting}
-                  variant={emergencyRoutingActive ? "destructive" : "outline"}
-                  className="font-display text-xs"
-                >
-                  {emergencyRoutingActive ? <><Power className="w-3.5 h-3.5 mr-1" /> Deactivate Emergency</> : <><AlertTriangle className="w-3.5 h-3.5 mr-1" /> Activate Emergency Routing</>}
-                </Button>
-                <span className={`text-xs font-display ${emergencyRoutingActive ? "text-destructive animate-pulse" : "text-muted-foreground"}`}>
-                  {emergencyRoutingActive ? "🚨 EMERGENCY ROUTING ACTIVE" : "Normal routing"}
-                </span>
-              </div>
-              {emergencyRoutingActive && emergencyWallet && (
-                <div className="mt-3 p-3 rounded-lg border border-destructive/30 bg-destructive/5">
-                  <span className="text-xs text-destructive font-display">Funds → </span>
-                  <code className="text-xs text-destructive/80">{emergencyWallet.address}</code>
-                </div>
-              )}
-            </div>
 
             {/* Fee Structure Overview */}
             <div className="rounded-lg border border-border bg-card p-6">
