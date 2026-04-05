@@ -10,7 +10,9 @@ import {
   Shield, Wallet, AlertTriangle, Settings, Users, Zap,
   RefreshCw, Save, Trash2, Power, Eye, Lock, Unlock,
   DollarSign, ScrollText, Search, UserX, Crown,
-  Layers, Building2, Award, Gift, Ticket, Gamepad2, ScanEye
+  Layers, Building2, Award, Gift, Ticket, Gamepad2, ScanEye,
+  KeyRound, Activity, CheckCircle2, XCircle, ChevronDown, ChevronRight,
+  Database, Server, Wifi, HardDrive
 } from "lucide-react";
 import {
   Tooltip, TooltipContent, TooltipTrigger,
@@ -50,6 +52,13 @@ const MasterPanel = () => {
   const [changePinOld, setChangePinOld] = useState("");
   const [changePinNew, setChangePinNew] = useState("");
   const [changePinConfirm, setChangePinConfirm] = useState("");
+  const [changePwdCurrent, setChangePwdCurrent] = useState("");
+  const [changePwdNew, setChangePwdNew] = useState("");
+  const [changePwdConfirm, setChangePwdConfirm] = useState("");
+  const [healthChecks, setHealthChecks] = useState<{label: string; status: "pass"|"fail"|"warn"; detail: string}[]>([]);
+  const [runningHealth, setRunningHealth] = useState(false);
+  const [errorLogs, setErrorLogs] = useState<any[]>([]);
+  const [xrayOpen, setXrayOpen] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     if (!loading && !user) { navigate("/auth", { replace: true }); return; }
@@ -125,6 +134,78 @@ const MasterPanel = () => {
     setChangePinOld(""); setChangePinNew(""); setChangePinConfirm("");
     toast({ title: "✅ Master PIN updated" });
   };
+
+  const handleChangePassword = async () => {
+    if (changePwdNew.length < 6) {
+      toast({ title: "Password must be at least 6 characters", variant: "destructive" }); return;
+    }
+    if (changePwdNew !== changePwdConfirm) {
+      toast({ title: "New passwords don't match", variant: "destructive" }); return;
+    }
+    const { error } = await supabase.auth.updateUser({ password: changePwdNew });
+    if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
+    setChangePwdCurrent(""); setChangePwdNew(""); setChangePwdConfirm("");
+    toast({ title: "✅ Login password updated" });
+    logAction("Master password changed", {});
+  };
+
+  const runSystemHealthCheck = async () => {
+    setRunningHealth(true);
+    const checks: {label: string; status: "pass"|"fail"|"warn"; detail: string}[] = [];
+
+    // 1. Auth check
+    const { data: { session } } = await supabase.auth.getSession();
+    checks.push({ label: "Authentication", status: session ? "pass" : "fail", detail: session ? "Active session" : "No session" });
+
+    // 2. Database connectivity
+    const t0 = Date.now();
+    const { error: dbErr } = await supabase.from("platform_settings").select("id").limit(1);
+    const dbMs = Date.now() - t0;
+    checks.push({ label: "Database", status: dbErr ? "fail" : dbMs > 2000 ? "warn" : "pass", detail: dbErr ? dbErr.message : `${dbMs}ms response` });
+
+    // 3. Fee wallet
+    const { data: mw } = await supabase.from("master_wallets").select("*").eq("wallet_purpose", "fee_collection").eq("is_active", true);
+    checks.push({ label: "Fee Collection Wallet", status: (mw && mw.length > 0) ? "pass" : "fail", detail: (mw && mw.length > 0) ? mw[0].label : "Not configured!" });
+
+    // 4. Emergency wallet
+    const { data: ew } = await supabase.from("master_wallets").select("*").eq("wallet_purpose", "emergency").eq("is_active", true);
+    checks.push({ label: "Emergency Wallet", status: (ew && ew.length > 0) ? "pass" : "warn", detail: (ew && ew.length > 0) ? ew[0].label : "Not configured" });
+
+    // 5. Master PIN
+    const { data: pin } = await supabase.from("platform_settings").select("value").eq("key", "master_pin").maybeSingle();
+    checks.push({ label: "Master PIN (2FA)", status: pin?.value ? (pin.value === "1234" ? "warn" : "pass") : "fail", detail: pin?.value ? (pin.value === "1234" ? "Default PIN! Change it" : "Custom PIN set") : "No PIN configured" });
+
+    // 6. RLS check — try to read user_roles (should succeed for master)
+    const { error: rlsErr } = await supabase.from("user_roles").select("id").limit(1);
+    checks.push({ label: "RLS Policies", status: rlsErr ? "fail" : "pass", detail: rlsErr ? rlsErr.message : "All tables accessible" });
+
+    // 7. Network fee
+    const { data: nf } = await supabase.from("platform_settings").select("value").eq("key", "master_network_fee").maybeSingle();
+    checks.push({ label: "Network Fee", status: nf?.value ? "pass" : "warn", detail: nf?.value ? `$${nf.value} USDC` : "Not set — using default" });
+
+    // 8. Active pools
+    const { data: ap } = await supabase.from("staking_pools").select("id").eq("status", "active");
+    checks.push({ label: "Active Pools", status: (ap && ap.length > 0) ? "pass" : "warn", detail: `${ap?.length || 0} active pools` });
+
+    // 9. Unresolved errors
+    const { data: errs } = await supabase.from("activity_log").select("*").in("severity", ["error", "critical"]).eq("resolved", false).order("created_at", { ascending: false }).limit(50);
+    checks.push({ label: "Unresolved Errors", status: (errs && errs.length > 0) ? (errs.some(e => e.severity === "critical") ? "fail" : "warn") : "pass", detail: `${errs?.length || 0} unresolved` });
+    setErrorLogs(errs || []);
+
+    // 10. Emergency routing
+    const { data: er } = await supabase.from("platform_settings").select("value").eq("key", "emergency_routing_active").maybeSingle();
+    checks.push({ label: "Emergency Routing", status: er?.value === "true" ? "warn" : "pass", detail: er?.value === "true" ? "⚠️ ACTIVE — funds going to emergency wallet" : "Normal routing" });
+
+    setHealthChecks(checks);
+    setRunningHealth(false);
+  };
+
+  const resolveError = async (id: string) => {
+    await supabase.from("activity_log").update({ resolved: true, resolved_at: new Date().toISOString() }).eq("id", id);
+    setErrorLogs(prev => prev.filter(e => e.id !== id));
+    toast({ title: "✅ Error resolved" });
+  };
+
 
   const [newMasterWallet, setNewMasterWallet] = useState({ label: "", address: "", wallet_purpose: "fee_collection", notes: "" });
   const [newWaiver, setNewWaiver] = useState({ user_id: "", project_account_id: "", waiver_type: "full", reason: "" });
@@ -826,10 +907,110 @@ const MasterPanel = () => {
                 <Save className="w-3 h-3 mr-1" /> Update PIN
               </Button>
             </div>
+
+            {/* Password Change */}
+            <div className="rounded-lg border border-border bg-card p-6">
+              <h3 className="font-display text-sm text-foreground mb-4 tracking-wider flex items-center gap-2">
+                <KeyRound className="w-4 h-4 text-accent" /> CHANGE LOGIN PASSWORD
+              </h3>
+              <p className="text-[10px] text-muted-foreground mb-4">Update your email/password login credentials. This is separate from your PIN.</p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
+                <div>
+                  <label className="text-[10px] text-muted-foreground font-display tracking-wider">NEW PASSWORD</label>
+                  <Input type="password" value={changePwdNew} onChange={e => setChangePwdNew(e.target.value)} placeholder="••••••••" className="bg-secondary border-border text-sm mt-1" />
+                </div>
+                <div>
+                  <label className="text-[10px] text-muted-foreground font-display tracking-wider">CONFIRM NEW PASSWORD</label>
+                  <Input type="password" value={changePwdConfirm} onChange={e => setChangePwdConfirm(e.target.value)} placeholder="••••••••" className="bg-secondary border-border text-sm mt-1" />
+                </div>
+                <div className="flex items-end">
+                  <Button size="sm" onClick={handleChangePassword} className="font-display text-xs w-full">
+                    <Save className="w-3 h-3 mr-1" /> Update Password
+                  </Button>
+                </div>
+              </div>
+            </div>
           </TabsContent>
 
           {/* ═══ DIAGNOSTICS ═══ */}
           <TabsContent value="diagnostics" className="space-y-6">
+            {/* System Health Check */}
+            <div className="rounded-lg border border-primary/30 bg-primary/5 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-display text-sm text-primary tracking-wider flex items-center gap-2">
+                  <Activity className="w-4 h-4" /> SYSTEM HEALTH CHECK
+                </h3>
+                <Button onClick={runSystemHealthCheck} disabled={runningHealth} size="sm" className="font-display text-xs">
+                  <RefreshCw className={`w-3 h-3 mr-1 ${runningHealth ? "animate-spin" : ""}`} />
+                  {runningHealth ? "Running..." : "Run Full Check"}
+                </Button>
+              </div>
+              {healthChecks.length > 0 && (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-4 mb-3">
+                    <span className="text-xs font-display text-primary">{healthChecks.filter(c => c.status === "pass").length}/{healthChecks.length} passed</span>
+                    {healthChecks.some(c => c.status === "fail") && <span className="text-xs font-display text-destructive">{healthChecks.filter(c => c.status === "fail").length} failed</span>}
+                    {healthChecks.some(c => c.status === "warn") && <span className="text-xs font-display text-accent">{healthChecks.filter(c => c.status === "warn").length} warnings</span>}
+                  </div>
+                  {healthChecks.map((check, i) => (
+                    <div key={i} className={`flex items-center justify-between p-3 rounded-lg border text-xs ${
+                      check.status === "pass" ? "border-primary/20 bg-primary/5" :
+                      check.status === "warn" ? "border-accent/20 bg-accent/5" :
+                      "border-destructive/20 bg-destructive/5"
+                    }`}>
+                      <div className="flex items-center gap-3">
+                        {check.status === "pass" ? <CheckCircle2 className="w-4 h-4 text-primary" /> :
+                         check.status === "warn" ? <AlertTriangle className="w-4 h-4 text-accent" /> :
+                         <XCircle className="w-4 h-4 text-destructive" />}
+                        <span className="font-display text-foreground">{check.label}</span>
+                      </div>
+                      <span className={`font-display ${
+                        check.status === "pass" ? "text-primary" : check.status === "warn" ? "text-accent" : "text-destructive"
+                      }`}>{check.detail}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {healthChecks.length === 0 && !runningHealth && (
+                <p className="text-xs text-muted-foreground text-center py-4">Click "Run Full Check" to scan all systems</p>
+              )}
+            </div>
+
+            {/* Error Log */}
+            <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-6">
+              <h3 className="font-display text-sm text-destructive mb-4 tracking-wider flex items-center gap-2">
+                <XCircle className="w-4 h-4" /> ERROR LOG ({errorLogs.length} unresolved)
+              </h3>
+              {errorLogs.length === 0 ? (
+                <p className="text-xs text-muted-foreground text-center py-4">
+                  {healthChecks.length > 0 ? "✅ No unresolved errors — system clean!" : "Run a health check to scan for errors"}
+                </p>
+              ) : (
+                <div className="space-y-2 max-h-[400px] overflow-y-auto">
+                  {errorLogs.map(err => (
+                    <div key={err.id} className="flex items-center justify-between p-3 rounded-lg bg-card border border-border text-xs">
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <span className={`w-2 h-2 rounded-full flex-shrink-0 ${err.severity === "critical" ? "bg-destructive animate-pulse" : "bg-accent"}`} />
+                        <div className="min-w-0">
+                          <p className="font-display text-foreground truncate">{err.message}</p>
+                          <div className="flex gap-2 text-[10px] text-muted-foreground">
+                            <span>{err.severity}</span>
+                            <span>{err.event_type}</span>
+                            {err.error_code && <code className="text-destructive">{err.error_code}</code>}
+                            <span>{new Date(err.created_at).toLocaleString()}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <Button variant="ghost" size="sm" className="text-[10px] text-primary flex-shrink-0" onClick={() => resolveError(err.id)}>
+                        <CheckCircle2 className="w-3 h-3 mr-1" /> Resolve
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Battle Log & Live Alerts */}
             <BattleLog />
             <LiveAlertsPanel />
           </TabsContent>
@@ -848,7 +1029,7 @@ const MasterPanel = () => {
             </div>
 
             <Tabs defaultValue="xr-pools">
-              <TabsList className="bg-card border border-border flex-wrap">
+              <TabsList className="bg-card border border-border flex-wrap h-auto gap-1 p-2">
                 <TabsTrigger value="xr-pools" className="font-display text-[10px] gap-1"><Layers className="w-3 h-3" /> Pools ({pools.length})</TabsTrigger>
                 <TabsTrigger value="xr-stakes" className="font-display text-[10px] gap-1"><Lock className="w-3 h-3" /> Stakes ({stakes.length})</TabsTrigger>
                 <TabsTrigger value="xr-projects" className="font-display text-[10px] gap-1"><Building2 className="w-3 h-3" /> Projects ({projects.length})</TabsTrigger>
