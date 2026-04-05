@@ -30,6 +30,9 @@ const MasterPanel = () => {
   const [pinInput, setPinInput] = useState("");
   const [storedPin, setStoredPin] = useState<string | null>(null);
   const [pinError, setPinError] = useState(false);
+  const [pinAttempts, setPinAttempts] = useState(0);
+  const [pinLocked, setPinLocked] = useState(false);
+  const [lockCountdown, setLockCountdown] = useState(0);
   const [masterWallets, setMasterWallets] = useState<any[]>([]);
   const [feeWaivers, setFeeWaivers] = useState<any[]>([]);
   const [profiles, setProfiles] = useState<any[]>([]);
@@ -44,11 +47,26 @@ const MasterPanel = () => {
   const [badges, setBadges] = useState<any[]>([]);
   const [raffles, setRaffles] = useState<any[]>([]);
   const [earlyUnlocks, setEarlyUnlocks] = useState<any[]>([]);
+  const [changePinOld, setChangePinOld] = useState("");
+  const [changePinNew, setChangePinNew] = useState("");
+  const [changePinConfirm, setChangePinConfirm] = useState("");
 
   useEffect(() => {
     if (!loading && !user) { navigate("/auth", { replace: true }); return; }
     if (user) checkAccess();
   }, [user, loading]);
+
+  // Lockout countdown timer
+  useEffect(() => {
+    if (!pinLocked) return;
+    const interval = setInterval(() => {
+      setLockCountdown(prev => {
+        if (prev <= 1) { setPinLocked(false); return 0; }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [pinLocked]);
 
   const checkAccess = async () => {
     const { data } = await supabase
@@ -56,27 +74,56 @@ const MasterPanel = () => {
       .eq("user_id", user!.id).eq("role", "master").maybeSingle();
     if (!data) { navigate("/", { replace: true }); return; }
     setIsMaster(true);
-    // Fetch master PIN from platform_settings
     const { data: pinSetting } = await supabase
       .from("platform_settings").select("value")
       .eq("key", "master_pin").maybeSingle();
     if (pinSetting?.value) {
       setStoredPin(pinSetting.value);
     } else {
-      // No PIN set yet — skip PIN gate
       setPinVerified(true);
     }
     fetchAll();
   };
 
+  const MAX_PIN_ATTEMPTS = 3;
+  const LOCKOUT_SECONDS = 60;
+
   const verifyPin = () => {
+    if (pinLocked) return;
     if (pinInput === storedPin) {
       setPinVerified(true);
       setPinError(false);
+      setPinAttempts(0);
     } else {
+      const newAttempts = pinAttempts + 1;
+      setPinAttempts(newAttempts);
       setPinError(true);
       setPinInput("");
+      if (newAttempts >= MAX_PIN_ATTEMPTS) {
+        setPinLocked(true);
+        setLockCountdown(LOCKOUT_SECONDS);
+      }
     }
+  };
+
+  const handleChangePin = async () => {
+    if (changePinOld !== storedPin) {
+      toast({ title: "Current PIN incorrect", variant: "destructive" });
+      return;
+    }
+    if (changePinNew.length < 4) {
+      toast({ title: "PIN must be at least 4 digits", variant: "destructive" });
+      return;
+    }
+    if (changePinNew !== changePinConfirm) {
+      toast({ title: "New PINs don't match", variant: "destructive" });
+      return;
+    }
+    const { error } = await supabase.from("platform_settings").update({ value: changePinNew }).eq("key", "master_pin");
+    if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
+    setStoredPin(changePinNew);
+    setChangePinOld(""); setChangePinNew(""); setChangePinConfirm("");
+    toast({ title: "✅ Master PIN updated" });
   };
 
   const [newMasterWallet, setNewMasterWallet] = useState({ label: "", address: "", wallet_purpose: "fee_collection", notes: "" });
