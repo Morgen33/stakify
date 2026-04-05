@@ -163,26 +163,23 @@ const SocialHubPreview = () => (
   </motion.div>
 );
 
-/**
- * 🚀 LAUNCH MODE — flip to `false` to reveal the full platform.
- * When true, only staking pools + essentials are shown.
- */
-const LAUNCH_MODE = true;
-
 const Index = () => {
   const { user, isAdmin, isOperator, isMaster, signOut } = useAuth();
   const { isConnected, shortAddress } = useWallet();
   const [pools, setPools] = useState<any[]>([]);
+  const [launchMode, setLaunchMode] = useState(true);
 
   useEffect(() => {
-    const fetchPools = async () => {
-      const { data } = await supabase
-        .from("staking_pools")
-        .select("*")
-        .order("created_at", { ascending: false });
-      if (data) setPools(data);
+    const fetchData = async () => {
+      const [poolsRes, settingRes] = await Promise.all([
+        supabase.from("staking_pools").select("*").order("created_at", { ascending: false }),
+        supabase.from("platform_settings").select("value").eq("key", "launch_mode").maybeSingle(),
+      ]);
+      if (poolsRes.data) setPools(poolsRes.data);
+      // Default to true (launch mode) if no setting exists
+      setLaunchMode(settingRes.data?.value !== "false");
     };
-    fetchPools();
+    fetchData();
   }, []);
 
   const displayPools = pools.length > 0 ? pools.map(p => ({
