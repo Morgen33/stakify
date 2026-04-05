@@ -124,8 +124,8 @@ const MasterPanel = () => {
       toast({ title: "Current PIN incorrect", variant: "destructive" });
       return;
     }
-    if (changePinNew.length < 4) {
-      toast({ title: "PIN must be at least 4 digits", variant: "destructive" });
+    if (!/^\d{3,8}$/.test(changePinNew)) {
+      toast({ title: "PIN must be 3–8 digits (numbers only)", variant: "destructive" });
       return;
     }
     if (changePinNew !== changePinConfirm) {
