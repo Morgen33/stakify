@@ -30,6 +30,9 @@ const MasterPanel = () => {
   const [pinInput, setPinInput] = useState("");
   const [storedPin, setStoredPin] = useState<string | null>(null);
   const [pinError, setPinError] = useState(false);
+  const [pinAttempts, setPinAttempts] = useState(0);
+  const [pinLocked, setPinLocked] = useState(false);
+  const [lockCountdown, setLockCountdown] = useState(0);
   const [masterWallets, setMasterWallets] = useState<any[]>([]);
   const [feeWaivers, setFeeWaivers] = useState<any[]>([]);
   const [profiles, setProfiles] = useState<any[]>([]);
@@ -44,11 +47,26 @@ const MasterPanel = () => {
   const [badges, setBadges] = useState<any[]>([]);
   const [raffles, setRaffles] = useState<any[]>([]);
   const [earlyUnlocks, setEarlyUnlocks] = useState<any[]>([]);
+  const [changePinOld, setChangePinOld] = useState("");
+  const [changePinNew, setChangePinNew] = useState("");
+  const [changePinConfirm, setChangePinConfirm] = useState("");
 
   useEffect(() => {
     if (!loading && !user) { navigate("/auth", { replace: true }); return; }
     if (user) checkAccess();
   }, [user, loading]);
+
+  // Lockout countdown timer
+  useEffect(() => {
+    if (!pinLocked) return;
+    const interval = setInterval(() => {
+      setLockCountdown(prev => {
+        if (prev <= 1) { setPinLocked(false); return 0; }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [pinLocked]);
 
   const checkAccess = async () => {
     const { data } = await supabase
@@ -56,27 +74,56 @@ const MasterPanel = () => {
       .eq("user_id", user!.id).eq("role", "master").maybeSingle();
     if (!data) { navigate("/", { replace: true }); return; }
     setIsMaster(true);
-    // Fetch master PIN from platform_settings
     const { data: pinSetting } = await supabase
       .from("platform_settings").select("value")
       .eq("key", "master_pin").maybeSingle();
     if (pinSetting?.value) {
       setStoredPin(pinSetting.value);
     } else {
-      // No PIN set yet — skip PIN gate
       setPinVerified(true);
     }
     fetchAll();
   };
 
+  const MAX_PIN_ATTEMPTS = 3;
+  const LOCKOUT_SECONDS = 60;
+
   const verifyPin = () => {
+    if (pinLocked) return;
     if (pinInput === storedPin) {
       setPinVerified(true);
       setPinError(false);
+      setPinAttempts(0);
     } else {
+      const newAttempts = pinAttempts + 1;
+      setPinAttempts(newAttempts);
       setPinError(true);
       setPinInput("");
+      if (newAttempts >= MAX_PIN_ATTEMPTS) {
+        setPinLocked(true);
+        setLockCountdown(LOCKOUT_SECONDS);
+      }
     }
+  };
+
+  const handleChangePin = async () => {
+    if (changePinOld !== storedPin) {
+      toast({ title: "Current PIN incorrect", variant: "destructive" });
+      return;
+    }
+    if (changePinNew.length < 4) {
+      toast({ title: "PIN must be at least 4 digits", variant: "destructive" });
+      return;
+    }
+    if (changePinNew !== changePinConfirm) {
+      toast({ title: "New PINs don't match", variant: "destructive" });
+      return;
+    }
+    const { error } = await supabase.from("platform_settings").update({ value: changePinNew }).eq("key", "master_pin");
+    if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
+    setStoredPin(changePinNew);
+    setChangePinOld(""); setChangePinNew(""); setChangePinConfirm("");
+    toast({ title: "✅ Master PIN updated" });
   };
 
   const [newMasterWallet, setNewMasterWallet] = useState({ label: "", address: "", wallet_purpose: "fee_collection", notes: "" });
@@ -283,6 +330,7 @@ const MasterPanel = () => {
             <Lock className="w-8 h-8 text-primary" />
           </div>
           <h1 className="font-display text-xl text-foreground tracking-widest">MASTER ACCESS</h1>
+          <p className="text-xs text-muted-foreground">Email + Password verified ✅</p>
           <p className="text-xs text-muted-foreground">Enter your security PIN to continue</p>
           <Input
             type="password"
@@ -293,9 +341,20 @@ const MasterPanel = () => {
             className={`text-center text-lg tracking-[0.5em] bg-secondary border-border ${pinError ? "border-destructive" : ""}`}
             maxLength={8}
             autoFocus
+            disabled={pinLocked}
           />
-          {pinError && <p className="text-xs text-destructive font-display">Incorrect PIN — try again</p>}
-          <Button onClick={verifyPin} className="w-full font-display">
+          {pinError && !pinLocked && (
+            <p className="text-xs text-destructive font-display">
+              Incorrect PIN — {MAX_PIN_ATTEMPTS - pinAttempts} attempt{MAX_PIN_ATTEMPTS - pinAttempts !== 1 ? "s" : ""} remaining
+            </p>
+          )}
+          {pinLocked && (
+            <div className="space-y-2">
+              <p className="text-xs text-destructive font-display">🔒 Too many failed attempts</p>
+              <p className="text-xs text-muted-foreground">Try again in <span className="text-destructive font-bold">{lockCountdown}s</span></p>
+            </div>
+          )}
+          <Button onClick={verifyPin} className="w-full font-display" disabled={pinLocked}>
             <Shield className="w-4 h-4 mr-2" /> Verify
           </Button>
           <Button variant="ghost" size="sm" onClick={() => navigate("/")} className="text-xs text-muted-foreground">
@@ -722,7 +781,7 @@ const MasterPanel = () => {
             <div className="rounded-lg border border-border bg-card p-6">
               <h3 className="font-display text-sm text-foreground mb-4 tracking-wider">PLATFORM SETTINGS</h3>
               <div className="space-y-2 mb-4">
-                {settings.map(s => (
+                {settings.filter(s => s.key !== "master_pin").map(s => (
                   <div key={s.id} className="flex items-center gap-3 p-3 rounded-lg bg-secondary/30 border border-border">
                     <span className="font-display text-xs text-foreground min-w-[180px] tracking-wider">{s.key}</span>
                     <Input defaultValue={s.value} id={`ms-${s.id}`} className="bg-background border-border text-xs flex-1" />
@@ -741,6 +800,31 @@ const MasterPanel = () => {
                 <Input placeholder="Value" value={newSettingValue} onChange={e => setNewSettingValue(e.target.value)} className="bg-secondary border-border text-xs flex-1" />
                 <Button size="sm" onClick={createSetting} className="text-xs font-display">Add</Button>
               </div>
+            </div>
+
+            {/* PIN Change */}
+            <div className="rounded-lg border border-primary/30 bg-primary/5 p-6">
+              <h3 className="font-display text-sm text-foreground mb-4 tracking-wider flex items-center gap-2">
+                <Lock className="w-4 h-4 text-primary" /> CHANGE MASTER PIN
+              </h3>
+              <p className="text-[10px] text-muted-foreground mb-4">This PIN is your 2FA gate for the Master panel. 3 failed attempts = 60s lockout.</p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
+                <div>
+                  <label className="text-[10px] text-muted-foreground font-display tracking-wider">CURRENT PIN</label>
+                  <Input type="password" value={changePinOld} onChange={e => setChangePinOld(e.target.value)} placeholder="••••" className="bg-secondary border-border text-sm mt-1" maxLength={8} />
+                </div>
+                <div>
+                  <label className="text-[10px] text-muted-foreground font-display tracking-wider">NEW PIN</label>
+                  <Input type="password" value={changePinNew} onChange={e => setChangePinNew(e.target.value)} placeholder="••••" className="bg-secondary border-border text-sm mt-1" maxLength={8} />
+                </div>
+                <div>
+                  <label className="text-[10px] text-muted-foreground font-display tracking-wider">CONFIRM NEW PIN</label>
+                  <Input type="password" value={changePinConfirm} onChange={e => setChangePinConfirm(e.target.value)} placeholder="••••" className="bg-secondary border-border text-sm mt-1" maxLength={8} />
+                </div>
+              </div>
+              <Button size="sm" onClick={handleChangePin} className="font-display text-xs">
+                <Save className="w-3 h-3 mr-1" /> Update PIN
+              </Button>
             </div>
           </TabsContent>
 
