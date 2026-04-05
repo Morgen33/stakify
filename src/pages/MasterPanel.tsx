@@ -59,6 +59,10 @@ const MasterPanel = () => {
   const [runningHealth, setRunningHealth] = useState(false);
   const [errorLogs, setErrorLogs] = useState<any[]>([]);
   const [xrayOpen, setXrayOpen] = useState<Record<string, boolean>>({});
+  const [editingUser, setEditingUser] = useState<string | null>(null);
+  const [editUserData, setEditUserData] = useState<{display_name: string; rank: string; points: number; level: number}>({ display_name: "", rank: "", points: 0, level: 1 });
+  const [badgeAssignUser, setBadgeAssignUser] = useState("");
+  const [badgeAssignBadge, setBadgeAssignBadge] = useState("");
 
   useEffect(() => {
     if (!loading && !user) { navigate("/auth", { replace: true }); return; }
@@ -204,6 +208,29 @@ const MasterPanel = () => {
     await supabase.from("activity_log").update({ resolved: true, resolved_at: new Date().toISOString() }).eq("id", id);
     setErrorLogs(prev => prev.filter(e => e.id !== id));
     toast({ title: "✅ Error resolved" });
+  };
+
+  const saveUserEdit = async (userId: string) => {
+    const { error } = await supabase.from("profiles").update({
+      display_name: editUserData.display_name,
+      rank: editUserData.rank,
+      points: editUserData.points,
+      level: editUserData.level,
+    }).eq("user_id", userId);
+    if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
+    toast({ title: "✅ User profile updated" });
+    logAction("User profile edited by master", { user_id: userId });
+    setEditingUser(null);
+    fetchAll();
+  };
+
+  const assignBadgeToUser = async () => {
+    if (!badgeAssignUser || !badgeAssignBadge) { toast({ title: "Select user and badge", variant: "destructive" }); return; }
+    const { error } = await supabase.from("user_badges").insert({ user_id: badgeAssignUser, badge_id: badgeAssignBadge });
+    if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
+    toast({ title: "✅ Badge awarded!" });
+    logAction("Badge assigned", { user_id: badgeAssignUser, badge_id: badgeAssignBadge });
+    setBadgeAssignUser(""); setBadgeAssignBadge("");
   };
 
 
@@ -776,10 +803,11 @@ const MasterPanel = () => {
                 <div>
                   <label className="text-[10px] text-muted-foreground font-display">ROLE</label>
                   <select value={assignRole.role} onChange={e => setAssignRole({ ...assignRole, role: e.target.value })} className="w-full bg-secondary border border-border rounded-md text-sm text-foreground px-3 py-2 mt-1">
-                    <option value="admin">Admin (Site Owner)</option>
-                    <option value="operator">Operator</option>
-                    <option value="project_owner">Project Owner</option>
-                    <option value="user">User</option>
+                    <option value="master">👑 Master (Dev Only)</option>
+                    <option value="admin">🛡️ Admin (Site Owner)</option>
+                    <option value="operator">⚙️ Operator</option>
+                    <option value="project_owner">🏗️ Project Owner</option>
+                    <option value="user">👤 User</option>
                   </select>
                 </div>
                 <div className="flex items-end">
@@ -1098,28 +1126,69 @@ const MasterPanel = () => {
                 </div>
               </TabsContent>
 
-              {/* Users */}
+              {/* Users — Editable */}
               <TabsContent value="xr-users">
-                <div className="rounded-lg border border-border bg-card p-4 space-y-2 max-h-[500px] overflow-y-auto">
+                <div className="rounded-lg border border-border bg-card p-4 space-y-2 max-h-[600px] overflow-y-auto">
                   {profiles.map(p => {
                     const userRoles = roles.filter(r => r.user_id === p.user_id);
+                    const isEditing = editingUser === p.user_id;
                     return (
-                      <div key={p.id} className="flex items-center justify-between p-3 rounded-lg bg-secondary/30 border border-border text-xs">
-                        <div className="flex items-center gap-3">
-                          <div className="w-7 h-7 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-[10px] font-display text-primary">
-                            {(p.display_name || "?")[0].toUpperCase()}
+                      <div key={p.id} className="rounded-lg bg-secondary/30 border border-border text-xs">
+                        <div className="flex items-center justify-between p-3">
+                          <div className="flex items-center gap-3">
+                            <div className="w-7 h-7 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-[10px] font-display text-primary">
+                              {(p.display_name || "?")[0].toUpperCase()}
+                            </div>
+                            <span className="font-display text-foreground">{p.display_name || "Unnamed"}</span>
+                            <span className="text-muted-foreground">Lvl {p.level} · {p.points} pts · {p.rank}</span>
+                            {userRoles.map(r => (
+                              <span key={r.id} className={`text-[9px] px-1.5 py-0.5 rounded-full font-display ${
+                                r.role === "master" ? "bg-primary/20 text-primary" :
+                                r.role === "admin" ? "bg-destructive/20 text-destructive" :
+                                r.role === "operator" ? "bg-accent/20 text-accent" :
+                                "bg-secondary text-muted-foreground"
+                              }`}>{r.role}</span>
+                            ))}
                           </div>
-                          <span className="font-display text-foreground">{p.display_name || "Unnamed"}</span>
-                          <span className="text-muted-foreground">Lvl {p.level} · {p.points} pts · {p.rank}</span>
-                          {userRoles.map(r => (
-                            <span key={r.id} className={`text-[9px] px-1.5 py-0.5 rounded-full font-display ${
-                              r.role === "master" ? "bg-primary/20 text-primary" :
-                              r.role === "admin" ? "bg-destructive/20 text-destructive" :
-                              r.role === "operator" ? "bg-accent/20 text-accent" :
-                              "bg-secondary text-muted-foreground"
-                            }`}>{r.role}</span>
-                          ))}
+                          <Button variant="ghost" size="sm" className="text-[10px] h-6" onClick={() => {
+                            if (isEditing) { setEditingUser(null); } else {
+                              setEditingUser(p.user_id);
+                              setEditUserData({ display_name: p.display_name || "", rank: p.rank, points: p.points, level: p.level });
+                            }
+                          }}>
+                            {isEditing ? "Cancel" : "✏️ Edit"}
+                          </Button>
                         </div>
+                        {isEditing && (
+                          <div className="px-3 pb-3 pt-1 border-t border-border/50 space-y-2">
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                              <div>
+                                <label className="text-[9px] text-muted-foreground font-display">DISPLAY NAME</label>
+                                <Input value={editUserData.display_name} onChange={e => setEditUserData({...editUserData, display_name: e.target.value})} className="bg-background border-border text-xs h-7 mt-0.5" />
+                              </div>
+                              <div>
+                                <label className="text-[9px] text-muted-foreground font-display">RANK</label>
+                                <select value={editUserData.rank} onChange={e => setEditUserData({...editUserData, rank: e.target.value})} className="w-full bg-background border border-border rounded-md text-xs h-7 mt-0.5 px-2 text-foreground">
+                                  {["Bronze","Silver","Gold","Platinum","Diamond","Legend"].map(r => <option key={r} value={r}>{r}</option>)}
+                                </select>
+                              </div>
+                              <div>
+                                <label className="text-[9px] text-muted-foreground font-display">POINTS</label>
+                                <Input type="number" value={editUserData.points} onChange={e => setEditUserData({...editUserData, points: Number(e.target.value)})} className="bg-background border-border text-xs h-7 mt-0.5" />
+                              </div>
+                              <div>
+                                <label className="text-[9px] text-muted-foreground font-display">LEVEL</label>
+                                <Input type="number" value={editUserData.level} onChange={e => setEditUserData({...editUserData, level: Number(e.target.value)})} className="bg-background border-border text-xs h-7 mt-0.5" />
+                              </div>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button size="sm" className="text-[10px] h-6 font-display" onClick={() => saveUserEdit(p.user_id)}>
+                                <Save className="w-3 h-3 mr-1" /> Save Changes
+                              </Button>
+                            </div>
+                            <p className="text-[9px] text-muted-foreground">⚠️ Points/Rank changes do NOT affect leaderboard position (leaderboard = staking only)</p>
+                          </div>
+                        )}
                       </div>
                     );
                   })}
@@ -1186,17 +1255,40 @@ const MasterPanel = () => {
                 </div>
               </TabsContent>
 
-              {/* Badges */}
+              {/* Badges — with assignment */}
               <TabsContent value="xr-badges">
-                <div className="rounded-lg border border-border bg-card p-4 space-y-2 max-h-[500px] overflow-y-auto">
-                  {badges.map(b => (
-                    <div key={b.id} className="flex items-center gap-3 p-3 rounded-lg bg-secondary/30 border border-border text-xs">
-                      <span className="text-lg">{b.icon || "🏆"}</span>
-                      <span className="font-display text-foreground">{b.name}</span>
-                      <span className="text-muted-foreground">{b.description}</span>
+                <div className="space-y-4">
+                  {/* Award Badge */}
+                  <div className="rounded-lg border border-accent/30 bg-accent/5 p-4">
+                    <h4 className="font-display text-xs text-accent mb-3 tracking-wider flex items-center gap-2">
+                      <Award className="w-3.5 h-3.5" /> AWARD BADGE TO USER
+                    </h4>
+                    <div className="flex gap-2 flex-wrap">
+                      <select value={badgeAssignUser} onChange={e => setBadgeAssignUser(e.target.value)} className="bg-secondary border border-border rounded-md text-xs text-foreground px-3 py-1.5">
+                        <option value="">Select user...</option>
+                        {profiles.map(p => <option key={p.id} value={p.user_id}>{p.display_name || "Unnamed"}</option>)}
+                      </select>
+                      <select value={badgeAssignBadge} onChange={e => setBadgeAssignBadge(e.target.value)} className="bg-secondary border border-border rounded-md text-xs text-foreground px-3 py-1.5">
+                        <option value="">Select badge...</option>
+                        {badges.map(b => <option key={b.id} value={b.id}>{b.icon || "🏆"} {b.name}</option>)}
+                      </select>
+                      <Button size="sm" className="text-xs font-display h-7" onClick={assignBadgeToUser}>
+                        <Award className="w-3 h-3 mr-1" /> Award
+                      </Button>
                     </div>
-                  ))}
-                  {badges.length === 0 && <p className="text-xs text-muted-foreground text-center py-4">No badges yet</p>}
+                  </div>
+
+                  {/* All Badges */}
+                  <div className="rounded-lg border border-border bg-card p-4 space-y-2 max-h-[400px] overflow-y-auto">
+                    {badges.map(b => (
+                      <div key={b.id} className="flex items-center gap-3 p-3 rounded-lg bg-secondary/30 border border-border text-xs">
+                        <span className="text-lg">{b.icon || "🏆"}</span>
+                        <span className="font-display text-foreground">{b.name}</span>
+                        <span className="text-muted-foreground">{b.description}</span>
+                      </div>
+                    ))}
+                    {badges.length === 0 && <p className="text-xs text-muted-foreground text-center py-4">No badges yet</p>}
+                  </div>
                 </div>
               </TabsContent>
 
