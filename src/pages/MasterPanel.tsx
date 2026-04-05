@@ -330,6 +330,7 @@ const MasterPanel = () => {
             <Lock className="w-8 h-8 text-primary" />
           </div>
           <h1 className="font-display text-xl text-foreground tracking-widest">MASTER ACCESS</h1>
+          <p className="text-xs text-muted-foreground">Email + Password verified ✅</p>
           <p className="text-xs text-muted-foreground">Enter your security PIN to continue</p>
           <Input
             type="password"
@@ -340,9 +341,20 @@ const MasterPanel = () => {
             className={`text-center text-lg tracking-[0.5em] bg-secondary border-border ${pinError ? "border-destructive" : ""}`}
             maxLength={8}
             autoFocus
+            disabled={pinLocked}
           />
-          {pinError && <p className="text-xs text-destructive font-display">Incorrect PIN — try again</p>}
-          <Button onClick={verifyPin} className="w-full font-display">
+          {pinError && !pinLocked && (
+            <p className="text-xs text-destructive font-display">
+              Incorrect PIN — {MAX_PIN_ATTEMPTS - pinAttempts} attempt{MAX_PIN_ATTEMPTS - pinAttempts !== 1 ? "s" : ""} remaining
+            </p>
+          )}
+          {pinLocked && (
+            <div className="space-y-2">
+              <p className="text-xs text-destructive font-display">🔒 Too many failed attempts</p>
+              <p className="text-xs text-muted-foreground">Try again in <span className="text-destructive font-bold">{lockCountdown}s</span></p>
+            </div>
+          )}
+          <Button onClick={verifyPin} className="w-full font-display" disabled={pinLocked}>
             <Shield className="w-4 h-4 mr-2" /> Verify
           </Button>
           <Button variant="ghost" size="sm" onClick={() => navigate("/")} className="text-xs text-muted-foreground">
