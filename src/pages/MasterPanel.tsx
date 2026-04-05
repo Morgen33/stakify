@@ -59,6 +59,10 @@ const MasterPanel = () => {
   const [runningHealth, setRunningHealth] = useState(false);
   const [errorLogs, setErrorLogs] = useState<any[]>([]);
   const [xrayOpen, setXrayOpen] = useState<Record<string, boolean>>({});
+  const [editingUser, setEditingUser] = useState<string | null>(null);
+  const [editUserData, setEditUserData] = useState<{display_name: string; rank: string; points: number; level: number}>({ display_name: "", rank: "", points: 0, level: 1 });
+  const [badgeAssignUser, setBadgeAssignUser] = useState("");
+  const [badgeAssignBadge, setBadgeAssignBadge] = useState("");
 
   useEffect(() => {
     if (!loading && !user) { navigate("/auth", { replace: true }); return; }
