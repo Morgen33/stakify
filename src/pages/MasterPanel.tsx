@@ -1053,6 +1053,60 @@ const MasterPanel = () => {
           <TabsContent value="features">
             <FeatureToggles />
           </TabsContent>
+
+          {/* ═══ LAUNCH MODE ═══ */}
+          <TabsContent value="launch" className="space-y-6">
+            <div className="rounded-lg border border-neon-green/30 bg-neon-green/5 p-6">
+              <h3 className="font-display text-sm text-neon-green mb-4 tracking-wider flex items-center gap-2">
+                <Zap className="w-4 h-4" /> LAUNCH MODE CONTROL
+              </h3>
+              <p className="text-xs text-muted-foreground mb-4">
+                When Launch Mode is <strong>ON</strong>, the homepage shows only staking pools with "Coming Soon" teasers for everything else.
+                When <strong>OFF</strong>, the full platform (leaderboard, badges, referrals, social hub) is revealed.
+              </p>
+              {(() => {
+                const launchSetting = settings.find(s => s.key === "launch_mode");
+                const isLaunchMode = launchSetting?.value !== "false";
+                return (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between p-4 rounded-lg bg-secondary/30 border border-border">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-3 h-3 rounded-full ${isLaunchMode ? "bg-neon-green animate-pulse" : "bg-muted-foreground"}`} />
+                        <div>
+                          <p className="font-display text-sm text-foreground">Launch Mode</p>
+                          <p className="text-[10px] text-muted-foreground">{isLaunchMode ? "Simplified staking-only homepage" : "Full platform revealed"}</p>
+                        </div>
+                      </div>
+                      <Button
+                        onClick={async () => {
+                          const newVal = isLaunchMode ? "false" : "true";
+                          if (launchSetting) {
+                            await supabase.from("platform_settings").update({ value: newVal }).eq("id", launchSetting.id);
+                          } else {
+                            await supabase.from("platform_settings").insert({ key: "launch_mode", value: newVal });
+                          }
+                          logAction("Launch mode toggled", { active: newVal });
+                          toast({ title: newVal === "true" ? "🚀 Launch mode ON — simplified homepage" : "🎉 Full platform revealed!" });
+                          fetchAll();
+                        }}
+                        className={`font-display text-xs ${isLaunchMode ? "bg-destructive text-destructive-foreground" : "bg-neon-green/80 text-background hover:bg-neon-green"}`}
+                      >
+                        {isLaunchMode ? "Reveal Full Platform" : "Enable Launch Mode"}
+                      </Button>
+                    </div>
+                    <div className="rounded-lg border border-border bg-card p-4">
+                      <p className="font-display text-[10px] text-muted-foreground tracking-wider mb-2">LAUNCH MODE HIDES:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {["Leaderboard", "Badges Panel", "Top NFT Projects", "Social Hub", "Referral Panel", "Raffle Promo", "Arcade Link", "Lottery Link", "Pricing Link"].map(item => (
+                          <span key={item} className="text-[10px] px-2 py-1 rounded-full border border-border bg-secondary/30 text-muted-foreground font-display">{item}</span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          </TabsContent>
           {/* ═══ X-RAY — See Everything ═══ */}
           <TabsContent value="xray" className="space-y-4">
             <div className="rounded-lg border border-accent/30 bg-accent/5 p-4 mb-2">
