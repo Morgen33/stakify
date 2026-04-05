@@ -524,7 +524,9 @@ const MasterPanel = () => {
             <TabsTrigger value="diagnostics" className="font-display gap-1.5 text-xs text-primary"><Eye className="w-3.5 h-3.5" /> Diagnostics</TabsTrigger>
             <TabsTrigger value="features" className="font-display gap-1.5 text-xs"><Power className="w-3.5 h-3.5" /> Features</TabsTrigger>
             <TabsTrigger value="xray" className="font-display gap-1.5 text-xs text-accent"><ScanEye className="w-3.5 h-3.5" /> X-Ray</TabsTrigger>
+            <TabsTrigger value="pin" className="font-display gap-1.5 text-xs text-primary"><KeyRound className="w-3.5 h-3.5" /> 🔑 PIN</TabsTrigger>
           </TabsList>
+
 
           {/* ═══ MY WALLETS ═══ */}
           <TabsContent value="wallets" className="space-y-6">
