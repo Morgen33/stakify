@@ -163,26 +163,23 @@ const SocialHubPreview = () => (
   </motion.div>
 );
 
-/**
- * 🚀 LAUNCH MODE — flip to `false` to reveal the full platform.
- * When true, only staking pools + essentials are shown.
- */
-const LAUNCH_MODE = true;
-
 const Index = () => {
   const { user, isAdmin, isOperator, isMaster, signOut } = useAuth();
   const { isConnected, shortAddress } = useWallet();
   const [pools, setPools] = useState<any[]>([]);
+  const [launchMode, setLaunchMode] = useState(true);
 
   useEffect(() => {
-    const fetchPools = async () => {
-      const { data } = await supabase
-        .from("staking_pools")
-        .select("*")
-        .order("created_at", { ascending: false });
-      if (data) setPools(data);
+    const fetchData = async () => {
+      const [poolsRes, settingRes] = await Promise.all([
+        supabase.from("staking_pools").select("*").order("created_at", { ascending: false }),
+        supabase.from("platform_settings").select("value").eq("key", "launch_mode").maybeSingle(),
+      ]);
+      if (poolsRes.data) setPools(poolsRes.data);
+      // Default to true (launch mode) if no setting exists
+      setLaunchMode(settingRes.data?.value !== "false");
     };
-    fetchPools();
+    fetchData();
   }, []);
 
   const displayPools = pools.length > 0 ? pools.map(p => ({
@@ -235,7 +232,7 @@ const Index = () => {
           <div className="flex items-center gap-6">
             <Link to="/dashboard" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-body">Dashboard</Link>
             <a href="#pools" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-body">Pools</a>
-            {!LAUNCH_MODE && (
+            {!launchMode && (
               <>
                 <a href="#leaderboard" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-body">Leaderboard</a>
                 <Link to="/arcade" className="text-sm text-accent hover:text-accent/80 transition-colors font-display">Arcade</Link>
@@ -278,9 +275,9 @@ const Index = () => {
         <StatsBar />
 
         {/* ── Main grid ── */}
-        <div className={`grid grid-cols-1 ${LAUNCH_MODE ? "lg:grid-cols-1 max-w-4xl mx-auto" : "lg:grid-cols-12"} gap-6`}>
+        <div className={`grid grid-cols-1 ${launchMode ? "lg:grid-cols-1 max-w-4xl mx-auto" : "lg:grid-cols-12"} gap-6`}>
           {/* Left column — hidden in launch mode */}
-          {!LAUNCH_MODE && (
+          {!launchMode && (
             <motion.div
               className="lg:col-span-3 space-y-6"
               initial={{ opacity: 0, x: -30 }}
@@ -294,7 +291,7 @@ const Index = () => {
           )}
 
           {/* Center column */}
-          <div className={LAUNCH_MODE ? "" : "lg:col-span-6"}>
+          <div className={launchMode ? "" : "lg:col-span-6"}>
             <div className="flex items-center justify-between mb-4" id="pools">
               <h2 className="font-display text-xl text-foreground flex items-center gap-2">
                 Active Staking Pools
@@ -309,7 +306,7 @@ const Index = () => {
                 Earn dual rewards on every stake ✨
               </span>
             </div>
-            <div className={`grid grid-cols-1 ${LAUNCH_MODE ? "md:grid-cols-2 lg:grid-cols-3" : "md:grid-cols-2"} gap-4`}>
+            <div className={`grid grid-cols-1 ${launchMode ? "md:grid-cols-2 lg:grid-cols-3" : "md:grid-cols-2"} gap-4`}>
               {displayPools.map((pool, i) => (
                 <motion.div
                   key={pool.projectName}
@@ -323,7 +320,7 @@ const Index = () => {
             </div>
 
             {/* Launch mode teaser for upcoming features */}
-            {LAUNCH_MODE && (
+            {launchMode && (
               <motion.div
                 className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4"
                 initial={{ opacity: 0, y: 20 }}
@@ -352,7 +349,7 @@ const Index = () => {
           </div>
 
           {/* Right column — hidden in launch mode */}
-          {!LAUNCH_MODE && (
+          {!launchMode && (
             <motion.div
               className="lg:col-span-3 space-y-6"
               initial={{ opacity: 0, x: 30 }}

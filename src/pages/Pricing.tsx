@@ -3,9 +3,10 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import {
   DollarSign, Shield, Zap, Trophy, ArrowLeft, CheckCircle2,
-  Sparkles, Users, Layers, Gift, Ticket
+  Sparkles, Users, Layers, Gift, Ticket, TrendingUp, Lock
 } from "lucide-react";
 import WalletModal from "@/components/WalletModal";
+import { Badge } from "@/components/ui/badge";
 
 const tiers = [
   {
@@ -14,9 +15,10 @@ const tiers = [
     subtitle: "One-time or gradual",
     color: "border-primary/30 bg-primary/5",
     accent: "text-primary",
+    highlight: "text-neon-green",
     features: [
       "Your own branded staking pool",
-      "Custom APY & lock periods",
+      "Custom reward rates & lock periods",
       "Dedicated project page with your branding",
       "Access to the Raffle House for giveaways",
       "Airdrop tool to reward your community",
@@ -29,6 +31,7 @@ const tiers = [
     subtitle: "Per stake/unstake action",
     color: "border-accent/30 bg-accent/5",
     accent: "text-accent",
+    highlight: "text-neon-green",
     features: [
       "Tiny network maintenance fee per action",
       "Covers infrastructure & security costs",
@@ -44,6 +47,7 @@ const tiers = [
     subtitle: "Set by platform owner",
     color: "border-neon-gold/30 bg-neon-gold/5",
     accent: "text-neon-gold",
+    highlight: "text-neon-green",
     features: [
       "Percentage of staking rewards",
       "Fully adjustable per pool or project",
@@ -56,15 +60,13 @@ const tiers = [
 ];
 
 const earningBreakdown = [
-  { label: "Staking Rewards (APY)", pct: "Up to 85%", desc: "Earn rewards from the projects you stake with", icon: TrendingUp },
+  { label: "Staking Rewards", pct: "Up to 85%", desc: "Earn rewards from the projects you stake with", icon: TrendingUp },
   { label: "Platform Points", pct: "Every action", desc: "Points unlock arcade games, badges, and future benefits", icon: Sparkles },
   { label: "Raffle Winnings", pct: "Variable", desc: "Win NFTs, tokens, and ETH through the Raffle House", icon: Ticket },
   { label: "Airdrop Rewards", pct: "Surprise drops", desc: "Projects and the platform reward active stakers", icon: Gift },
   { label: "Referral Bonuses", pct: "100 pts each", desc: "Invite friends and earn bonus points for every signup", icon: Users },
   { label: "Leaderboard Prizes", pct: "Top stakers", desc: "Climb the leaderboard for exclusive rewards", icon: Trophy },
 ];
-
-import { TrendingUp } from "lucide-react";
 
 const Pricing = () => {
   return (
@@ -98,7 +100,7 @@ const Pricing = () => {
             <span className="font-display text-[10px] text-primary tracking-widest">TRANSPARENT PRICING</span>
           </div>
           <h1 className="font-display text-4xl text-foreground mb-3 tracking-wider">
-            FAIR FEES. <span className="text-primary">MASSIVE</span> REWARDS.
+            FAIR FEES. <span className="text-neon-green drop-shadow-[0_0_8px_hsl(var(--neon-green))]">MASSIVE</span> REWARDS.
           </h1>
           <p className="text-muted-foreground max-w-lg mx-auto text-sm">
             We keep fees minimal so you keep more of your rewards. Every fee supports
@@ -115,14 +117,15 @@ const Pricing = () => {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
+              whileHover={{ y: -4 }}
             >
               <p className={`font-display text-xs tracking-widest ${tier.accent} mb-2`}>{tier.name}</p>
-              <p className="font-display text-3xl text-foreground mb-1">{tier.price}</p>
-              <p className="text-xs text-muted-foreground mb-5">{tier.subtitle}</p>
+              <p className={`font-display text-3xl ${tier.highlight} drop-shadow-[0_0_6px_hsl(var(--neon-green)/0.4)]`}>{tier.price}</p>
+              <p className="text-xs text-muted-foreground mb-5 mt-1">{tier.subtitle}</p>
               <ul className="space-y-2.5">
                 {tier.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-xs text-muted-foreground">
-                    <CheckCircle2 className={`w-3.5 h-3.5 ${tier.accent} shrink-0 mt-0.5`} />
+                  <li key={f} className="flex items-start gap-2 text-xs text-foreground/80">
+                    <CheckCircle2 className={`w-3.5 h-3.5 text-neon-green shrink-0 mt-0.5`} />
                     <span>{f}</span>
                   </li>
                 ))}
@@ -134,7 +137,7 @@ const Pricing = () => {
         {/* What You Earn */}
         <div>
           <h2 className="font-display text-2xl text-foreground text-center mb-2 tracking-wider">
-            WHAT <span className="text-accent">YOU</span> EARN
+            WHAT <span className="text-neon-green drop-shadow-[0_0_8px_hsl(var(--neon-green))]">YOU</span> EARN
           </h2>
           <p className="text-center text-sm text-muted-foreground mb-8">Every stake is an investment in multiple reward streams</p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -145,17 +148,18 @@ const Pricing = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
+                whileHover={{ y: -3 }}
               >
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
-                    <item.icon className="w-4 h-4 text-primary" />
+                  <div className="p-2 rounded-lg bg-neon-green/10 border border-neon-green/20">
+                    <item.icon className="w-4 h-4 text-neon-green" />
                   </div>
                   <div>
                     <p className="font-display text-sm text-foreground">{item.label}</p>
-                    <p className="text-[10px] text-accent font-display">{item.pct}</p>
+                    <p className="text-[11px] text-neon-green font-display font-bold">{item.pct}</p>
                   </div>
                 </div>
-                <p className="text-xs text-muted-foreground">{item.desc}</p>
+                <p className="text-xs text-foreground/70">{item.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -177,18 +181,25 @@ const Pricing = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
               <div className="rounded-lg border border-border bg-card/50 p-4">
                 <p className="font-display text-sm text-foreground mb-1">💰 Revenue Share</p>
-                <p className="text-xs text-muted-foreground">Earn kickbacks for bringing users and running successful raffles. Active projects get rewarded with points and future token allocations.</p>
+                <p className="text-xs text-foreground/70">Earn kickbacks for bringing users and running successful raffles. Active projects get rewarded with points and future token allocations.</p>
               </div>
               <div className="rounded-lg border border-border bg-card/50 p-4">
                 <p className="font-display text-sm text-foreground mb-1">🎟️ Raffle Tools</p>
-                <p className="text-xs text-muted-foreground">Run raffles for your community with NFT, token, or ETH prizes. Share directly to X with one click. We handle payments and winner selection.</p>
+                <p className="text-xs text-foreground/70">Run raffles for your community with NFT, token, or ETH prizes. We handle payments and winner selection.</p>
               </div>
               <div className="rounded-lg border border-border bg-card/50 p-4">
                 <p className="font-display text-sm text-foreground mb-1">📦 Airdrop System</p>
-                <p className="text-xs text-muted-foreground">Send tokens, NFTs, or reward drops directly to your stakers. Build loyalty and keep your community engaged long-term.</p>
+                <p className="text-xs text-foreground/70">Send tokens, NFTs, or reward drops directly to your stakers. Build loyalty and keep your community engaged long-term.</p>
               </div>
             </div>
-            <Button asChild className="mt-6 bg-accent text-accent-foreground font-display">
+
+            {/* Master fee lock notice */}
+            <div className="mt-6 flex items-center justify-center gap-2 text-[10px] text-muted-foreground">
+              <Lock className="w-3 h-3" />
+              <span>Platform network fee ($0.12/action) is locked and non-negotiable. Project fees are customizable.</span>
+            </div>
+
+            <Button asChild className="mt-4 bg-accent text-accent-foreground font-display">
               <Link to="/auth">Get Started — List Your Project</Link>
             </Button>
           </div>
