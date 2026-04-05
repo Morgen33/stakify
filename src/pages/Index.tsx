@@ -64,7 +64,7 @@ const Index = () => {
       <div className="bg-primary/5 border-b border-primary/10 py-1.5 text-center">
         <p className="text-[11px] text-muted-foreground font-body tracking-wide">
           <span className="font-display text-primary/80 text-[10px] mr-1.5">BETA</span>
-          Platform is in early access — features &amp; fees are subject to change as we refine the experience.
+          Platform is in early access — Point system, badge earnings &amp; additional features coming soon. Staking is live!
         </p>
       </div>
       <nav className="border-b border-border bg-card/80 backdrop-blur-md sticky top-0 z-50">
