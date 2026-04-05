@@ -8,7 +8,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Layers, TrendingUp, Trophy, Coins, Gift, HelpCircle,
-  Clock, Unlock, Lock, RefreshCw, ExternalLink, Zap, Image, CheckCircle2, Gamepad2, AlertTriangle, DollarSign, ArrowLeftRight, Sparkles
+  Clock, Unlock, Lock, RefreshCw, ExternalLink, Zap, Image, CheckCircle2, Gamepad2, AlertTriangle, DollarSign, ArrowLeftRight, Sparkles,
+  User, Palette, Star, Crown, Shield, Wand2
 } from "lucide-react";
 import { motion } from "framer-motion";
 import WalletModal from "@/components/WalletModal";
