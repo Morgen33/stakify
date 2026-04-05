@@ -274,23 +274,23 @@ const Index = () => {
         <StatsBar />
 
         {/* ── Main grid ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Left column — slides in from left */}
-          <motion.div
-            className="lg:col-span-3 space-y-6"
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            <TopNFTProjects />
-            <BadgesPanel />
-
-            {/* Social Hub Preview (left sidebar) */}
-            <SocialHubPreview />
-          </motion.div>
+        <div className={`grid grid-cols-1 ${LAUNCH_MODE ? "lg:grid-cols-1 max-w-4xl mx-auto" : "lg:grid-cols-12"} gap-6`}>
+          {/* Left column — hidden in launch mode */}
+          {!LAUNCH_MODE && (
+            <motion.div
+              className="lg:col-span-3 space-y-6"
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <TopNFTProjects />
+              <BadgesPanel />
+              <SocialHubPreview />
+            </motion.div>
+          )}
 
           {/* Center column */}
-          <div className="lg:col-span-6">
+          <div className={LAUNCH_MODE ? "" : "lg:col-span-6"}>
             <div className="flex items-center justify-between mb-4" id="pools">
               <h2 className="font-display text-xl text-foreground flex items-center gap-2">
                 Active Staking Pools
@@ -305,7 +305,7 @@ const Index = () => {
                 Earn dual rewards on every stake ✨
               </span>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className={`grid grid-cols-1 ${LAUNCH_MODE ? "md:grid-cols-2 lg:grid-cols-3" : "md:grid-cols-2"} gap-4`}>
               {displayPools.map((pool, i) => (
                 <motion.div
                   key={pool.projectName}
@@ -317,34 +317,61 @@ const Index = () => {
                 </motion.div>
               ))}
             </div>
+
+            {/* Launch mode teaser for upcoming features */}
+            {LAUNCH_MODE && (
+              <motion.div
+                className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+              >
+                {[
+                  { emoji: "🏆", title: "Leaderboard", desc: "Compete with stakers worldwide" },
+                  { emoji: "🎟️", title: "Raffle House", desc: "Win NFTs, tokens & ETH" },
+                  { emoji: "💬", title: "Social Hub", desc: "Live stages, chat & music" },
+                ].map((item) => (
+                  <div key={item.title} className="rounded-xl border border-accent/20 bg-card/50 p-5 text-center relative overflow-hidden">
+                    <div className="absolute inset-0 backdrop-blur-[1px] bg-background/20" />
+                    <div className="relative z-10">
+                      <span className="text-3xl block mb-2">{item.emoji}</span>
+                      <p className="font-display text-sm text-foreground tracking-wider mb-1">{item.title}</p>
+                      <p className="text-[10px] text-muted-foreground mb-2">{item.desc}</p>
+                      <Badge variant="outline" className="font-display text-[9px] border-accent/40 text-accent animate-pulse">
+                        COMING SOON
+                      </Badge>
+                    </div>
+                  </div>
+                ))}
+              </motion.div>
+            )}
           </div>
 
-          {/* Right column */}
-          <motion.div
-            className="lg:col-span-3 space-y-6"
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-          >
-            <div id="leaderboard">
-              <Leaderboard />
-            </div>
-
-            {/* Raffle Promo */}
-            <Link to="/raffle" className="block">
-              <motion.div
-                className="rounded-xl border border-neon-purple/20 bg-gradient-to-br from-neon-purple/5 to-accent/5 p-5 text-center hover:border-neon-purple/40 transition-colors"
-                whileHover={{ scale: 1.02 }}
-              >
-                <span className="text-3xl mb-2 block">🎟️</span>
-                <p className="font-display text-sm text-foreground tracking-wider mb-1">RAFFLE HOUSE</p>
-                <p className="text-[10px] text-neon-purple font-display tracking-widest mb-2">COMING SOON</p>
-                <p className="text-[10px] text-muted-foreground">Win NFTs, tokens & ETH. Buy tickets with ETH, USDC, or SOL!</p>
-              </motion.div>
-            </Link>
-
-            <ReferralPanel />
-          </motion.div>
+          {/* Right column — hidden in launch mode */}
+          {!LAUNCH_MODE && (
+            <motion.div
+              className="lg:col-span-3 space-y-6"
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+            >
+              <div id="leaderboard">
+                <Leaderboard />
+              </div>
+              <Link to="/raffle" className="block">
+                <motion.div
+                  className="rounded-xl border border-neon-purple/20 bg-gradient-to-br from-neon-purple/5 to-accent/5 p-5 text-center hover:border-neon-purple/40 transition-colors"
+                  whileHover={{ scale: 1.02 }}
+                >
+                  <span className="text-3xl mb-2 block">🎟️</span>
+                  <p className="font-display text-sm text-foreground tracking-wider mb-1">RAFFLE HOUSE</p>
+                  <p className="text-[10px] text-neon-purple font-display tracking-widest mb-2">COMING SOON</p>
+                  <p className="text-[10px] text-muted-foreground">Win NFTs, tokens & ETH. Buy tickets with ETH, USDC, or SOL!</p>
+                </motion.div>
+              </Link>
+              <ReferralPanel />
+            </motion.div>
+          )}
         </div>
 
         {/* Footer */}
