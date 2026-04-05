@@ -130,7 +130,7 @@ const StakeModal = ({ poolName, poolId, nftContract, apy, rewardToken, lockPerio
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="bg-card border-border max-w-md max-h-[90vh] overflow-y-auto">
+      <DialogContent className="bg-card border-border max-w-2xl w-[95vw] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="font-display text-foreground tracking-wider flex items-center gap-2">
             STAKE — {poolName}
