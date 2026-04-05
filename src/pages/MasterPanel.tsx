@@ -1082,7 +1082,7 @@ const MasterPanel = () => {
                       <div className="flex items-center gap-3">
                         <span className={`w-2 h-2 rounded-full ${p.status === "active" ? "bg-primary" : "bg-destructive"}`} />
                         <span className="font-display text-foreground">{p.project_name}</span>
-                        <span className="text-muted-foreground">{p.apy}% APY</span>
+                        <span className="text-muted-foreground">{p.apy}% Rate</span>
                         <span className="text-muted-foreground">{p.total_staked} staked</span>
                       </div>
                       <span className="text-[10px] font-display text-muted-foreground">{p.status}</span>

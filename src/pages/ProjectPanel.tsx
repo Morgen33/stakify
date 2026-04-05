@@ -337,7 +337,7 @@ const ProjectPanel = () => {
                           </div>
                         </div>
                         <div className="flex gap-4 text-xs text-muted-foreground">
-                          <span>APY: <strong className="text-foreground">{pool.apy}%</strong></span>
+                          <span>Rate: <strong className="text-foreground">{pool.apy}%</strong></span>
                           <span>Fee: <strong className="text-destructive">{pool.platform_fee_pct}%</strong></span>
                           <span>Lock: <strong className="text-foreground">{pool.lock_period_days}d</strong></span>
                           <span>Staked: <strong className="text-foreground">{pool.total_staked}</strong></span>
@@ -511,7 +511,7 @@ const ProjectPanel = () => {
                   <Input type="number" value={calcAvgStake} onChange={(e) => setCalcAvgStake(e.target.value)} className="bg-secondary border-border text-sm mt-1" />
                 </div>
                 <div>
-                  <label className="text-[10px] text-muted-foreground font-display tracking-wider">APY %</label>
+                  <label className="text-[10px] text-muted-foreground font-display tracking-wider">REWARD RATE %</label>
                   <Input type="number" value={calcApy} onChange={(e) => setCalcApy(e.target.value)} className="bg-secondary border-border text-sm mt-1" />
                 </div>
                 <div>

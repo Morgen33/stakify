@@ -83,10 +83,10 @@ const StakingCard = ({
         <div className="bg-secondary/50 rounded-md p-3">
           <div className="flex items-center gap-1 mb-1">
             <TrendingUp className="w-3 h-3 text-neon-green" />
-            <span className="text-xs text-muted-foreground">APY</span>
+            <span className="text-xs text-muted-foreground">Reward Rate</span>
             <Tooltip>
               <TooltipTrigger><HelpCircle className="w-2.5 h-2.5 text-muted-foreground" /></TooltipTrigger>
-              <TooltipContent>Annual Percentage Yield — the estimated yearly return on your staked assets.</TooltipContent>
+              <TooltipContent>The estimated reward rate set by the project — earned as tokens &amp; badges, not financial yield.</TooltipContent>
             </Tooltip>
           </div>
           <p className="font-display text-xl text-neon-green">{apy}%</p>

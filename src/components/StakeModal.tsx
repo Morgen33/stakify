@@ -42,7 +42,7 @@ const stakeTypes: { type: StakeType; mode: StakeMode; label: string; icon: typeo
   {
     type: "flexible", mode: 2,
     label: "Flexible", icon: Zap,
-    tip: "Choose your own lock duration. Longer locks earn higher APY boosts.",
+    tip: "Choose your own lock duration. Longer locks earn higher reward boosts.",
     desc: "Custom duration • Scaled rewards",
   },
 ];
@@ -172,7 +172,7 @@ const StakeModal = ({ poolName, poolId, nftContract, apy, rewardToken, lockPerio
                 <Tooltip>
                   <TooltipTrigger><HelpCircle className="w-3 h-3" /></TooltipTrigger>
                   <TooltipContent className="max-w-xs">
-                    <p className="text-xs">Soft = withdraw anytime (lower APY). Hard = locked (higher APY). Flexible = you choose the duration.</p>
+                    <p className="text-xs">Soft = withdraw anytime (lower rewards). Hard = locked (higher rewards). Flexible = you choose the duration.</p>
                   </TooltipContent>
                 </Tooltip>
               </p>
@@ -209,7 +209,7 @@ const StakeModal = ({ poolName, poolId, nftContract, apy, rewardToken, lockPerio
                   LOCK DURATION
                   <Tooltip>
                     <TooltipTrigger><HelpCircle className="w-3 h-3" /></TooltipTrigger>
-                    <TooltipContent>Longer locks earn proportionally higher APY.</TooltipContent>
+                    <TooltipContent>Longer locks earn proportionally higher rewards.</TooltipContent>
                   </Tooltip>
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -264,7 +264,7 @@ const StakeModal = ({ poolName, poolId, nftContract, apy, rewardToken, lockPerio
             {/* Breakdown */}
             <div className="rounded-lg border border-border bg-secondary/20 p-4 space-y-2">
               <div className="flex justify-between text-xs">
-                <span className="text-muted-foreground">Effective APY</span>
+                <span className="text-muted-foreground">Effective Reward Rate</span>
                 <span className="font-display text-neon-green">{effectiveApy.toFixed(1)}%</span>
               </div>
               <div className="flex justify-between text-xs">
