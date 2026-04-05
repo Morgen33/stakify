@@ -524,7 +524,9 @@ const MasterPanel = () => {
             <TabsTrigger value="diagnostics" className="font-display gap-1.5 text-xs text-primary"><Eye className="w-3.5 h-3.5" /> Diagnostics</TabsTrigger>
             <TabsTrigger value="features" className="font-display gap-1.5 text-xs"><Power className="w-3.5 h-3.5" /> Features</TabsTrigger>
             <TabsTrigger value="xray" className="font-display gap-1.5 text-xs text-accent"><ScanEye className="w-3.5 h-3.5" /> X-Ray</TabsTrigger>
+            <TabsTrigger value="pin" className="font-display gap-1.5 text-xs text-primary"><KeyRound className="w-3.5 h-3.5" /> 🔑 PIN</TabsTrigger>
           </TabsList>
+
 
           {/* ═══ MY WALLETS ═══ */}
           <TabsContent value="wallets" className="space-y-6">
@@ -1312,6 +1314,33 @@ const MasterPanel = () => {
                 </div>
               </TabsContent>
             </Tabs>
+          </TabsContent>
+
+          {/* ═══ PIN — Quick Change ═══ */}
+          <TabsContent value="pin" className="space-y-4">
+            <div className="max-w-md mx-auto rounded-lg border border-primary/30 bg-primary/5 p-6">
+              <h3 className="font-display text-lg text-foreground mb-2 tracking-wider flex items-center gap-2">
+                <KeyRound className="w-5 h-5 text-primary" /> Change Master PIN
+              </h3>
+              <p className="text-xs text-muted-foreground mb-6">Your PIN is the 2FA gate to this panel. 3 failed attempts = 60s lockout.</p>
+              <div className="space-y-4">
+                <div>
+                  <label className="text-xs text-muted-foreground font-display tracking-wider">CURRENT PIN</label>
+                  <Input type="password" value={changePinOld} onChange={e => setChangePinOld(e.target.value)} placeholder="••••" className="bg-secondary border-border mt-1" maxLength={8} />
+                </div>
+                <div>
+                  <label className="text-xs text-muted-foreground font-display tracking-wider">NEW PIN</label>
+                  <Input type="password" value={changePinNew} onChange={e => setChangePinNew(e.target.value)} placeholder="••••" className="bg-secondary border-border mt-1" maxLength={8} />
+                </div>
+                <div>
+                  <label className="text-xs text-muted-foreground font-display tracking-wider">CONFIRM NEW PIN</label>
+                  <Input type="password" value={changePinConfirm} onChange={e => setChangePinConfirm(e.target.value)} placeholder="••••" className="bg-secondary border-border mt-1" maxLength={8} />
+                </div>
+                <Button onClick={handleChangePin} className="w-full font-display">
+                  <Save className="w-4 h-4 mr-2" /> Update PIN
+                </Button>
+              </div>
+            </div>
           </TabsContent>
         </Tabs>
       </main>
