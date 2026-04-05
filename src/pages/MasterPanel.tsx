@@ -442,9 +442,11 @@ const MasterPanel = () => {
           <p className="text-xs text-muted-foreground">Enter your security PIN to continue</p>
           <Input
             type="password"
-            placeholder="••••••"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            placeholder="•••••••"
             value={pinInput}
-            onChange={e => { setPinInput(e.target.value); setPinError(false); }}
+            onChange={e => { setPinInput(e.target.value.replace(/\D/g, "")); setPinError(false); }}
             onKeyDown={e => e.key === "Enter" && verifyPin()}
             className={`text-center text-lg tracking-[0.5em] bg-secondary border-border ${pinError ? "border-destructive" : ""}`}
             maxLength={8}
