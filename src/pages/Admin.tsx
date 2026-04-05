@@ -751,32 +751,124 @@ const Admin = () => {
 
           {/* ═══ FEES ═══ */}
           <TabsContent value="fees" className="space-y-6">
-            <div className="rounded-lg border border-accent/20 bg-accent/5 p-4 flex items-start gap-3">
-              <DollarSign className="w-5 h-5 text-accent shrink-0 mt-0.5" />
+            {/* Header */}
+            <div className="rounded-lg border border-neon-green/30 bg-neon-green/5 p-5 flex items-start gap-3">
+              <DollarSign className="w-6 h-6 text-neon-green shrink-0 mt-0.5" />
               <div>
-                <p className="font-display text-sm text-accent">Platform Fee Control</p>
-                <p className="text-xs text-muted-foreground mt-1">Change default fees here and override per-pool in Pools tab or per-project in Projects tab.</p>
+                <p className="font-display text-base text-neon-green tracking-wider">💰 FEE CONTROL CENTER</p>
+                <p className="text-sm text-foreground/80 mt-1">Manage platform fees, per-project rates, and view the fee structure. The <strong className="text-neon-green">Master Network Fee ($0.12/action)</strong> is locked and can only be changed by the Master.</p>
               </div>
             </div>
+
+            {/* Fee Structure Overview */}
+            <div className="rounded-lg border border-border bg-card p-6">
+              <h3 className="font-display text-sm text-foreground mb-4 tracking-wider flex items-center gap-2">
+                <Layers className="w-4 h-4 text-primary" /> FEE STRUCTURE OVERVIEW
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="rounded-lg border border-neon-green/20 bg-neon-green/5 p-4 text-center">
+                  <Lock className="w-5 h-5 text-neon-green mx-auto mb-2" />
+                  <p className="font-display text-2xl text-neon-green">$0.12</p>
+                  <p className="font-display text-[10px] text-neon-green/80 tracking-wider mt-1">MASTER NETWORK FEE</p>
+                  <p className="text-[10px] text-muted-foreground mt-1">Per stake/unstake action</p>
+                  <p className="text-[9px] text-destructive mt-2 font-display">🔒 LOCKED — Master Only</p>
+                </div>
+                <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 text-center">
+                  <DollarSign className="w-5 h-5 text-primary mx-auto mb-2" />
+                  <p className="font-display text-2xl text-primary">10%</p>
+                  <p className="font-display text-[10px] text-primary/80 tracking-wider mt-1">DEFAULT PROJECT FEE</p>
+                  <p className="text-[10px] text-muted-foreground mt-1">On staking rewards</p>
+                  <p className="text-[9px] text-neon-green mt-2 font-display">✏️ Adjustable per project</p>
+                </div>
+                <div className="rounded-lg border border-accent/20 bg-accent/5 p-4 text-center">
+                  <CreditCard className="w-5 h-5 text-accent mx-auto mb-2" />
+                  <p className="font-display text-2xl text-accent">5%</p>
+                  <p className="font-display text-[10px] text-accent/80 tracking-wider mt-1">EARLY UNLOCK FEE</p>
+                  <p className="text-[10px] text-muted-foreground mt-1">Charged for breaking lock</p>
+                  <p className="text-[9px] text-neon-green mt-2 font-display">✏️ Adjustable per pool</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Per-Project Fee Table */}
+            <div className="rounded-lg border border-border bg-card p-6">
+              <h3 className="font-display text-sm text-foreground mb-4 tracking-wider flex items-center gap-2">
+                <Building2 className="w-4 h-4 text-accent" /> PROJECT FEE RATES
+              </h3>
+              <p className="text-xs text-muted-foreground mb-4">Adjust fee percentages per project. These fees apply to staking rewards within their pools.</p>
+              {projects.length > 0 ? (
+                <div className="space-y-3">
+                  {projects.map((p) => (
+                    <div key={p.id} className="flex items-center justify-between p-3 rounded-lg bg-secondary/30 border border-border">
+                      <div className="flex items-center gap-3">
+                        <span className={`w-2 h-2 rounded-full ${p.status === "active" ? "bg-neon-green" : "bg-destructive"}`} />
+                        <span className="font-display text-sm text-foreground">{p.project_name}</span>
+                        <span className="text-[10px] text-muted-foreground">({p.slug})</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-display text-sm text-neon-green">{p.platform_fee_pct}%</span>
+                        <Input
+                          type="number"
+                          placeholder="New %"
+                          className="bg-background border-border text-xs w-20"
+                          onBlur={(e) => {
+                            if (e.target.value && parseFloat(e.target.value) !== p.platform_fee_pct) {
+                              updateProjectFee(p.id, e.target.value);
+                            }
+                          }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground text-center py-4">No projects onboarded yet.</p>
+              )}
+            </div>
+
+            {/* All Platform Settings */}
             <div className="rounded-lg border border-border bg-card p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-display text-sm text-foreground tracking-wider">SETTINGS</h3>
+                <h3 className="font-display text-sm text-foreground tracking-wider flex items-center gap-2">
+                  <Settings className="w-4 h-4 text-muted-foreground" /> ALL PLATFORM SETTINGS
+                </h3>
                 <Button variant="ghost" size="sm" onClick={fetchAll} className="text-xs"><RefreshCw className="w-3 h-3 mr-1" /> Refresh</Button>
               </div>
               <div className="space-y-3">
-                {settings.map((s) => (
-                  <div key={s.id} className="flex items-center gap-3 p-3 rounded-lg bg-secondary/30 border border-border">
-                    <span className="font-display text-xs text-foreground min-w-[180px] tracking-wider">{s.key}</span>
-                    <Input defaultValue={s.value} onBlur={(e) => { if (e.target.value !== s.value) updateSetting(s.id, e.target.value); }} className="bg-background border-border max-w-xs text-sm" />
-                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => deleteSetting(s.id)}><Trash2 className="w-3.5 h-3.5 text-destructive" /></Button>
-                  </div>
-                ))}
+                {settings.map((s) => {
+                  const isMasterFee = s.key === "master_network_fee";
+                  return (
+                    <div key={s.id} className={`flex items-center gap-3 p-3 rounded-lg border ${isMasterFee ? "border-neon-green/30 bg-neon-green/5" : "border-border bg-secondary/30"}`}>
+                      <span className={`font-display text-xs min-w-[180px] tracking-wider ${isMasterFee ? "text-neon-green" : "text-foreground"}`}>
+                        {isMasterFee && "🔒 "}{s.key}
+                      </span>
+                      <Input
+                        defaultValue={s.value}
+                        disabled={isMasterFee}
+                        onBlur={(e) => { if (!isMasterFee && e.target.value !== s.value) updateSetting(s.id, e.target.value); }}
+                        className={`border-border max-w-xs text-sm ${isMasterFee ? "bg-neon-green/10 text-neon-green font-display cursor-not-allowed" : "bg-background"}`}
+                      />
+                      {isMasterFee ? (
+                        <span className="text-[9px] text-destructive font-display">Master Only</span>
+                      ) : (
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => deleteSetting(s.id)}><Trash2 className="w-3.5 h-3.5 text-destructive" /></Button>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
               <div className="mt-4 pt-4 border-t border-border grid grid-cols-3 gap-2">
                 <Input placeholder="Key" value={newSettingKey} onChange={(e) => setNewSettingKey(e.target.value)} className="bg-background border-border text-xs" />
                 <Input placeholder="Value" value={newSettingValue} onChange={(e) => setNewSettingValue(e.target.value)} className="bg-background border-border text-xs" />
                 <Button onClick={createSetting} size="sm" className="bg-primary text-primary-foreground font-display text-xs"><Plus className="w-3 h-3 mr-1" /> Add</Button>
               </div>
+            </div>
+
+            {/* Revenue micro-fee notice */}
+            <div className="rounded-lg border border-border bg-card p-4 text-center">
+              <p className="text-xs text-muted-foreground">
+                💡 <span className="text-foreground font-display">Pro tip:</span> Micro-fees on every action add up. At 1,000 stakes/day × $0.12 = <span className="text-neon-green font-display">$120/day</span> in network fees alone — plus your percentage on rewards.
+              </p>
             </div>
           </TabsContent>
 
