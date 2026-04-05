@@ -20,6 +20,7 @@ import {
 import BattleLog from "@/components/BattleLog";
 import FeatureToggles from "@/components/FeatureToggles";
 import LiveAlertsPanel from "@/components/LiveAlertsPanel";
+import { Badge } from "@/components/ui/badge";
 import { logAction } from "@/lib/activity-logger";
 
 const MasterPanel = () => {
