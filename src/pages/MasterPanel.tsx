@@ -210,6 +210,29 @@ const MasterPanel = () => {
     toast({ title: "✅ Error resolved" });
   };
 
+  const saveUserEdit = async (userId: string) => {
+    const { error } = await supabase.from("profiles").update({
+      display_name: editUserData.display_name,
+      rank: editUserData.rank,
+      points: editUserData.points,
+      level: editUserData.level,
+    }).eq("user_id", userId);
+    if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
+    toast({ title: "✅ User profile updated" });
+    logAction("User profile edited by master", { user_id: userId });
+    setEditingUser(null);
+    fetchAll();
+  };
+
+  const assignBadgeToUser = async () => {
+    if (!badgeAssignUser || !badgeAssignBadge) { toast({ title: "Select user and badge", variant: "destructive" }); return; }
+    const { error } = await supabase.from("user_badges").insert({ user_id: badgeAssignUser, badge_id: badgeAssignBadge });
+    if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
+    toast({ title: "✅ Badge awarded!" });
+    logAction("Badge assigned", { user_id: badgeAssignUser, badge_id: badgeAssignBadge });
+    setBadgeAssignUser(""); setBadgeAssignBadge("");
+  };
+
 
   const [newMasterWallet, setNewMasterWallet] = useState({ label: "", address: "", wallet_purpose: "fee_collection", notes: "" });
   const [newWaiver, setNewWaiver] = useState({ user_id: "", project_account_id: "", waiver_type: "full", reason: "" });
