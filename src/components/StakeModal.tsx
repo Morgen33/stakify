@@ -172,7 +172,7 @@ const StakeModal = ({ poolName, poolId, nftContract, apy, rewardToken, lockPerio
                 <Tooltip>
                   <TooltipTrigger><HelpCircle className="w-3 h-3" /></TooltipTrigger>
                   <TooltipContent className="max-w-xs">
-                    <p className="text-xs">Soft = withdraw anytime (lower APY). Hard = locked (higher APY). Flexible = you choose the duration.</p>
+                    <p className="text-xs">Soft = withdraw anytime (lower rewards). Hard = locked (higher rewards). Flexible = you choose the duration.</p>
                   </TooltipContent>
                 </Tooltip>
               </p>
