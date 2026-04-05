@@ -844,62 +844,6 @@ const MasterPanel = () => {
                 })}
               </div>
             </div>
-
-            {/* ═══ MASTER FEE WITHDRAWAL ═══ */}
-            <div className="rounded-lg border border-primary/30 bg-primary/5 p-6">
-              <h3 className="font-display text-sm text-primary mb-2 tracking-wider flex items-center gap-2">
-                <DollarSign className="w-4 h-4" /> MASTER FEE WITHDRAWAL
-              </h3>
-              <p className="text-xs text-muted-foreground mb-4">
-                Extract <strong className="text-primary">only your 12% Master Network Fee</strong> earnings. You cannot access admin or project funds — those are completely separate.
-              </p>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                <div className="rounded-lg border border-border bg-secondary/30 p-4 text-center">
-                  <p className="text-[10px] text-muted-foreground font-display tracking-wider">YOUR FEE RATE</p>
-                  <p className="font-display text-2xl text-primary mt-1">12%</p>
-                  <p className="text-[10px] text-muted-foreground mt-1">Master Network Fee</p>
-                </div>
-                <div className="rounded-lg border border-border bg-secondary/30 p-4 text-center">
-                  <p className="text-[10px] text-muted-foreground font-display tracking-wider">TOTAL STAKES</p>
-                  <p className="font-display text-2xl text-foreground mt-1">{stakes.length}</p>
-                  <p className="text-[10px] text-muted-foreground mt-1">All-time transactions</p>
-                </div>
-                <div className="rounded-lg border border-border bg-secondary/30 p-4 text-center">
-                  <p className="text-[10px] text-muted-foreground font-display tracking-wider">ACTIVE WALLETS</p>
-                  <p className="font-display text-2xl text-foreground mt-1">{masterWallets.filter(w => w.is_active).length}</p>
-                  <p className="text-[10px] text-muted-foreground mt-1">Fee collection wallets</p>
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <p className="font-display text-xs text-foreground tracking-wider">WITHDRAWAL WALLET</p>
-                {masterWallets.filter(w => w.is_active).length > 0 ? (
-                  masterWallets.filter(w => w.is_active).map(w => (
-                    <div key={w.id} className="flex items-center gap-3 p-3 rounded-lg bg-card border border-primary/20">
-                      <Wallet className="w-4 h-4 text-primary" />
-                      <div className="flex-1">
-                        <p className="font-display text-xs text-foreground">{w.label}</p>
-                        <p className="text-[10px] text-muted-foreground font-mono">{w.address}</p>
-                      </div>
-                      <Badge variant="outline" className="text-[9px] border-primary/30 text-primary">ACTIVE</Badge>
-                    </div>
-                  ))
-                ) : (
-                  <div className="rounded-lg border border-border bg-secondary/20 p-4 text-center">
-                    <p className="text-xs text-muted-foreground">No active wallet set. Add one in the <strong className="text-foreground">Wallets</strong> tab above.</p>
-                  </div>
-                )}
-              </div>
-
-              <div className="mt-4 p-3 rounded-lg bg-destructive/5 border border-destructive/20">
-                <p className="text-[10px] text-muted-foreground leading-relaxed">
-                  <strong className="text-destructive">⚠️ Important:</strong> This only withdraws <strong className="text-foreground">your 12% share</strong>. 
-                  Admin fees, project fees, and user funds are in separate pools and <strong className="text-destructive">cannot be accessed from here</strong>. 
-                  All withdrawals are logged in the activity log.
-                </p>
-              </div>
-            </div>
           </TabsContent>
 
           {/* ═══ SETTINGS ═══ */}
