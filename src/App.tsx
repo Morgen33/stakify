@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -6,22 +7,35 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { WalletProvider } from "@/contexts/WalletContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
-import Index from "./pages/Index.tsx";
-import Auth from "./pages/Auth.tsx";
-import Admin from "./pages/Admin.tsx";
-import Dashboard from "./pages/Dashboard.tsx";
-import ProjectPanel from "./pages/ProjectPanel.tsx";
-import ProjectPage from "./pages/ProjectPage.tsx";
-import OperatorPanel from "./pages/OperatorPanel.tsx";
-import MasterPanel from "./pages/MasterPanel.tsx";
-import Arcade from "./pages/Arcade.tsx";
-import Raffle from "./pages/Raffle.tsx";
-import Pricing from "./pages/Pricing.tsx";
-import About from "./pages/About.tsx";
-import Lottery from "./pages/Lottery.tsx";
-import NotFound from "./pages/NotFound.tsx";
+import LoadingSkeleton from "@/components/LoadingSkeleton";
 
-const queryClient = new QueryClient();
+// Eager-load critical route
+import Index from "./pages/Index.tsx";
+
+// Lazy-load everything else for faster initial load
+const Auth = lazy(() => import("./pages/Auth.tsx"));
+const Admin = lazy(() => import("./pages/Admin.tsx"));
+const Dashboard = lazy(() => import("./pages/Dashboard.tsx"));
+const ProjectPanel = lazy(() => import("./pages/ProjectPanel.tsx"));
+const ProjectPage = lazy(() => import("./pages/ProjectPage.tsx"));
+const OperatorPanel = lazy(() => import("./pages/OperatorPanel.tsx"));
+const MasterPanel = lazy(() => import("./pages/MasterPanel.tsx"));
+const Arcade = lazy(() => import("./pages/Arcade.tsx"));
+const Raffle = lazy(() => import("./pages/Raffle.tsx"));
+const Pricing = lazy(() => import("./pages/Pricing.tsx"));
+const About = lazy(() => import("./pages/About.tsx"));
+const Lottery = lazy(() => import("./pages/Lottery.tsx"));
+const NotFound = lazy(() => import("./pages/NotFound.tsx"));
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 2,
+      staleTime: 30_000,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const App = () => (
   <ErrorBoundary>
@@ -32,23 +46,24 @@ const App = () => (
         <BrowserRouter>
           <AuthProvider>
             <WalletProvider>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/admin" element={<Admin />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/operator" element={<OperatorPanel />} />
-                <Route path="/master" element={<MasterPanel />} />
-                <Route path="/project-panel" element={<ProjectPanel />} />
-                <Route path="/project/:slug" element={<ProjectPage />} />
-                <Route path="/arcade" element={<Arcade />} />
-                <Route path="/raffle" element={<Raffle />} />
-                <Route path="/pricing" element={<Pricing />} />
-                <Route path="/lottery" element={<Lottery />} />
-                <Route path="/about" element={<About />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
+              <Suspense fallback={<LoadingSkeleton />}>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/admin" element={<Admin />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/operator" element={<OperatorPanel />} />
+                  <Route path="/master" element={<MasterPanel />} />
+                  <Route path="/project-panel" element={<ProjectPanel />} />
+                  <Route path="/project/:slug" element={<ProjectPage />} />
+                  <Route path="/arcade" element={<Arcade />} />
+                  <Route path="/raffle" element={<Raffle />} />
+                  <Route path="/pricing" element={<Pricing />} />
+                  <Route path="/lottery" element={<Lottery />} />
+                  <Route path="/about" element={<About />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Suspense>
             </WalletProvider>
           </AuthProvider>
         </BrowserRouter>
