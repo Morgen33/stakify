@@ -756,7 +756,7 @@ const Admin = () => {
               <DollarSign className="w-6 h-6 text-neon-green shrink-0 mt-0.5" />
               <div>
                 <p className="font-display text-base text-neon-green tracking-wider">💰 FEE CONTROL CENTER</p>
-                <p className="text-sm text-foreground/80 mt-1">Manage platform fees, per-project rates, and view the fee structure. The <strong className="text-neon-green">Master Network Fee ($0.12/action)</strong> is locked and can only be changed by the Master.</p>
+                <p className="text-sm text-foreground/80 mt-1">Manage platform fees, per-project rates, and view the fee structure. All fees are <strong className="text-neon-green">subject to change at any time</strong> by the platform. The Master Network Fee is set by the Master and may be adjusted as needed.</p>
               </div>
             </div>
 
