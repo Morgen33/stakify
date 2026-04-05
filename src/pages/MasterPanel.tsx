@@ -124,8 +124,8 @@ const MasterPanel = () => {
       toast({ title: "Current PIN incorrect", variant: "destructive" });
       return;
     }
-    if (changePinNew.length < 4) {
-      toast({ title: "PIN must be at least 4 digits", variant: "destructive" });
+    if (!/^\d{3,8}$/.test(changePinNew)) {
+      toast({ title: "PIN must be 3–8 digits (numbers only)", variant: "destructive" });
       return;
     }
     if (changePinNew !== changePinConfirm) {
@@ -442,9 +442,11 @@ const MasterPanel = () => {
           <p className="text-xs text-muted-foreground">Enter your security PIN to continue</p>
           <Input
             type="password"
-            placeholder="••••••"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            placeholder="•••••••"
             value={pinInput}
-            onChange={e => { setPinInput(e.target.value); setPinError(false); }}
+            onChange={e => { setPinInput(e.target.value.replace(/\D/g, "")); setPinError(false); }}
             onKeyDown={e => e.key === "Enter" && verifyPin()}
             className={`text-center text-lg tracking-[0.5em] bg-secondary border-border ${pinError ? "border-destructive" : ""}`}
             maxLength={8}
@@ -918,19 +920,20 @@ const MasterPanel = () => {
               <h3 className="font-display text-sm text-foreground mb-4 tracking-wider flex items-center gap-2">
                 <Lock className="w-4 h-4 text-primary" /> CHANGE MASTER PIN
               </h3>
-              <p className="text-[10px] text-muted-foreground mb-4">This PIN is your 2FA gate for the Master panel. 3 failed attempts = 60s lockout.</p>
+              <p className="text-[10px] text-muted-foreground mb-1">This PIN is your 2FA gate for the Master panel. 3 failed attempts = 60s lockout.</p>
+              <p className="text-[10px] text-primary/80 mb-3">PIN: <strong>3–8 digits</strong> (numbers only).</p>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
                 <div>
                   <label className="text-[10px] text-muted-foreground font-display tracking-wider">CURRENT PIN</label>
-                  <Input type="password" value={changePinOld} onChange={e => setChangePinOld(e.target.value)} placeholder="••••" className="bg-secondary border-border text-sm mt-1" maxLength={8} />
+                  <Input type="password" inputMode="numeric" pattern="[0-9]*" value={changePinOld} onChange={e => setChangePinOld(e.target.value.replace(/\D/g, ""))} placeholder="•••" className="bg-secondary border-border text-sm mt-1" maxLength={8} />
                 </div>
                 <div>
                   <label className="text-[10px] text-muted-foreground font-display tracking-wider">NEW PIN</label>
-                  <Input type="password" value={changePinNew} onChange={e => setChangePinNew(e.target.value)} placeholder="••••" className="bg-secondary border-border text-sm mt-1" maxLength={8} />
+                  <Input type="password" inputMode="numeric" pattern="[0-9]*" value={changePinNew} onChange={e => setChangePinNew(e.target.value.replace(/\D/g, ""))} placeholder="3–8 digits" className="bg-secondary border-border text-sm mt-1" maxLength={8} />
                 </div>
                 <div>
                   <label className="text-[10px] text-muted-foreground font-display tracking-wider">CONFIRM NEW PIN</label>
-                  <Input type="password" value={changePinConfirm} onChange={e => setChangePinConfirm(e.target.value)} placeholder="••••" className="bg-secondary border-border text-sm mt-1" maxLength={8} />
+                  <Input type="password" inputMode="numeric" pattern="[0-9]*" value={changePinConfirm} onChange={e => setChangePinConfirm(e.target.value.replace(/\D/g, ""))} placeholder="3–8 digits" className="bg-secondary border-border text-sm mt-1" maxLength={8} />
                 </div>
               </div>
               <Button size="sm" onClick={handleChangePin} className="font-display text-xs">
@@ -1322,19 +1325,20 @@ const MasterPanel = () => {
               <h3 className="font-display text-lg text-foreground mb-2 tracking-wider flex items-center gap-2">
                 <KeyRound className="w-5 h-5 text-primary" /> Change Master PIN
               </h3>
-              <p className="text-xs text-muted-foreground mb-6">Your PIN is the 2FA gate to this panel. 3 failed attempts = 60s lockout.</p>
+              <p className="text-xs text-muted-foreground mb-1">Your PIN is the 2FA gate to this panel. 3 failed attempts = 60s lockout.</p>
+              <p className="text-xs text-primary/80 mb-6">PIN must be <strong>3–8 digits</strong> (numbers only).</p>
               <div className="space-y-4">
                 <div>
                   <label className="text-xs text-muted-foreground font-display tracking-wider">CURRENT PIN</label>
-                  <Input type="password" value={changePinOld} onChange={e => setChangePinOld(e.target.value)} placeholder="••••" className="bg-secondary border-border mt-1" maxLength={8} />
+                  <Input type="password" inputMode="numeric" pattern="[0-9]*" value={changePinOld} onChange={e => setChangePinOld(e.target.value.replace(/\D/g, ""))} placeholder="•••" className="bg-secondary border-border mt-1" maxLength={8} />
                 </div>
                 <div>
                   <label className="text-xs text-muted-foreground font-display tracking-wider">NEW PIN</label>
-                  <Input type="password" value={changePinNew} onChange={e => setChangePinNew(e.target.value)} placeholder="••••" className="bg-secondary border-border mt-1" maxLength={8} />
+                  <Input type="password" inputMode="numeric" pattern="[0-9]*" value={changePinNew} onChange={e => setChangePinNew(e.target.value.replace(/\D/g, ""))} placeholder="3–8 digits" className="bg-secondary border-border mt-1" maxLength={8} />
                 </div>
                 <div>
                   <label className="text-xs text-muted-foreground font-display tracking-wider">CONFIRM NEW PIN</label>
-                  <Input type="password" value={changePinConfirm} onChange={e => setChangePinConfirm(e.target.value)} placeholder="••••" className="bg-secondary border-border mt-1" maxLength={8} />
+                  <Input type="password" inputMode="numeric" pattern="[0-9]*" value={changePinConfirm} onChange={e => setChangePinConfirm(e.target.value.replace(/\D/g, ""))} placeholder="3–8 digits" className="bg-secondary border-border mt-1" maxLength={8} />
                 </div>
                 <Button onClick={handleChangePin} className="w-full font-display">
                   <Save className="w-4 h-4 mr-2" /> Update PIN
