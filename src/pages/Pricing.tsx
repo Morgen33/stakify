@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import {
   DollarSign, Shield, Zap, Trophy, ArrowLeft, CheckCircle2,
-  Sparkles, Users, Layers, Gift, Ticket, TrendingUp, Lock
+  Sparkles, Users, Layers, Gift, Ticket, TrendingUp, Lock, Info
 } from "lucide-react";
 import WalletModal from "@/components/WalletModal";
 import { Badge } from "@/components/ui/badge";
