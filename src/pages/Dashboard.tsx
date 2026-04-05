@@ -8,7 +8,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Layers, TrendingUp, Trophy, Coins, Gift, HelpCircle,
-  Clock, Unlock, Lock, RefreshCw, ExternalLink, Zap, Image, CheckCircle2, Gamepad2, AlertTriangle, DollarSign, ArrowLeftRight, Sparkles
+  Clock, Unlock, Lock, RefreshCw, ExternalLink, Zap, Image, CheckCircle2, Gamepad2, AlertTriangle, DollarSign, ArrowLeftRight, Sparkles,
+  User, Palette, Star, Crown, Shield, Wand2
 } from "lucide-react";
 import { motion } from "framer-motion";
 import WalletModal from "@/components/WalletModal";
@@ -184,6 +185,7 @@ const Dashboard = () => {
             <TabsTrigger value="badges" className="font-display gap-1.5 text-xs"><Trophy className="w-3.5 h-3.5" /> Badges</TabsTrigger>
             <TabsTrigger value="arcade" className="font-display gap-1.5 text-xs"><Gamepad2 className="w-3.5 h-3.5" /> Arcade</TabsTrigger>
             <TabsTrigger value="swap" className="font-display gap-1.5 text-xs relative"><ArrowLeftRight className="w-3.5 h-3.5" /> Swap <span className="ml-1 px-1.5 py-0.5 rounded-full bg-accent/20 text-accent text-[8px] font-display">SOON</span></TabsTrigger>
+            <TabsTrigger value="profile" className="font-display gap-1.5 text-xs relative"><User className="w-3.5 h-3.5" /> My Profile <span className="ml-1 px-1.5 py-0.5 rounded-full bg-primary/20 text-primary text-[8px] font-display">SOON</span></TabsTrigger>
           </TabsList>
 
           {/* Stakes */}
@@ -463,6 +465,79 @@ const Dashboard = () => {
               <Badge variant="outline" className="font-display text-xs border-accent/40 text-accent px-4 py-1.5 animate-pulse">
                 🚀 COMING SOON — Something big is brewing
               </Badge>
+            </motion.div>
+          </TabsContent>
+
+          {/* Custom Profile — Coming Soon */}
+          <TabsContent value="profile">
+            <motion.div
+              className="rounded-xl border border-primary/20 bg-card p-8 text-center relative overflow-hidden"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              {/* Blurred preview background */}
+              <div className="absolute inset-0 pointer-events-none select-none">
+                <div className="blur-[6px] opacity-30 p-8 space-y-6">
+                  {/* Fake profile customizer preview */}
+                  <div className="flex items-center gap-6 justify-center">
+                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary/40 to-accent/40 border-4 border-primary/20" />
+                    <div className="space-y-2 text-left">
+                      <div className="h-6 w-40 rounded bg-foreground/20" />
+                      <div className="h-4 w-56 rounded bg-foreground/10" />
+                      <div className="flex gap-2">
+                        <div className="h-6 w-16 rounded-full bg-primary/30" />
+                        <div className="h-6 w-16 rounded-full bg-accent/30" />
+                        <div className="h-6 w-16 rounded-full bg-neon-green/30" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-4 gap-3 max-w-md mx-auto">
+                    {Array.from({ length: 8 }).map((_, i) => (
+                      <div key={i} className="aspect-square rounded-lg bg-gradient-to-br from-primary/20 to-accent/20 border border-border" />
+                    ))}
+                  </div>
+                  <div className="flex gap-3 justify-center">
+                    {["🔥", "💎", "⚡", "🌟", "👑", "🎨"].map((e) => (
+                      <div key={e} className="w-12 h-12 rounded-lg bg-secondary/50 border border-border flex items-center justify-center text-xl">{e}</div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Coming Soon overlay */}
+              <div className="relative z-10 py-12 space-y-6">
+                <div className="w-20 h-20 rounded-full bg-primary/10 border-2 border-primary/30 flex items-center justify-center mx-auto">
+                  <Palette className="w-10 h-10 text-primary" />
+                </div>
+                <h3 className="font-display text-2xl text-foreground tracking-wider">
+                  CUSTOM PROFILES
+                </h3>
+                <p className="text-muted-foreground max-w-lg mx-auto text-sm leading-relaxed">
+                  Express yourself with custom PFPs, animated frames, profile themes, 
+                  and exclusive collectible badges. Make your staking profile uniquely yours.
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-lg mx-auto">
+                  <div className="rounded-lg border border-border bg-secondary/30 p-3">
+                    <User className="w-5 h-5 text-primary mx-auto mb-1" />
+                    <p className="font-display text-[10px] text-foreground">Custom PFPs</p>
+                  </div>
+                  <div className="rounded-lg border border-border bg-secondary/30 p-3">
+                    <Sparkles className="w-5 h-5 text-accent mx-auto mb-1" />
+                    <p className="font-display text-[10px] text-foreground">Animations</p>
+                  </div>
+                  <div className="rounded-lg border border-border bg-secondary/30 p-3">
+                    <Crown className="w-5 h-5 text-primary mx-auto mb-1" />
+                    <p className="font-display text-[10px] text-foreground">Rare Badges</p>
+                  </div>
+                  <div className="rounded-lg border border-border bg-secondary/30 p-3">
+                    <Wand2 className="w-5 h-5 text-accent mx-auto mb-1" />
+                    <p className="font-display text-[10px] text-foreground">Profile Themes</p>
+                  </div>
+                </div>
+                <Badge variant="outline" className="font-display text-xs border-primary/40 text-primary px-4 py-1.5 animate-pulse">
+                  ✨ COMING SOON — Custom Profiles
+                </Badge>
+              </div>
             </motion.div>
           </TabsContent>
         </Tabs>
