@@ -771,7 +771,7 @@ const Admin = () => {
                   <p className="font-display text-2xl text-neon-green">$0.12</p>
                   <p className="font-display text-[10px] text-neon-green/80 tracking-wider mt-1">MASTER NETWORK FEE</p>
                   <p className="text-[10px] text-muted-foreground mt-1">Per stake/unstake action</p>
-                  <p className="text-[9px] text-muted-foreground mt-2 font-display">⚙️ Subject to change</p>
+                  <p className="text-[9px] text-destructive mt-2 font-display">🔒 LOCKED — Master Only</p>
                 </div>
                 <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 text-center">
                   <DollarSign className="w-5 h-5 text-primary mx-auto mb-2" />
