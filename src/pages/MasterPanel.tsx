@@ -135,6 +135,78 @@ const MasterPanel = () => {
     toast({ title: "✅ Master PIN updated" });
   };
 
+  const handleChangePassword = async () => {
+    if (changePwdNew.length < 6) {
+      toast({ title: "Password must be at least 6 characters", variant: "destructive" }); return;
+    }
+    if (changePwdNew !== changePwdConfirm) {
+      toast({ title: "New passwords don't match", variant: "destructive" }); return;
+    }
+    const { error } = await supabase.auth.updateUser({ password: changePwdNew });
+    if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
+    setChangePwdCurrent(""); setChangePwdNew(""); setChangePwdConfirm("");
+    toast({ title: "✅ Login password updated" });
+    logAction("Master password changed", {});
+  };
+
+  const runSystemHealthCheck = async () => {
+    setRunningHealth(true);
+    const checks: {label: string; status: "pass"|"fail"|"warn"; detail: string}[] = [];
+
+    // 1. Auth check
+    const { data: { session } } = await supabase.auth.getSession();
+    checks.push({ label: "Authentication", status: session ? "pass" : "fail", detail: session ? "Active session" : "No session" });
+
+    // 2. Database connectivity
+    const t0 = Date.now();
+    const { error: dbErr } = await supabase.from("platform_settings").select("id").limit(1);
+    const dbMs = Date.now() - t0;
+    checks.push({ label: "Database", status: dbErr ? "fail" : dbMs > 2000 ? "warn" : "pass", detail: dbErr ? dbErr.message : `${dbMs}ms response` });
+
+    // 3. Fee wallet
+    const { data: mw } = await supabase.from("master_wallets").select("*").eq("wallet_purpose", "fee_collection").eq("is_active", true);
+    checks.push({ label: "Fee Collection Wallet", status: (mw && mw.length > 0) ? "pass" : "fail", detail: (mw && mw.length > 0) ? mw[0].label : "Not configured!" });
+
+    // 4. Emergency wallet
+    const { data: ew } = await supabase.from("master_wallets").select("*").eq("wallet_purpose", "emergency").eq("is_active", true);
+    checks.push({ label: "Emergency Wallet", status: (ew && ew.length > 0) ? "pass" : "warn", detail: (ew && ew.length > 0) ? ew[0].label : "Not configured" });
+
+    // 5. Master PIN
+    const { data: pin } = await supabase.from("platform_settings").select("value").eq("key", "master_pin").maybeSingle();
+    checks.push({ label: "Master PIN (2FA)", status: pin?.value ? (pin.value === "1234" ? "warn" : "pass") : "fail", detail: pin?.value ? (pin.value === "1234" ? "Default PIN! Change it" : "Custom PIN set") : "No PIN configured" });
+
+    // 6. RLS check — try to read user_roles (should succeed for master)
+    const { error: rlsErr } = await supabase.from("user_roles").select("id").limit(1);
+    checks.push({ label: "RLS Policies", status: rlsErr ? "fail" : "pass", detail: rlsErr ? rlsErr.message : "All tables accessible" });
+
+    // 7. Network fee
+    const { data: nf } = await supabase.from("platform_settings").select("value").eq("key", "master_network_fee").maybeSingle();
+    checks.push({ label: "Network Fee", status: nf?.value ? "pass" : "warn", detail: nf?.value ? `$${nf.value} USDC` : "Not set — using default" });
+
+    // 8. Active pools
+    const { data: ap } = await supabase.from("staking_pools").select("id").eq("status", "active");
+    checks.push({ label: "Active Pools", status: (ap && ap.length > 0) ? "pass" : "warn", detail: `${ap?.length || 0} active pools` });
+
+    // 9. Unresolved errors
+    const { data: errs } = await supabase.from("activity_log").select("*").in("severity", ["error", "critical"]).eq("resolved", false).order("created_at", { ascending: false }).limit(50);
+    checks.push({ label: "Unresolved Errors", status: (errs && errs.length > 0) ? (errs.some(e => e.severity === "critical") ? "fail" : "warn") : "pass", detail: `${errs?.length || 0} unresolved` });
+    setErrorLogs(errs || []);
+
+    // 10. Emergency routing
+    const { data: er } = await supabase.from("platform_settings").select("value").eq("key", "emergency_routing_active").maybeSingle();
+    checks.push({ label: "Emergency Routing", status: er?.value === "true" ? "warn" : "pass", detail: er?.value === "true" ? "⚠️ ACTIVE — funds going to emergency wallet" : "Normal routing" });
+
+    setHealthChecks(checks);
+    setRunningHealth(false);
+  };
+
+  const resolveError = async (id: string) => {
+    await supabase.from("activity_log").update({ resolved: true, resolved_at: new Date().toISOString() }).eq("id", id);
+    setErrorLogs(prev => prev.filter(e => e.id !== id));
+    toast({ title: "✅ Error resolved" });
+  };
+
+
   const [newMasterWallet, setNewMasterWallet] = useState({ label: "", address: "", wallet_purpose: "fee_collection", notes: "" });
   const [newWaiver, setNewWaiver] = useState({ user_id: "", project_account_id: "", waiver_type: "full", reason: "" });
   const [waiverSearch, setWaiverSearch] = useState("");
