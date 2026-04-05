@@ -10,7 +10,9 @@ import {
   Shield, Wallet, AlertTriangle, Settings, Users, Zap,
   RefreshCw, Save, Trash2, Power, Eye, Lock, Unlock,
   DollarSign, ScrollText, Search, UserX, Crown,
-  Layers, Building2, Award, Gift, Ticket, Gamepad2, ScanEye
+  Layers, Building2, Award, Gift, Ticket, Gamepad2, ScanEye,
+  KeyRound, Activity, CheckCircle2, XCircle, ChevronDown, ChevronRight,
+  Database, Server, Wifi, HardDrive
 } from "lucide-react";
 import {
   Tooltip, TooltipContent, TooltipTrigger,
