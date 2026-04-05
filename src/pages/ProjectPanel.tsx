@@ -337,7 +337,7 @@ const ProjectPanel = () => {
                           </div>
                         </div>
                         <div className="flex gap-4 text-xs text-muted-foreground">
-                          <span>APY: <strong className="text-foreground">{pool.apy}%</strong></span>
+                          <span>Rate: <strong className="text-foreground">{pool.apy}%</strong></span>
                           <span>Fee: <strong className="text-destructive">{pool.platform_fee_pct}%</strong></span>
                           <span>Lock: <strong className="text-foreground">{pool.lock_period_days}d</strong></span>
                           <span>Staked: <strong className="text-foreground">{pool.total_staked}</strong></span>
