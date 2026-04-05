@@ -1255,17 +1255,40 @@ const MasterPanel = () => {
                 </div>
               </TabsContent>
 
-              {/* Badges */}
+              {/* Badges — with assignment */}
               <TabsContent value="xr-badges">
-                <div className="rounded-lg border border-border bg-card p-4 space-y-2 max-h-[500px] overflow-y-auto">
-                  {badges.map(b => (
-                    <div key={b.id} className="flex items-center gap-3 p-3 rounded-lg bg-secondary/30 border border-border text-xs">
-                      <span className="text-lg">{b.icon || "🏆"}</span>
-                      <span className="font-display text-foreground">{b.name}</span>
-                      <span className="text-muted-foreground">{b.description}</span>
+                <div className="space-y-4">
+                  {/* Award Badge */}
+                  <div className="rounded-lg border border-accent/30 bg-accent/5 p-4">
+                    <h4 className="font-display text-xs text-accent mb-3 tracking-wider flex items-center gap-2">
+                      <Award className="w-3.5 h-3.5" /> AWARD BADGE TO USER
+                    </h4>
+                    <div className="flex gap-2 flex-wrap">
+                      <select value={badgeAssignUser} onChange={e => setBadgeAssignUser(e.target.value)} className="bg-secondary border border-border rounded-md text-xs text-foreground px-3 py-1.5">
+                        <option value="">Select user...</option>
+                        {profiles.map(p => <option key={p.id} value={p.user_id}>{p.display_name || "Unnamed"}</option>)}
+                      </select>
+                      <select value={badgeAssignBadge} onChange={e => setBadgeAssignBadge(e.target.value)} className="bg-secondary border border-border rounded-md text-xs text-foreground px-3 py-1.5">
+                        <option value="">Select badge...</option>
+                        {badges.map(b => <option key={b.id} value={b.id}>{b.icon || "🏆"} {b.name}</option>)}
+                      </select>
+                      <Button size="sm" className="text-xs font-display h-7" onClick={assignBadgeToUser}>
+                        <Award className="w-3 h-3 mr-1" /> Award
+                      </Button>
                     </div>
-                  ))}
-                  {badges.length === 0 && <p className="text-xs text-muted-foreground text-center py-4">No badges yet</p>}
+                  </div>
+
+                  {/* All Badges */}
+                  <div className="rounded-lg border border-border bg-card p-4 space-y-2 max-h-[400px] overflow-y-auto">
+                    {badges.map(b => (
+                      <div key={b.id} className="flex items-center gap-3 p-3 rounded-lg bg-secondary/30 border border-border text-xs">
+                        <span className="text-lg">{b.icon || "🏆"}</span>
+                        <span className="font-display text-foreground">{b.name}</span>
+                        <span className="text-muted-foreground">{b.description}</span>
+                      </div>
+                    ))}
+                    {badges.length === 0 && <p className="text-xs text-muted-foreground text-center py-4">No badges yet</p>}
+                  </div>
                 </div>
               </TabsContent>
 
