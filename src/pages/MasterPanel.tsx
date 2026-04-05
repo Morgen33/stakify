@@ -399,21 +399,6 @@ const MasterPanel = () => {
     fetchAll();
   };
 
-  // ─── Emergency Routing Toggle ───
-  const emergencyRoutingActive = settings.find(s => s.key === "emergency_routing_active")?.value === "true";
-
-  const toggleEmergencyRouting = async () => {
-    const newVal = !emergencyRoutingActive;
-    const existing = settings.find(s => s.key === "emergency_routing_active");
-    if (existing) {
-      await supabase.from("platform_settings").update({ value: newVal ? "true" : "false" }).eq("id", existing.id);
-    } else {
-      await supabase.from("platform_settings").insert({ key: "emergency_routing_active", value: newVal ? "true" : "false" });
-    }
-    logAction("Emergency routing toggled", { active: newVal });
-    toast({ title: newVal ? "🚨 Funds routing to EMERGENCY wallet" : "✅ Funds routing to normal wallet" });
-    fetchAll();
-  };
 
   if (loading || !isMaster) return null;
 
