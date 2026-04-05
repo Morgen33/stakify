@@ -163,6 +163,12 @@ const SocialHubPreview = () => (
   </motion.div>
 );
 
+/**
+ * 🚀 LAUNCH MODE — flip to `false` to reveal the full platform.
+ * When true, only staking pools + essentials are shown.
+ */
+const LAUNCH_MODE = true;
+
 const Index = () => {
   const { user, isAdmin, isOperator, isMaster, signOut } = useAuth();
   const { isConnected, shortAddress } = useWallet();
