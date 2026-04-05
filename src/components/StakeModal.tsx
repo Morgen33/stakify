@@ -209,7 +209,7 @@ const StakeModal = ({ poolName, poolId, nftContract, apy, rewardToken, lockPerio
                   LOCK DURATION
                   <Tooltip>
                     <TooltipTrigger><HelpCircle className="w-3 h-3" /></TooltipTrigger>
-                    <TooltipContent>Longer locks earn proportionally higher APY.</TooltipContent>
+                    <TooltipContent>Longer locks earn proportionally higher rewards.</TooltipContent>
                   </Tooltip>
                 </p>
                 <div className="flex flex-wrap gap-2">
