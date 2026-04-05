@@ -59,12 +59,6 @@ const MasterPanel = () => {
   const [runningHealth, setRunningHealth] = useState(false);
   const [errorLogs, setErrorLogs] = useState<any[]>([]);
   const [xrayOpen, setXrayOpen] = useState<Record<string, boolean>>({});
-  const [changePwdNew, setChangePwdNew] = useState("");
-  const [changePwdConfirm, setChangePwdConfirm] = useState("");
-  const [healthChecks, setHealthChecks] = useState<{label: string; status: "pass"|"fail"|"warn"; detail: string}[]>([]);
-  const [runningHealth, setRunningHealth] = useState(false);
-  const [errorLogs, setErrorLogs] = useState<any[]>([]);
-  const [xrayOpen, setXrayOpen] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     if (!loading && !user) { navigate("/auth", { replace: true }); return; }
