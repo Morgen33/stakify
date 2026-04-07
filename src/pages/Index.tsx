@@ -286,6 +286,13 @@ const Index = () => {
             STAKEFORGE
           </h2>
           <div className="flex items-center gap-6">
+            {isConnected && (
+              <Link to="/hub" className="relative group">
+                <span className="font-display text-sm text-primary border border-primary/40 rounded-full px-4 py-1.5 bg-primary/10 hover:bg-primary/20 transition-all shadow-[0_0_12px_hsl(185_100%_50%/0.3)] hover:shadow-[0_0_20px_hsl(185_100%_50%/0.5)] flex items-center gap-1.5">
+                  <Zap className="w-3.5 h-3.5" /> STAKING HUB
+                </span>
+              </Link>
+            )}
             <Link to="/dashboard" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-body">Dashboard</Link>
             <a href="#pools" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-body">Pools</a>
             {!launchMode && (

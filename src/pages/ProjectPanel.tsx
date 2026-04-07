@@ -138,7 +138,7 @@ const ProjectPanel = () => {
       toast({ title: "Restricted", description: "Platform fee is set by STAKEFORGE and cannot be changed.", variant: "destructive" });
       return;
     }
-    const { error } = await supabase.from("project_accounts").update({ [field]: value }).eq("id", project.id);
+    const { error } = await supabase.from("project_accounts").update({ [field]: value } as any).eq("id", project.id);
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
