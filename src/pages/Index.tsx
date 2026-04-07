@@ -5,7 +5,7 @@ import { useWallet } from "@/contexts/WalletContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { HelpCircle, Mic, Music, Users, Crown, Radio, Tv, MessageCircle, Volume2, Trophy, Star, Shield } from "lucide-react";
+import { HelpCircle, Mic, Music, Users, Crown, Radio, Tv, MessageCircle, Volume2, Trophy, Star, Shield, Zap } from "lucide-react";
 import { motion } from "framer-motion";
 import HeroHeader from "@/components/HeroHeader";
 import StatsBar from "@/components/StatsBar";
@@ -286,6 +286,13 @@ const Index = () => {
             STAKEFORGE
           </h2>
           <div className="flex items-center gap-6">
+            {isConnected && (
+              <Link to="/hub" className="relative group">
+                <span className="font-display text-sm text-primary border border-primary/40 rounded-full px-4 py-1.5 bg-primary/10 hover:bg-primary/20 transition-all shadow-[0_0_12px_hsl(185_100%_50%/0.3)] hover:shadow-[0_0_20px_hsl(185_100%_50%/0.5)] flex items-center gap-1.5">
+                  <Zap className="w-3.5 h-3.5" /> STAKING HUB
+                </span>
+              </Link>
+            )}
             <Link to="/dashboard" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-body">Dashboard</Link>
             <a href="#pools" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-body">Pools</a>
             {!launchMode && (
@@ -318,7 +325,9 @@ const Index = () => {
               <Button variant="outline" size="sm" onClick={signOut} className="font-display border-border text-xs">Sign Out</Button>
             ) : (
               <Link to="/auth">
-                <Button variant="ghost" size="sm" className="font-display text-xs text-muted-foreground">Email Login</Button>
+                <Button variant="ghost" size="sm" className="font-display text-xs text-muted-foreground">
+                  <Shield className="w-3 h-3 mr-1" /> Staff Login
+                </Button>
               </Link>
             )}
           </div>

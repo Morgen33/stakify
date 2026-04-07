@@ -62,10 +62,14 @@ const Auth = () => {
           <h1 className="font-display text-3xl text-primary tracking-widest text-glow-cyan mb-2">
             STAKEFORGE
           </h1>
-          <div className="flex items-center justify-center gap-2 text-muted-foreground">
+          <div className="flex items-center justify-center gap-2 text-muted-foreground mb-3">
             <Shield className="w-4 h-4 text-neon-green" />
-            <span className="text-sm">Secured Platform</span>
+            <span className="text-sm">Staff Portal — Secured Access</span>
           </div>
+          <p className="text-[10px] text-muted-foreground border border-border rounded-lg px-3 py-2 bg-secondary/30">
+            🔒 This login is for <strong className="text-accent">Project Owners</strong>, <strong className="text-accent">Admins</strong>, and <strong className="text-accent">Master</strong> only.
+            <br />Consumers access the platform via <strong className="text-primary">Wallet Connect</strong> on the home page.
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
