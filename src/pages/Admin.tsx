@@ -21,7 +21,11 @@ import {
 import BattleLog from "@/components/BattleLog";
 import LiveAlertsPanel from "@/components/LiveAlertsPanel";
 import FeatureToggles from "@/components/FeatureToggles";
+import SnapshotPanel from "@/components/admin/SnapshotPanel";
+import ProjectOverview from "@/components/admin/ProjectOverview";
 import { logAction } from "@/lib/activity-logger";
+import { motion } from "framer-motion";
+import { Camera, TrendingUp } from "lucide-react";
 
 const Admin = () => {
   const { user, isAdmin, loading } = useAuth();
@@ -433,6 +437,8 @@ const Admin = () => {
               )}
             </TabsTrigger>
             <TabsTrigger value="kickbacks" className="font-display gap-1.5 text-xs text-neon-gold"><Award className="w-3.5 h-3.5" /> Kickbacks</TabsTrigger>
+            <TabsTrigger value="snapshot" className="font-display gap-1.5 text-xs text-primary"><Camera className="w-3.5 h-3.5" /> Snapshot</TabsTrigger>
+            <TabsTrigger value="overview" className="font-display gap-1.5 text-xs text-neon-green"><TrendingUp className="w-3.5 h-3.5" /> Overview</TabsTrigger>
           </TabsList>
 
           {/* ═══ POOLS ═══ */}
@@ -1476,6 +1482,19 @@ const Admin = () => {
                 })}
               </div>
             </div>
+          </TabsContent>
+          {/* ═══ SNAPSHOT ═══ */}
+          <TabsContent value="snapshot">
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
+              <SnapshotPanel pools={pools} stakes={stakes} profiles={profiles} projects={projects} onRefresh={fetchAll} />
+            </motion.div>
+          </TabsContent>
+
+          {/* ═══ OVERVIEW ═══ */}
+          <TabsContent value="overview">
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
+              <ProjectOverview projects={projects} pools={pools} stakes={stakes} payments={payments} />
+            </motion.div>
           </TabsContent>
         </Tabs>
       </main>
