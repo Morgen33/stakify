@@ -5,7 +5,7 @@ import { useWallet } from "@/contexts/WalletContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { HelpCircle, Mic, Music, Users, Crown, Radio, Tv, MessageCircle, Volume2, Trophy, Star, Shield } from "lucide-react";
+import { HelpCircle, Mic, Music, Users, Crown, Radio, Tv, MessageCircle, Volume2, Trophy, Star, Shield, Zap } from "lucide-react";
 import { motion } from "framer-motion";
 import HeroHeader from "@/components/HeroHeader";
 import StatsBar from "@/components/StatsBar";
