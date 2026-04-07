@@ -25,6 +25,7 @@ const Raffle = lazy(() => import("./pages/Raffle.tsx"));
 const Pricing = lazy(() => import("./pages/Pricing.tsx"));
 const About = lazy(() => import("./pages/About.tsx"));
 const Lottery = lazy(() => import("./pages/Lottery.tsx"));
+const Hub = lazy(() => import("./pages/Hub.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
 const queryClient = new QueryClient({
@@ -61,6 +62,7 @@ const App = () => (
                   <Route path="/pricing" element={<Pricing />} />
                   <Route path="/lottery" element={<Lottery />} />
                   <Route path="/about" element={<About />} />
+                  <Route path="/hub" element={<Hub />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </Suspense>
