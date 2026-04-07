@@ -325,7 +325,9 @@ const Index = () => {
               <Button variant="outline" size="sm" onClick={signOut} className="font-display border-border text-xs">Sign Out</Button>
             ) : (
               <Link to="/auth">
-                <Button variant="ghost" size="sm" className="font-display text-xs text-muted-foreground">Email Login</Button>
+                <Button variant="ghost" size="sm" className="font-display text-xs text-muted-foreground">
+                  <Shield className="w-3 h-3 mr-1" /> Staff Login
+                </Button>
               </Link>
             )}
           </div>
