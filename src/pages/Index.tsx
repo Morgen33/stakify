@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react"; // v2
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useWallet } from "@/contexts/WalletContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { HelpCircle, Mic, Music, Users, Crown, Radio, Tv, MessageCircle, Volume2 } from "lucide-react";
+import { HelpCircle, Mic, Music, Users, Crown, Radio, Tv, MessageCircle, Volume2, Trophy, Star, Shield } from "lucide-react";
 import { motion } from "framer-motion";
 import HeroHeader from "@/components/HeroHeader";
 import StatsBar from "@/components/StatsBar";
@@ -19,6 +19,8 @@ import StartupDisclaimer from "@/components/StartupDisclaimer";
 import WalletModal from "@/components/WalletModal";
 import WelcomeSplash from "@/components/WelcomeSplash";
 import SeasonalBanner from "@/components/SeasonalBanner";
+import CoverTeasers from "@/components/CoverTeasers";
+import HondroPointsTeaser from "@/components/HondroPointsTeaser";
 import { Badge } from "@/components/ui/badge";
 
 /* ── Floating spring petals animation ── */
@@ -67,9 +69,7 @@ const SocialHubPreview = () => (
     viewport={{ once: true }}
     transition={{ duration: 0.5 }}
   >
-    {/* Blurred background content */}
     <div className="blur-[5px] pointer-events-none select-none p-5 space-y-4">
-      {/* Stage area */}
       <div className="rounded-lg bg-gradient-to-br from-primary/10 to-accent/10 border border-border p-4">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
@@ -81,7 +81,6 @@ const SocialHubPreview = () => (
             <span className="text-[10px] text-muted-foreground">247 listening</span>
           </div>
         </div>
-        {/* Host + co-hosts */}
         <div className="flex items-center gap-3 mb-3">
           <div className="flex flex-col items-center">
             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent to-primary border-2 border-accent" />
@@ -94,7 +93,6 @@ const SocialHubPreview = () => (
             </div>
           ))}
         </div>
-        {/* Speakers row */}
         <div className="flex items-center gap-2 flex-wrap">
           {Array.from({ length: 8 }).map((_, i) => (
             <div key={i} className="w-8 h-8 rounded-full bg-secondary border border-border" />
@@ -102,8 +100,6 @@ const SocialHubPreview = () => (
           <span className="text-[9px] text-muted-foreground">+42 more</span>
         </div>
       </div>
-
-      {/* Jumbotron */}
       <div className="rounded-lg bg-gradient-to-r from-primary/20 via-accent/10 to-primary/20 border border-border p-3 flex items-center gap-3">
         <Tv className="w-5 h-5 text-primary" />
         <div className="flex-1">
@@ -112,8 +108,6 @@ const SocialHubPreview = () => (
         </div>
         <Music className="w-4 h-4 text-accent" />
       </div>
-
-      {/* Chat messages */}
       <div className="space-y-2">
         {["Just staked 5 NFTs 🔥", "This collection is fire!", "Who's minting tomorrow?", "Love the community vibes ✨"].map((msg, i) => (
           <div key={i} className="flex items-start gap-2">
@@ -124,8 +118,6 @@ const SocialHubPreview = () => (
           </div>
         ))}
       </div>
-
-      {/* Music player bar */}
       <div className="rounded-lg bg-secondary/50 border border-border p-3 flex items-center gap-3">
         <Volume2 className="w-4 h-4 text-accent" />
         <div className="flex-1 h-1.5 rounded-full bg-border">
@@ -134,8 +126,6 @@ const SocialHubPreview = () => (
         <span className="text-[9px] text-muted-foreground font-display">3:24</span>
       </div>
     </div>
-
-    {/* Coming Soon overlay */}
     <div className="absolute inset-0 flex flex-col items-center justify-center z-10 bg-background/40 backdrop-blur-[2px]">
       <div className="w-16 h-16 rounded-full bg-accent/10 border-2 border-accent/30 flex items-center justify-center mb-3">
         <MessageCircle className="w-8 h-8 text-accent" />
@@ -163,6 +153,73 @@ const SocialHubPreview = () => (
   </motion.div>
 );
 
+/* ── Blurred Leaderboard Teaser ── */
+const LeaderboardTeaser = () => (
+  <motion.div
+    className="rounded-xl border border-primary/20 bg-card relative overflow-hidden"
+    initial={{ opacity: 0, y: 20 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true }}
+    transition={{ duration: 0.5 }}
+  >
+    <div className="blur-[4px] pointer-events-none select-none p-5 space-y-2">
+      {[1, 2, 3, 4, 5].map(i => (
+        <div key={i} className="flex items-center gap-3 p-2 rounded-lg bg-secondary/30">
+          <span className="font-display text-sm text-accent w-6">#{i}</span>
+          <div className="w-7 h-7 rounded-full bg-primary/20" />
+          <div className="flex-1">
+            <div className="h-2.5 w-24 rounded bg-foreground/15 mb-1" />
+            <div className="h-2 w-16 rounded bg-foreground/10" />
+          </div>
+          <span className="font-display text-xs text-primary">{(1000 - i * 120).toLocaleString()} pts</span>
+        </div>
+      ))}
+    </div>
+    <div className="absolute inset-0 flex flex-col items-center justify-center z-10 bg-background/40 backdrop-blur-[2px]">
+      <Trophy className="w-10 h-10 text-accent mb-2" />
+      <h3 className="font-display text-sm text-foreground tracking-wider mb-1">LEADERBOARD</h3>
+      <p className="text-[10px] text-muted-foreground mb-2">Compete with stakers worldwide</p>
+      <Badge variant="outline" className="font-display text-[9px] border-accent/40 text-accent animate-pulse">
+        COMING SOON
+      </Badge>
+    </div>
+  </motion.div>
+);
+
+/* ── Badge System Teaser ── */
+const BadgeTeaser = () => (
+  <motion.div
+    className="rounded-xl border border-neon-purple/20 bg-card relative overflow-hidden p-5"
+    initial={{ opacity: 0, y: 20 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true }}
+    transition={{ duration: 0.5 }}
+  >
+    <div className="text-center">
+      <div className="flex justify-center gap-3 mb-4">
+        {["🏆", "⭐", "💎", "🔥", "👑"].map((emoji, i) => (
+          <motion.div
+            key={i}
+            className="w-12 h-12 rounded-xl bg-secondary/50 border border-border flex items-center justify-center opacity-40"
+            initial={{ scale: 0.8 }}
+            whileInView={{ scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: i * 0.1 }}
+          >
+            <span className="text-xl grayscale">{emoji}</span>
+          </motion.div>
+        ))}
+      </div>
+      <Star className="w-6 h-6 text-neon-purple mx-auto mb-2" />
+      <h3 className="font-display text-sm text-foreground tracking-wider mb-1">BADGES & ACHIEVEMENTS</h3>
+      <p className="text-[10px] text-muted-foreground mb-2">Earn badges for staking milestones, loyalty & community engagement</p>
+      <Badge variant="outline" className="font-display text-[9px] border-neon-purple/40 text-neon-purple animate-pulse">
+        COMING SOON
+      </Badge>
+    </div>
+  </motion.div>
+);
+
 const Index = () => {
   const { user, isAdmin, isOperator, isMaster, signOut } = useAuth();
   const { isConnected, shortAddress } = useWallet();
@@ -176,7 +233,6 @@ const Index = () => {
         supabase.from("platform_settings").select("value").eq("key", "launch_mode").maybeSingle(),
       ]);
       if (poolsRes.data) setPools(poolsRes.data);
-      // Default to true (launch mode) if no setting exists
       setLaunchMode(settingRes.data?.value !== "false");
     };
     fetchData();
@@ -318,34 +374,6 @@ const Index = () => {
                 </motion.div>
               ))}
             </div>
-
-            {/* Launch mode teaser for upcoming features */}
-            {launchMode && (
-              <motion.div
-                className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-              >
-                {[
-                  { emoji: "🏆", title: "Leaderboard", desc: "Compete with stakers worldwide" },
-                  { emoji: "🎟️", title: "Raffle House", desc: "Win NFTs, tokens & ETH" },
-                  { emoji: "💬", title: "Social Hub", desc: "Live stages, chat & music" },
-                ].map((item) => (
-                  <div key={item.title} className="rounded-xl border border-accent/20 bg-card/50 p-5 text-center relative overflow-hidden">
-                    <div className="absolute inset-0 backdrop-blur-[1px] bg-background/20" />
-                    <div className="relative z-10">
-                      <span className="text-3xl block mb-2">{item.emoji}</span>
-                      <p className="font-display text-sm text-foreground tracking-wider mb-1">{item.title}</p>
-                      <p className="text-[10px] text-muted-foreground mb-2">{item.desc}</p>
-                      <Badge variant="outline" className="font-display text-[9px] border-accent/40 text-accent animate-pulse">
-                        COMING SOON
-                      </Badge>
-                    </div>
-                  </div>
-                ))}
-              </motion.div>
-            )}
           </div>
 
           {/* Right column — hidden in launch mode */}
@@ -374,6 +402,52 @@ const Index = () => {
             </motion.div>
           )}
         </div>
+
+        {/* ── Ecosystem Teasers (always visible) ── */}
+        <CoverTeasers />
+
+        {/* ── Hondro Points Teaser ── */}
+        <HondroPointsTeaser />
+
+        {/* ── Coming Soon Teasers (launch mode) ── */}
+        {launchMode && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <LeaderboardTeaser />
+            <BadgeTeaser />
+            <SocialHubPreview />
+          </div>
+        )}
+
+        {/* ── Marketing / Announcements Section ── */}
+        <motion.section
+          className="rounded-2xl border border-border bg-gradient-to-br from-card via-secondary/20 to-card p-8 text-center"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
+          <Shield className="w-8 h-8 text-primary mx-auto mb-3" />
+          <h2 className="font-display text-xl text-foreground tracking-widest mb-2">
+            BUILT <span className="text-primary text-glow-cyan">DIFFERENT</span>
+          </h2>
+          <p className="text-sm text-muted-foreground max-w-xl mx-auto mb-6">
+            STAKEFORGE is built by developers who believe in transparency, security, and community.
+            Every feature is designed to give project owners the tools they need and holders the rewards they deserve.
+          </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            {[
+              "OpenZeppelin Security",
+              "Role-Based Access",
+              "Multi-Project Support",
+              "Real-Time Analytics",
+              "Smart Contract Auditable",
+            ].map(feature => (
+              <span key={feature} className="px-3 py-1.5 rounded-full border border-primary/20 bg-primary/5 text-[10px] text-primary font-display tracking-wider">
+                {feature}
+              </span>
+            ))}
+          </div>
+        </motion.section>
 
         {/* Footer */}
         <footer className="border-t border-border pt-6 pb-8 text-center">
