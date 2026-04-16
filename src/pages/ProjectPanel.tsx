@@ -6,10 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Switch } from "@/components/ui/switch";
 import {
   Layers, Settings, Users, DollarSign, RefreshCw,
   Save, Calculator, FileText, AlertTriangle, CreditCard,
-  Eye, Gift, Send, Image
+  Eye, Gift, Send, Image, Sliders
 } from "lucide-react";
 import {
   Tooltip,
@@ -239,7 +240,7 @@ const ProjectPanel = () => {
               <Eye className="w-3.5 h-3.5" /> Overview
             </TabsTrigger>
             <TabsTrigger value="pools" className="font-display gap-1.5 text-xs">
-              <Layers className="w-3.5 h-3.5" /> My Pools
+              <Sliders className="w-3.5 h-3.5" /> Staking Config
             </TabsTrigger>
             <TabsTrigger value="payments" className="font-display gap-1.5 text-xs">
               <CreditCard className="w-3.5 h-3.5" /> Payments
@@ -321,30 +322,21 @@ const ProjectPanel = () => {
                   No pools assigned to your project yet. Contact STAKEFORGE admin to create pools.
                 </p>
               ) : (
-                <div className="space-y-3">
+                <div className="space-y-6">
                   {pools.map((pool) => {
                     const poolStakes = stakes.filter((s) => s.pool_id === pool.id);
                     const activeCount = poolStakes.filter((s) => s.status === "active").length;
                     return (
-                      <div key={pool.id} className="rounded-lg border border-border bg-secondary/30 p-4">
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center gap-3">
-                            <span className={`w-2 h-2 rounded-full ${pool.status === "active" ? "bg-primary" : "bg-destructive"}`} />
-                            <span className="font-display text-sm text-foreground">{pool.project_name}</span>
-                            <span className="text-[10px] px-2 py-0.5 rounded-full border border-border text-muted-foreground font-display">
-                              {pool.status.toUpperCase()}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="flex gap-4 text-xs text-muted-foreground">
-                          <span>Rate: <strong className="text-foreground">{pool.apy}%</strong></span>
-                          <span>Fee: <strong className="text-destructive">{pool.platform_fee_pct}%</strong></span>
-                          <span>Lock: <strong className="text-foreground">{pool.lock_period_days}d</strong></span>
-                          <span>Staked: <strong className="text-foreground">{pool.total_staked}</strong></span>
-                          <span>Active: <strong className="text-primary">{activeCount}</strong></span>
-                          <span>Token: <strong className="text-accent">{pool.reward_token}</strong></span>
-                        </div>
-                      </div>
+                      <PoolConfigCard
+                        key={pool.id}
+                        pool={pool}
+                        activeCount={activeCount}
+                        onSave={async (updates) => {
+                          const { error } = await supabase.from("staking_pools").update(updates as any).eq("id", pool.id);
+                          if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
+                          else { toast({ title: "✅ Pool config saved" }); fetchAll(); }
+                        }}
+                      />
                     );
                   })}
                 </div>
