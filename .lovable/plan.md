@@ -1,110 +1,94 @@
 
 
-# Major Platform Update — Admin Controls, Project Owner Tools, Cover Page & Teasers
+# Major Update — Project Owner Staking Controls, Master Game Controls, Safety Branding & Go-Live Checklist
 
 ## Overview
 
-This is a large update touching four major areas: (1) enhanced Admin panel with better project oversight, staker snapshots, and money management, (2) expanded Project Owner panel with staking configuration options, (3) Master panel cleanup with better oversight, and (4) a revamped cover page (Index) with futuristic teasers, marketing sections, and Hondro branding for the points system.
+This update covers four areas: (1) letting project owners control how their community stakes, (2) giving the Master exclusive control over all game/casino economics, (3) adding a prominent "Safety First" section to the cover page, and (4) providing a clear go-live checklist for Ethereum staking.
 
 ---
 
-## 1. Revamped Cover Page (Index.tsx)
+## 1. Project Owner Staking Controls
 
-**Hero Section overhaul:**
-- Add animated futuristic teaser cards that scroll down the page with icons and neon glow effects
-- Feature cards for: "Staking Platform — LIVE", "Trade Store — Coming Soon", "Casino — Coming Soon", "Tokens Across All Platforms", "Launchpad for ETH & SOL — Coming Soon", "Hint to Degeneracy — All in One Platform"
-- Each teaser uses motion animations (fade-in, float, scale) with neon icon accents
-- Add a "Powered by Hondro Points" branding section — explain that points are created by Hondro, separate from project owner tokens, spendable in store/marketplace/prizes/games/casino
-- Add a marketing-ready section at the bottom that Admin/Master can populate later with announcements
-- Badge system teaser with sample badge icons (greyed/locked with "Coming Soon")
-- Leaderboard teaser with blurred preview
-- All "Coming Soon" items use the existing blur + badge overlay pattern
+**What changes:** When a user clicks "Stake Now" on any pool, the staking options they see (modes, lock periods, fees, reward multipliers) are configured by that pool's project owner — not hardcoded.
 
-**Futuristic UI polish:**
-- Animated gradient borders on teaser sections
-- Particle/glow effects on scroll
-- Staggered reveal animations as user scrolls down
+**Implementation:**
+- Add columns to `staking_pools` table via migration:
+  - `allowed_modes` (text[], default `{'soft','hard','flexible'}`) — which staking modes are enabled
+  - `custom_lock_options` (int[], default `{7,14,30,60,90}`) — available lock durations in days
+  - `soft_reward_multiplier` (numeric, default 0.8)
+  - `hard_reward_multiplier` (numeric, default 1.2)
+  - `early_unlock_enabled` (boolean, default true)
+  - `pool_description` (text, nullable)
+  - `pool_banner_url` (text, nullable)
+- Update `StakeModal.tsx` to read these from the pool data instead of using hardcoded values
+- Update `ProjectPanel.tsx` to let project owners configure these fields for their pools
+- RLS already allows project owners to update pools via the `restrict_project_owner_updates` trigger — we add these new fields as "allowed" (not protected)
 
----
+## 2. Master-Only Game & Casino Controls
 
-## 2. Admin Panel Enhancements (Admin.tsx)
+**What changes:** Only the Master can set pricing, payout rates, and toggle availability for all games (Prize Wheel, Lottery, Casino, NFT Randomizer).
 
-**Better project oversight:**
-- Add a unified "Project Overview" card within the Projects tab showing all projects with their staking pools, active stakers count, total staked, and fee earnings in one glanceable grid
-- Inline fee percentage editing with better visibility (larger font, neon-green numbers)
+**Implementation:**
+- Add `platform_settings` entries for game economics: `wheel_spin_cost`, `wheel_max_payout`, `lottery_ticket_price`, `lottery_payout_pct`, `casino_house_edge`, `randomizer_cost`, `randomizer_payout`
+- Add a "Game Economics" section to `MasterPanel.tsx` with sliders/inputs for each setting
+- Remove any game-pricing controls from Admin panel (Admin can only toggle on/off via existing `FeatureToggles`)
+- Update game pages (Arcade, Lottery, PrizeWheel) to read pricing from `platform_settings`
 
-**Snapshot feature:**
-- New "Snapshot" button on each pool — captures all active stakers (wallet address, user_id, display_name, staked amount, duration) into a downloadable list
-- One-click "Reward All" from snapshot — bulk airdrop to all captured stakers with copy/paste wallet support
+## 3. "Safety First" Cover Page Section
 
-**Money management improvements:**
-- Cleaner payment recording UI with larger, more visible input fields
-- Quick-action buttons: "Send Payment", "Record Incoming", "Mark Paid"
-- Payment history with status badges (paid/pending/overdue) in neon-green/yellow/red
+**What changes:** Add a dedicated, prominent safety section to `Index.tsx` between the ecosystem teasers and footer.
 
-**Tab transition animations:**
-- Each tab content gets a fade-in + slide-up entrance animation using framer-motion
-- Tab headers get subtle glow on active state
+**Content:**
+- Heading: "SAFETY IS OUR FOUNDATION"
+- Copy emphasizing: OpenZeppelin audited contracts, ReentrancyGuard + Pausable, role-based access with 4-tier hierarchy, emergency unlock protection, Row-Level Security on all data, HIBP password checks, PIN + OTP 2FA on all staff panels, smart contract audit required before mainnet
+- Visual: Shield icon with animated glow, security feature badges in a grid
+- Tone: "We don't cut corners. Every line of code, every access rule, every transaction is built with your safety as the non-negotiable priority."
 
----
+## 4. Go-Live Checklist — What You Need To Do
 
-## 3. Project Owner Panel Enhancements (ProjectPanel.tsx)
+This is a clear list of steps required to start staking NFTs live on Ethereum. No code changes needed for this section — it's informational.
 
-**Staking configuration options:**
-- Allow project owners to configure within their allowed range:
-  - Community fee (1-5%)
-  - Preferred lock periods (dropdown: 7/14/30/60/90 days)
-  - Reward token name and display
-  - Enable/disable early unlock for their pools
-  - Custom pool description/banner
-- All changes go through existing RLS — protected fields remain locked
+### Smart Contract Deployment
+1. **Get the contract audited** — `StakeForgeVault.sol` MUST be professionally audited before mainnet. This is non-negotiable. Cost: typically $5K–$25K depending on auditor. Recommended: Trail of Bits, OpenZeppelin, Certik, or Code4rena.
+2. **Deploy to Sepolia testnet first** — Use the existing `contracts/scripts/deploy.js` with Hardhat. You need a Sepolia RPC URL (Alchemy/Infura free tier) and a funded Sepolia wallet.
+3. **Update contract addresses** — After deploy, update `src/lib/contracts/config.ts` with the deployed vault address for chain ID `11155111` (Sepolia) and later `1` (mainnet).
+4. **Test end-to-end on testnet** — Stake, unstake, emergency unlock, fee collection — all on Sepolia before touching mainnet.
 
-**Community oversight:**
-- Staker list view showing who's staked, how much, and for how long
-- Simple snapshot/export of their own stakers
-- Airdrop improvements — bulk select from staker list
+### Backend / API Status
+- **Database**: Fully configured with RLS, triggers, and role hierarchy. Ready.
+- **Edge functions**: `eth-price` function deployed. Ready.
+- **Auth**: Email + wallet connect flows built. Ready.
+- **No outsourcing needed for backend** — the current Lovable Cloud backend handles all data, auth, and serverless functions. The only external dependency is the Ethereum smart contract deployment and audit.
 
----
+### What You Need From WeGens (or Any Project)
+- NFT contract address (ERC-721, deployed on Ethereum)
+- Collection metadata (name, logo, banner, description)
+- Desired staking configuration (modes, lock periods, reward token)
+- Wallet address for fee collection
+- Community links (Discord, Twitter/X)
 
-## 4. Master Panel Cleanup (MasterPanel.tsx)
-
-**Better oversight UI:**
-- Add a "Platform Overview" dashboard card at the top showing: total platform revenue, total stakers across all projects, total pools, active projects
-- Cleaner tab organization with animated transitions
-- Project-level drill-down view — click any project to see its pools, stakers, revenue
-
-**Hondro Points System placeholder:**
-- New "Points System" section (Coming Soon badge) with description: "Hondro Points — earned across all platform activities, spendable in Store, Marketplace, Games & Casino"
-- Visual mockup of points earning flow (stake → earn points → spend in store)
-
----
-
-## 5. UI Animations Across All Panels
-
-- Every tab switch gets a `motion.div` wrapper with `animate-fade-in` entrance
-- Active tab indicator glows with neon-cyan
-- Cards use `hover-scale` utility class
-- Stats numbers use a count-up animation on mount
-- Futuristic border glow on focused/active sections
+### Items That Need External Services
+- **Smart contract audit**: Must be outsourced to a professional auditor
+- **RPC provider**: Alchemy or Infura account (free tier works for testnet)
+- **Domain**: Custom domain setup if desired (currently on `stakify.lovable.app`)
 
 ---
 
 ## Technical Approach
 
-### Files to modify:
-- `src/pages/Index.tsx` — Add teaser sections, marketing area, Hondro branding, futuristic scroll animations
-- `src/pages/Admin.tsx` — Add snapshot feature, improve project overview, better payment UI, tab animations
-- `src/pages/ProjectPanel.tsx` — Add staking config options, staker list, bulk airdrop
-- `src/pages/MasterPanel.tsx` — Add platform overview dashboard, points system teaser, animated tabs
-- `src/index.css` — Add any new animation keyframes needed
+### Database migration
+New columns on `staking_pools` for project-owner-configurable staking options.
 
-### No database changes required
-All new features use existing tables and RLS policies. The snapshot feature reads from `stakes` + `profiles` (already accessible to admin). Project owner config changes use existing `staking_pools` columns.
+### Files to modify
+- `src/components/StakeModal.tsx` — Read pool config for modes, durations, multipliers
+- `src/pages/ProjectPanel.tsx` — Add staking config UI for project owners
+- `src/pages/MasterPanel.tsx` — Add "Game Economics" section
+- `src/pages/Index.tsx` — Add "Safety First" section
+- `src/pages/Arcade.tsx` / `src/components/PrizeWheel.tsx` — Read pricing from platform_settings
 
-### Component extraction
-Given the size of Admin.tsx (1486 lines) and MasterPanel.tsx (1366 lines), new sections will be built as separate components where possible to keep files manageable:
-- `src/components/admin/SnapshotPanel.tsx`
-- `src/components/admin/ProjectOverview.tsx`
-- `src/components/CoverTeasers.tsx`
-- `src/components/HondroPointsTeaser.tsx`
+### Files unchanged
+- Smart contract (`StakeForgeVault.sol`) — already complete, needs audit not code changes
+- Backend edge functions — already sufficient
+- Auth system — already built
 
