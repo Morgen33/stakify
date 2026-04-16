@@ -51,10 +51,10 @@ const App = () => (
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/auth" element={<Auth />} />
-                  <Route path="/admin" element={<Admin />} />
+                  <Route path="/sf-admin-9x7k" element={<Admin />} />
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/operator" element={<OperatorPanel />} />
-                  <Route path="/master" element={<MasterPanel />} />
+                  <Route path="/sf-master-q4z8" element={<MasterPanel />} />
                   <Route path="/project-panel" element={<ProjectPanel />} />
                   <Route path="/project/:slug" element={<ProjectPage />} />
                   <Route path="/arcade" element={<Arcade />} />

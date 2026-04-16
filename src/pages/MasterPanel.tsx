@@ -348,6 +348,20 @@ const MasterPanel = () => {
   const deleteSetting = async (id: string) => { await supabase.from("platform_settings").delete().eq("id", id); fetchAll(); };
 
   // ─── Emergency ───
+  const [emergencyPinInput, setEmergencyPinInput] = useState("");
+  const [emergencyPinVerified, setEmergencyPinVerified] = useState(false);
+
+  const verifyEmergencyPin = () => {
+    const emergencyPinSetting = settings.find(s => s.key === "emergency_pin");
+    if (emergencyPinInput === (emergencyPinSetting?.value || "1220")) {
+      setEmergencyPinVerified(true);
+      toast({ title: "🔓 Emergency access granted" });
+    } else {
+      toast({ title: "❌ Incorrect emergency password", variant: "destructive" });
+      setEmergencyPinInput("");
+    }
+  };
+
   const emergencyUnlockStake = async (stakeId: string) => {
     if (!window.confirm("🚨 EMERGENCY UNLOCK this stake?")) return;
     await supabase.from("stakes").update({ status: "emergency_unlocked", unlock_at: new Date().toISOString() }).eq("id", stakeId);
@@ -811,65 +825,135 @@ const MasterPanel = () => {
 
           {/* ═══ EMERGENCY ═══ */}
           <TabsContent value="emergency" className="space-y-6">
-            <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-6">
+             <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-6">
               <h3 className="font-display text-sm text-destructive mb-4 tracking-wider flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4" /> EMERGENCY CONTROLS — MASTER ONLY
               </h3>
-              <p className="text-xs text-muted-foreground mb-4">These actions are irreversible. Only use in emergencies.</p>
+              <p className="text-xs text-muted-foreground mb-4">These actions are irreversible. Enter emergency password to access.</p>
 
-              <div className="space-y-3">
-                {pools.map(pool => {
-                  const poolStakes = stakes.filter(s => s.pool_id === pool.id && s.status === "active");
-                  return (
-                    <div key={pool.id} className="rounded-lg border border-border bg-card p-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-3">
-                          <span className={`w-2 h-2 rounded-full ${pool.status === "active" ? "bg-primary" : "bg-destructive"}`} />
-                          <span className="font-display text-sm text-foreground">{pool.project_name}</span>
-                          <span className="text-[10px] text-muted-foreground">{poolStakes.length} active stakes</span>
-                        </div>
-                        <Button variant="destructive" size="sm" className="font-display text-xs" onClick={() => emergencyUnlockAll(pool.id)}>
-                          <Unlock className="w-3 h-3 mr-1" /> Unlock All
-                        </Button>
-                      </div>
-                      {poolStakes.slice(0, 3).map(s => (
-                        <div key={s.id} className="flex items-center justify-between px-3 py-1 text-xs text-muted-foreground">
-                          <span>{s.amount} staked</span>
-                          <Button variant="ghost" size="sm" className="text-[10px] text-destructive h-6" onClick={() => emergencyUnlockStake(s.id)}>
-                            Unlock
+              {!emergencyPinVerified ? (
+                <div className="flex flex-col items-center gap-4 py-8">
+                  <Lock className="w-10 h-10 text-destructive/50" />
+                  <p className="text-sm text-muted-foreground font-display">Enter Emergency Password</p>
+                  <div className="flex gap-2 max-w-xs w-full">
+                    <Input
+                      type="password"
+                      placeholder="Password..."
+                      value={emergencyPinInput}
+                      onChange={e => setEmergencyPinInput(e.target.value)}
+                      onKeyDown={e => e.key === "Enter" && verifyEmergencyPin()}
+                      className="bg-secondary border-destructive/30 text-center"
+                    />
+                    <Button variant="destructive" onClick={verifyEmergencyPin} className="font-display text-xs">
+                      <Unlock className="w-3.5 h-3.5 mr-1" /> Unlock
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {pools.map(pool => {
+                    const poolStakes = stakes.filter(s => s.pool_id === pool.id && s.status === "active");
+                    return (
+                      <div key={pool.id} className="rounded-lg border border-border bg-card p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-3">
+                            <span className={`w-2 h-2 rounded-full ${pool.status === "active" ? "bg-primary" : "bg-destructive"}`} />
+                            <span className="font-display text-sm text-foreground">{pool.project_name}</span>
+                            <span className="text-[10px] text-muted-foreground">{poolStakes.length} active stakes</span>
+                          </div>
+                          <Button variant="destructive" size="sm" className="font-display text-xs" onClick={() => emergencyUnlockAll(pool.id)}>
+                            <Unlock className="w-3 h-3 mr-1" /> Unlock All
                           </Button>
                         </div>
-                      ))}
-                    </div>
-                  );
-                })}
-              </div>
+                        {poolStakes.slice(0, 3).map(s => (
+                          <div key={s.id} className="flex items-center justify-between px-3 py-1 text-xs text-muted-foreground">
+                            <span>{s.amount} staked</span>
+                            <Button variant="ghost" size="sm" className="text-[10px] text-destructive h-6" onClick={() => emergencyUnlockStake(s.id)}>
+                              Unlock
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </TabsContent>
 
           {/* ═══ SETTINGS ═══ */}
           <TabsContent value="settings" className="space-y-6">
             <div className="rounded-lg border border-border bg-card p-6">
-              <h3 className="font-display text-sm text-foreground mb-4 tracking-wider">PLATFORM SETTINGS</h3>
-              <div className="space-y-2 mb-4">
-                {settings.filter(s => s.key !== "master_pin").map(s => (
-                  <div key={s.id} className="flex items-center gap-3 p-3 rounded-lg bg-secondary/30 border border-border">
-                    <span className="font-display text-xs text-foreground min-w-[180px] tracking-wider">{s.key}</span>
-                    <Input defaultValue={s.value} id={`ms-${s.id}`} className="bg-background border-border text-xs flex-1" />
-                    <Button size="sm" variant="outline" className="text-xs h-7" onClick={() => {
-                      const val = (document.getElementById(`ms-${s.id}`) as HTMLInputElement)?.value;
-                      if (val) updateSetting(s.id, val);
-                    }}><Save className="w-3 h-3" /></Button>
-                    <Button size="sm" variant="ghost" className="text-xs h-7 text-destructive" onClick={() => deleteSetting(s.id)}>
-                      <Trash2 className="w-3 h-3" />
-                    </Button>
+              <h3 className="font-display text-sm text-foreground mb-6 tracking-wider flex items-center gap-2">
+                <Settings className="w-4 h-4 text-primary" /> PLATFORM SETTINGS
+              </h3>
+              
+              {/* Grouped Settings */}
+              {(() => {
+                const grouped: Record<string, typeof settings> = {};
+                const categoryMap: Record<string, string> = {
+                  master_pin: "🔐 Security",
+                  emergency_pin: "🔐 Security",
+                  master_network_fee: "💰 Fees",
+                  launch_mode: "🚀 Launch",
+                  wheel_spin_cost: "🎮 Games",
+                  wheel_max_payout: "🎮 Games",
+                  lottery_ticket_price: "🎮 Games",
+                  lottery_payout_pct: "🎮 Games",
+                  casino_house_edge: "🎮 Games",
+                  randomizer_cost: "🎮 Games",
+                  randomizer_payout: "🎮 Games",
+                };
+                settings.filter(s => s.key !== "master_pin").forEach(s => {
+                  const cat = categoryMap[s.key] || "⚙️ General";
+                  if (!grouped[cat]) grouped[cat] = [];
+                  grouped[cat].push(s);
+                });
+                return Object.entries(grouped).map(([category, items]) => (
+                  <div key={category} className="mb-6">
+                    <h4 className="font-display text-xs text-primary mb-3 tracking-wider border-b border-border pb-2">{category}</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {items.map(s => {
+                        const isBoolean = s.value === "true" || s.value === "false";
+                        return (
+                          <div key={s.id} className="flex items-center gap-3 p-4 rounded-xl bg-secondary/20 border border-border hover:border-primary/30 transition-colors">
+                            <div className="flex-1 min-w-0">
+                              <p className="font-display text-xs text-foreground tracking-wider truncate">{s.key.replace(/_/g, " ").toUpperCase()}</p>
+                              <p className="text-[10px] text-muted-foreground mt-0.5">{s.key}</p>
+                            </div>
+                            {isBoolean ? (
+                              <Button
+                                size="sm"
+                                variant={s.value === "true" ? "default" : "outline"}
+                                className={`text-xs font-display min-w-[60px] ${s.value === "true" ? "bg-primary text-primary-foreground" : ""}`}
+                                onClick={() => updateSetting(s.id, s.value === "true" ? "false" : "true")}
+                              >
+                                {s.value === "true" ? "ON" : "OFF"}
+                              </Button>
+                            ) : (
+                              <>
+                                <Input defaultValue={s.value} id={`ms-${s.id}`} className="bg-background border-border text-xs max-w-[140px]" />
+                                <Button size="sm" variant="outline" className="text-xs h-8" onClick={() => {
+                                  const val = (document.getElementById(`ms-${s.id}`) as HTMLInputElement)?.value;
+                                  if (val) updateSetting(s.id, val);
+                                }}><Save className="w-3 h-3" /></Button>
+                              </>
+                            )}
+                            <Button size="sm" variant="ghost" className="text-xs h-8 text-destructive" onClick={() => deleteSetting(s.id)}>
+                              <Trash2 className="w-3 h-3" />
+                            </Button>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
-                ))}
-              </div>
-              <div className="flex gap-2">
+                ));
+              })()}
+
+              <div className="flex gap-2 pt-4 border-t border-border">
                 <Input placeholder="Key" value={newSettingKey} onChange={e => setNewSettingKey(e.target.value)} className="bg-secondary border-border text-xs max-w-[200px]" />
                 <Input placeholder="Value" value={newSettingValue} onChange={e => setNewSettingValue(e.target.value)} className="bg-secondary border-border text-xs flex-1" />
-                <Button size="sm" onClick={createSetting} className="text-xs font-display">Add</Button>
+                <Button size="sm" onClick={createSetting} className="text-xs font-display">Add Setting</Button>
               </div>
             </div>
 
