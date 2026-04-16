@@ -12,7 +12,7 @@ import {
   DollarSign, ScrollText, Search, UserX, Crown,
   Layers, Building2, Award, Gift, Ticket, Gamepad2, ScanEye,
   KeyRound, Activity, CheckCircle2, XCircle, ChevronDown, ChevronRight,
-  Database, Server, Wifi, HardDrive
+  Database, Server, Wifi, HardDrive, HelpCircle, X
 } from "lucide-react";
 import {
   Tooltip, TooltipContent, TooltipTrigger,
@@ -64,6 +64,23 @@ const MasterPanel = () => {
   const [editUserData, setEditUserData] = useState<{display_name: string; rank: string; points: number; level: number}>({ display_name: "", rank: "", points: 0, level: 1 });
   const [badgeAssignUser, setBadgeAssignUser] = useState("");
   const [badgeAssignBadge, setBadgeAssignBadge] = useState("");
+  const [activeTab, setActiveTab] = useState("wallets");
+  const [showHelp, setShowHelp] = useState(false);
+
+  const tabHelpGuides: Record<string, { title: string; steps: string[] }> = {
+    wallets: { title: "My Wallets", steps: ["Add wallet addresses for fee collection and operations.", "Set one wallet as active — this receives all platform fees.", "Label wallets for easy identification (e.g. 'Primary ETH', 'Backup SOL')."] },
+    fees: { title: "Fee Control", steps: ["Set the global platform fee percentage charged on all staking pools.", "This fee is deducted from rewards before distribution to stakers.", "Changes apply to all pools — individual pool fees are set by project owners."] },
+    waivers: { title: "Fee Waivers", steps: ["Grant fee waivers to specific users or projects.", "Search by user ID or project name, then select waiver type.", "Waivers can be full (0% fee) or partial — toggle active/inactive anytime."] },
+    roles: { title: "Role Management", steps: ["View all platform roles: Master, Admin, Operator, Project Owner, User.", "Assign or remove roles — only Master can create other Masters.", "Admin can manage everything except Master-level access."] },
+    emergency: { title: "Emergency Controls", steps: ["⚠️ Use only in critical situations (rugs, exploits, security breaches).", "Enter PIN 1220 to unlock emergency actions.", "Force-unlock all stakes in a pool or blacklist a project instantly."] },
+    settings: { title: "Platform Settings", steps: ["View and edit all platform configuration key-value pairs.", "Grouped by category: Security, Fees, Games, Launch.", "Changes take effect immediately — double-check before saving."] },
+    diagnostics: { title: "Diagnostics", steps: ["Run health checks to verify database, auth, and API connectivity.", "View the Battle Log for real-time system events and errors.", "Review live alerts for security incidents and anomalies."] },
+    features: { title: "Feature Toggles", steps: ["Enable or disable platform features (Raffle, Lottery, Arcade, etc.).", "Disabled features show 'Coming Soon' to users.", "Use during maintenance or for staged rollouts."] },
+    games: { title: "Game Economics", steps: ["Set pricing for all games: Prize Wheel, Lottery, Casino, Randomizer.", "Control payout percentages and house edge.", "Only Master can modify game economics — Admin can only toggle on/off."] },
+    launch: { title: "Launch Mode", steps: ["Toggle Launch Mode for a simplified, OG-only homepage.", "Set launch date and customize the pre-launch message.", "When ready, disable Launch Mode to reveal the full platform."] },
+    xray: { title: "X-Ray Inspector", steps: ["Deep-dive into all platform data: pools, projects, stakes, users.", "Expand any row to see full details and relationships.", "Use for auditing, debugging, and verifying data integrity."] },
+    pin: { title: "PIN & Security", steps: ["Change your Master PIN used for emergency controls.", "Update your account password with current password verification.", "PIN and password changes are logged in the Battle Log."] },
+  };
 
   useEffect(() => {
     if (!loading && !user) { navigate("/auth", { replace: true }); return; }
@@ -513,21 +530,51 @@ const MasterPanel = () => {
       </div>
 
       <main className="container max-w-7xl mx-auto px-4 pb-10">
-        <Tabs defaultValue="wallets">
-          <TabsList className="bg-card border border-border mb-6 flex-wrap h-auto gap-1 p-2">
-            <TabsTrigger value="wallets" className="font-display gap-1.5 text-xs"><Wallet className="w-3.5 h-3.5" /> My Wallets</TabsTrigger>
-            <TabsTrigger value="fees" className="font-display gap-1.5 text-xs"><DollarSign className="w-3.5 h-3.5" /> Fee Control</TabsTrigger>
-            <TabsTrigger value="waivers" className="font-display gap-1.5 text-xs"><UserX className="w-3.5 h-3.5" /> Fee Waivers</TabsTrigger>
-            <TabsTrigger value="roles" className="font-display gap-1.5 text-xs"><Shield className="w-3.5 h-3.5" /> Roles</TabsTrigger>
-            <TabsTrigger value="emergency" className="font-display gap-1.5 text-xs text-destructive"><AlertTriangle className="w-3.5 h-3.5" /> Emergency</TabsTrigger>
-            <TabsTrigger value="settings" className="font-display gap-1.5 text-xs"><Settings className="w-3.5 h-3.5" /> Settings</TabsTrigger>
-            <TabsTrigger value="diagnostics" className="font-display gap-1.5 text-xs text-primary"><Eye className="w-3.5 h-3.5" /> Diagnostics</TabsTrigger>
-            <TabsTrigger value="features" className="font-display gap-1.5 text-xs"><Power className="w-3.5 h-3.5" /> Features</TabsTrigger>
-            <TabsTrigger value="games" className="font-display gap-1.5 text-xs text-neon-purple"><Gamepad2 className="w-3.5 h-3.5" /> 🎮 Games</TabsTrigger>
-            <TabsTrigger value="launch" className="font-display gap-1.5 text-xs text-neon-green"><Zap className="w-3.5 h-3.5" /> 🚀 Launch</TabsTrigger>
-            <TabsTrigger value="xray" className="font-display gap-1.5 text-xs text-accent"><ScanEye className="w-3.5 h-3.5" /> X-Ray</TabsTrigger>
-            <TabsTrigger value="pin" className="font-display gap-1.5 text-xs text-primary"><KeyRound className="w-3.5 h-3.5" /> 🔑 PIN</TabsTrigger>
-          </TabsList>
+        <Tabs defaultValue="wallets" onValueChange={(v) => setActiveTab(v)}>
+          <div className="flex items-center gap-3 mb-2">
+            <TabsList className="bg-card border border-border flex-wrap h-auto gap-1 p-2 flex-1">
+              <TabsTrigger value="wallets" className="font-display gap-1.5 text-xs"><Wallet className="w-3.5 h-3.5" /> My Wallets</TabsTrigger>
+              <TabsTrigger value="fees" className="font-display gap-1.5 text-xs"><DollarSign className="w-3.5 h-3.5" /> Fee Control</TabsTrigger>
+              <TabsTrigger value="waivers" className="font-display gap-1.5 text-xs"><UserX className="w-3.5 h-3.5" /> Fee Waivers</TabsTrigger>
+              <TabsTrigger value="roles" className="font-display gap-1.5 text-xs"><Shield className="w-3.5 h-3.5" /> Roles</TabsTrigger>
+              <TabsTrigger value="emergency" className="font-display gap-1.5 text-xs text-destructive"><AlertTriangle className="w-3.5 h-3.5" /> Emergency</TabsTrigger>
+              <TabsTrigger value="settings" className="font-display gap-1.5 text-xs"><Settings className="w-3.5 h-3.5" /> Settings</TabsTrigger>
+              <TabsTrigger value="diagnostics" className="font-display gap-1.5 text-xs text-primary"><Eye className="w-3.5 h-3.5" /> Diagnostics</TabsTrigger>
+              <TabsTrigger value="features" className="font-display gap-1.5 text-xs"><Power className="w-3.5 h-3.5" /> Features</TabsTrigger>
+              <TabsTrigger value="games" className="font-display gap-1.5 text-xs text-neon-purple"><Gamepad2 className="w-3.5 h-3.5" /> 🎮 Games</TabsTrigger>
+              <TabsTrigger value="launch" className="font-display gap-1.5 text-xs text-neon-green"><Zap className="w-3.5 h-3.5" /> 🚀 Launch</TabsTrigger>
+              <TabsTrigger value="xray" className="font-display gap-1.5 text-xs text-accent"><ScanEye className="w-3.5 h-3.5" /> X-Ray</TabsTrigger>
+              <TabsTrigger value="pin" className="font-display gap-1.5 text-xs text-primary"><KeyRound className="w-3.5 h-3.5" /> 🔑 PIN</TabsTrigger>
+            </TabsList>
+            <Button
+              variant={showHelp ? "default" : "outline"}
+              size="sm"
+              onClick={() => setShowHelp(!showHelp)}
+              className={`shrink-0 gap-1.5 font-display text-xs transition-all ${showHelp ? 'bg-primary text-primary-foreground shadow-[0_0_12px_hsl(var(--primary)/0.5)]' : 'border-primary/40 text-primary hover:bg-primary/10'}`}
+            >
+              {showHelp ? <X className="w-3.5 h-3.5" /> : <HelpCircle className="w-3.5 h-3.5" />}
+              {showHelp ? "Hide Guide" : "How To Use"}
+            </Button>
+          </div>
+
+          {showHelp && tabHelpGuides[activeTab] && (
+            <div className="mb-4 rounded-lg border border-primary/30 bg-primary/5 p-4 animate-in fade-in slide-in-from-top-2 duration-300">
+              <div className="flex items-center gap-2 mb-3">
+                <HelpCircle className="w-4 h-4 text-primary" />
+                <h3 className="font-display text-sm text-primary font-semibold tracking-wide">
+                  {tabHelpGuides[activeTab].title} — Quick Guide
+                </h3>
+              </div>
+              <ol className="space-y-1.5 pl-1">
+                {tabHelpGuides[activeTab].steps.map((step, i) => (
+                  <li key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
+                    <span className="shrink-0 w-5 h-5 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[10px] font-bold mt-0.5">{i + 1}</span>
+                    <span>{step}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
 
 
           {/* ═══ MY WALLETS ═══ */}
