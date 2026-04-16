@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useWallet } from "@/contexts/WalletContext";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -29,6 +30,7 @@ import { Camera, TrendingUp } from "lucide-react";
 
 const Admin = () => {
   const { user, isAdmin, loading } = useAuth();
+  const { address: walletAddress, shortAddress, isConnected: walletConnected, connectMetaMask, disconnect: disconnectWallet } = useWallet();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -1058,6 +1060,37 @@ const Admin = () => {
 
           {/* ═══ AIRDROPS ═══ */}
           <TabsContent value="airdrops" className="space-y-6">
+            {/* Admin Wallet Connection */}
+            <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
+              <h3 className="font-display text-xs text-primary mb-3 tracking-wider flex items-center gap-2">
+                <Wallet className="w-3.5 h-3.5" /> SENDING WALLET
+              </h3>
+              {walletConnected ? (
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center">
+                      <Wallet className="w-4 h-4 text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-display text-xs text-foreground">{shortAddress}</p>
+                      <p className="text-[10px] text-muted-foreground font-mono">{walletAddress}</p>
+                    </div>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-primary font-display">CONNECTED</span>
+                  </div>
+                  <Button variant="outline" size="sm" onClick={disconnectWallet} className="font-display text-xs">
+                    Disconnect
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <p className="text-xs text-muted-foreground">Connect the wallet you'll send airdrops from.</p>
+                  <Button size="sm" onClick={connectMetaMask} className="bg-primary text-primary-foreground font-display text-xs">
+                    <Wallet className="w-3.5 h-3.5 mr-1.5" /> Connect Wallet
+                  </Button>
+                </div>
+              )}
+            </div>
+
             {/* Search & Send */}
             <div className="rounded-lg border border-accent/20 bg-card p-6">
               <h3 className="font-display text-sm text-foreground mb-4 tracking-wider flex items-center gap-2">
