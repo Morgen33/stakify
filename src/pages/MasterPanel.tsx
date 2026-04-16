@@ -825,39 +825,59 @@ const MasterPanel = () => {
 
           {/* ═══ EMERGENCY ═══ */}
           <TabsContent value="emergency" className="space-y-6">
-            <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-6">
+             <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-6">
               <h3 className="font-display text-sm text-destructive mb-4 tracking-wider flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4" /> EMERGENCY CONTROLS — MASTER ONLY
               </h3>
-              <p className="text-xs text-muted-foreground mb-4">These actions are irreversible. Only use in emergencies.</p>
+              <p className="text-xs text-muted-foreground mb-4">These actions are irreversible. Enter emergency password to access.</p>
 
-              <div className="space-y-3">
-                {pools.map(pool => {
-                  const poolStakes = stakes.filter(s => s.pool_id === pool.id && s.status === "active");
-                  return (
-                    <div key={pool.id} className="rounded-lg border border-border bg-card p-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-3">
-                          <span className={`w-2 h-2 rounded-full ${pool.status === "active" ? "bg-primary" : "bg-destructive"}`} />
-                          <span className="font-display text-sm text-foreground">{pool.project_name}</span>
-                          <span className="text-[10px] text-muted-foreground">{poolStakes.length} active stakes</span>
-                        </div>
-                        <Button variant="destructive" size="sm" className="font-display text-xs" onClick={() => emergencyUnlockAll(pool.id)}>
-                          <Unlock className="w-3 h-3 mr-1" /> Unlock All
-                        </Button>
-                      </div>
-                      {poolStakes.slice(0, 3).map(s => (
-                        <div key={s.id} className="flex items-center justify-between px-3 py-1 text-xs text-muted-foreground">
-                          <span>{s.amount} staked</span>
-                          <Button variant="ghost" size="sm" className="text-[10px] text-destructive h-6" onClick={() => emergencyUnlockStake(s.id)}>
-                            Unlock
+              {!emergencyPinVerified ? (
+                <div className="flex flex-col items-center gap-4 py-8">
+                  <Lock className="w-10 h-10 text-destructive/50" />
+                  <p className="text-sm text-muted-foreground font-display">Enter Emergency Password</p>
+                  <div className="flex gap-2 max-w-xs w-full">
+                    <Input
+                      type="password"
+                      placeholder="Password..."
+                      value={emergencyPinInput}
+                      onChange={e => setEmergencyPinInput(e.target.value)}
+                      onKeyDown={e => e.key === "Enter" && verifyEmergencyPin()}
+                      className="bg-secondary border-destructive/30 text-center"
+                    />
+                    <Button variant="destructive" onClick={verifyEmergencyPin} className="font-display text-xs">
+                      <Unlock className="w-3.5 h-3.5 mr-1" /> Unlock
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {pools.map(pool => {
+                    const poolStakes = stakes.filter(s => s.pool_id === pool.id && s.status === "active");
+                    return (
+                      <div key={pool.id} className="rounded-lg border border-border bg-card p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-3">
+                            <span className={`w-2 h-2 rounded-full ${pool.status === "active" ? "bg-primary" : "bg-destructive"}`} />
+                            <span className="font-display text-sm text-foreground">{pool.project_name}</span>
+                            <span className="text-[10px] text-muted-foreground">{poolStakes.length} active stakes</span>
+                          </div>
+                          <Button variant="destructive" size="sm" className="font-display text-xs" onClick={() => emergencyUnlockAll(pool.id)}>
+                            <Unlock className="w-3 h-3 mr-1" /> Unlock All
                           </Button>
                         </div>
-                      ))}
-                    </div>
-                  );
-                })}
-              </div>
+                        {poolStakes.slice(0, 3).map(s => (
+                          <div key={s.id} className="flex items-center justify-between px-3 py-1 text-xs text-muted-foreground">
+                            <span>{s.amount} staked</span>
+                            <Button variant="ghost" size="sm" className="text-[10px] text-destructive h-6" onClick={() => emergencyUnlockStake(s.id)}>
+                              Unlock
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </TabsContent>
 
