@@ -15,7 +15,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Ticket, Clock, Trophy, Users, Coins, Gift, ArrowLeft,
   Sparkles, Share2, Crown, Flame, Star, Zap, Diamond,
-  Plus, Filter, Search, Timer, Shield, ExternalLink, TrendingUp, Wallet
+  Plus, Filter, Search, Timer, Shield, ExternalLink, TrendingUp, Wallet,
+  Lock as LockIcon
 } from "lucide-react";
 import WalletModal from "@/components/WalletModal";
 
