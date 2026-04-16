@@ -376,14 +376,19 @@ const Raffle = () => {
   const [raffles, setRaffles] = useState<any[]>([]);
   const [myTickets, setMyTickets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [featureEnabled, setFeatureEnabled] = useState(false);
   const [chainFilter, setChainFilter] = useState<"all" | "ETH" | "SOL">("all");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "upcoming" | "drawn">("all");
   const [searchQuery, setSearchQuery] = useState("");
 
   const fetchData = useCallback(async () => {
     setLoading(true);
-    const { data } = await supabase.from("raffles").select("*").order("created_at", { ascending: false });
-    setRaffles(data || []);
+    const [rafflesRes, settingsRes] = await Promise.all([
+      supabase.from("raffles").select("*").order("created_at", { ascending: false }),
+      supabase.from("platform_settings").select("*").eq("key", "feature_raffle").maybeSingle(),
+    ]);
+    setRaffles(rafflesRes.data || []);
+    setFeatureEnabled(settingsRes.data?.value === "true");
     if (user) {
       const { data: tickets } = await supabase.from("raffle_tickets").select("*").eq("user_id", user.id);
       setMyTickets(tickets || []);
