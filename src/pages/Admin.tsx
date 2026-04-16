@@ -30,6 +30,7 @@ import { Camera, TrendingUp } from "lucide-react";
 
 const Admin = () => {
   const { user, isAdmin, loading } = useAuth();
+  const { address: walletAddress, shortAddress, isConnected: walletConnected, connectMetaMask, disconnect: disconnectWallet } = useWallet();
   const navigate = useNavigate();
   const { toast } = useToast();
 
