@@ -54,19 +54,18 @@ const WalletModal = ({ trigger, redirectAfterConnect = "/hub" }: WalletModalProp
   };
 
   const handleSignupComplete = () => {
-    // Store display name locally for now (can sync to profile later)
     if (displayName.trim()) {
       localStorage.setItem("sf_display_name", displayName.trim());
     }
     setShowSignup(false);
     setOpen(false);
-    navigate("/hub");
+    if (redirectAfterConnect) navigate(redirectAfterConnect);
   };
 
   const handleSkipSignup = () => {
     setShowSignup(false);
     setOpen(false);
-    navigate("/hub");
+    if (redirectAfterConnect) navigate(redirectAfterConnect);
   };
 
   const copyAddress = () => {
