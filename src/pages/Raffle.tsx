@@ -553,7 +553,7 @@ const Raffle = () => {
                 transition={{ delay: 0.3 }}
               >
                 <motion.div animate={{ rotate: [0, 5, -5, 0] }} transition={{ duration: 3, repeat: Infinity }}>
-                  <Lock className="w-16 h-16 text-accent mx-auto mb-4" />
+                  <LockIcon className="w-16 h-16 text-accent mx-auto mb-4" />
                 </motion.div>
                 <h2 className="font-display text-3xl text-foreground mb-3 tracking-wider">COMING SOON</h2>
                 <p className="text-sm text-muted-foreground mb-6">
