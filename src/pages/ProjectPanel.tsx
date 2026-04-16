@@ -18,6 +18,132 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
+/* ─── Pool Config Card (inline component) ─── */
+const MODES = ["soft", "hard", "flexible"] as const;
+const LOCK_PRESETS = [7, 14, 30, 60, 90, 180, 365];
+
+const PoolConfigCard = ({ pool, activeCount, onSave }: { pool: any; activeCount: number; onSave: (u: any) => Promise<void> }) => {
+  const [modes, setModes] = useState<string[]>(pool.allowed_modes ?? ["soft", "hard", "flexible"]);
+  const [locks, setLocks] = useState<number[]>(pool.custom_lock_options ?? [7, 14, 30, 60, 90]);
+  const [softMul, setSoftMul] = useState(Number(pool.soft_reward_multiplier ?? 0.8));
+  const [hardMul, setHardMul] = useState(Number(pool.hard_reward_multiplier ?? 1.2));
+  const [earlyUnlock, setEarlyUnlock] = useState(pool.early_unlock_enabled ?? true);
+  const [desc, setDesc] = useState(pool.pool_description ?? "");
+  const [saving, setSaving] = useState(false);
+
+  const toggleMode = (m: string) => setModes(prev => prev.includes(m) ? prev.filter(x => x !== m) : [...prev, m]);
+  const toggleLock = (d: number) => setLocks(prev => prev.includes(d) ? prev.filter(x => x !== d) : [...prev, d].sort((a, b) => a - b));
+
+  const save = async () => {
+    setSaving(true);
+    await onSave({
+      allowed_modes: modes,
+      custom_lock_options: locks,
+      soft_reward_multiplier: softMul,
+      hard_reward_multiplier: hardMul,
+      early_unlock_enabled: earlyUnlock,
+      pool_description: desc || null,
+    });
+    setSaving(false);
+  };
+
+  return (
+    <div className="rounded-lg border border-border bg-secondary/30 p-5 space-y-4">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <span className={`w-2.5 h-2.5 rounded-full ${pool.status === "active" ? "bg-primary" : "bg-destructive"}`} />
+          <span className="font-display text-sm text-foreground">{pool.project_name}</span>
+          <span className="text-[10px] px-2 py-0.5 rounded-full border border-border text-muted-foreground font-display">
+            {pool.status.toUpperCase()}
+          </span>
+        </div>
+        <div className="flex gap-3 text-xs text-muted-foreground">
+          <span>Rate: <strong className="text-foreground">{pool.apy}%</strong></span>
+          <span>Staked: <strong className="text-foreground">{pool.total_staked}</strong></span>
+          <span>Active: <strong className="text-primary">{activeCount}</strong></span>
+        </div>
+      </div>
+
+      {/* Staking Modes */}
+      <div>
+        <p className="text-[10px] text-muted-foreground font-display tracking-wider mb-2">ALLOWED STAKING MODES</p>
+        <div className="flex gap-2">
+          {MODES.map(m => (
+            <button
+              key={m}
+              onClick={() => toggleMode(m)}
+              className={`px-3 py-1.5 rounded-lg border text-xs font-display transition-all ${
+                modes.includes(m)
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-border bg-secondary/30 text-muted-foreground hover:border-primary/30"
+              }`}
+            >
+              {m.charAt(0).toUpperCase() + m.slice(1)}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Lock Duration Options */}
+      {modes.includes("flexible") && (
+        <div>
+          <p className="text-[10px] text-muted-foreground font-display tracking-wider mb-2">LOCK DURATION OPTIONS (DAYS)</p>
+          <div className="flex flex-wrap gap-2">
+            {LOCK_PRESETS.map(d => (
+              <button
+                key={d}
+                onClick={() => toggleLock(d)}
+                className={`px-2.5 py-1 rounded-md border text-xs font-display ${
+                  locks.includes(d) ? "border-accent bg-accent/10 text-accent" : "border-border text-muted-foreground"
+                }`}
+              >
+                {d}d
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Multipliers */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div>
+          <label className="text-[10px] text-muted-foreground font-display">SOFT MULTIPLIER</label>
+          <Input type="number" step="0.1" min="0.1" max="2" value={softMul} onChange={e => setSoftMul(Number(e.target.value))} className="bg-secondary border-border text-sm mt-1" />
+        </div>
+        <div>
+          <label className="text-[10px] text-muted-foreground font-display">HARD MULTIPLIER</label>
+          <Input type="number" step="0.1" min="0.5" max="3" value={hardMul} onChange={e => setHardMul(Number(e.target.value))} className="bg-secondary border-border text-sm mt-1" />
+        </div>
+        <div className="flex items-end gap-2">
+          <div>
+            <label className="text-[10px] text-muted-foreground font-display">EARLY UNLOCK</label>
+            <div className="flex items-center gap-2 mt-2">
+              <Switch checked={earlyUnlock} onCheckedChange={setEarlyUnlock} />
+              <span className="text-xs text-muted-foreground">{earlyUnlock ? "Enabled" : "Disabled"}</span>
+            </div>
+          </div>
+        </div>
+        <div>
+          <label className="text-[10px] text-muted-foreground font-display">PLATFORM FEE 🔒</label>
+          <Input value={`${pool.platform_fee_pct}%`} disabled className="bg-muted border-border text-sm mt-1 opacity-60" />
+        </div>
+      </div>
+
+      {/* Description */}
+      <div>
+        <label className="text-[10px] text-muted-foreground font-display">POOL DESCRIPTION (shown to stakers)</label>
+        <Input value={desc} onChange={e => setDesc(e.target.value)} placeholder="Tell your community about this pool..." className="bg-secondary border-border text-sm mt-1" />
+      </div>
+
+      {/* Save */}
+      <Button onClick={save} disabled={saving || modes.length === 0} size="sm" className="bg-primary text-primary-foreground font-display text-xs">
+        <Save className="w-3 h-3 mr-1.5" /> {saving ? "Saving..." : "Save Configuration"}
+      </Button>
+    </div>
+  );
+};
+
 const ProjectPanel = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();

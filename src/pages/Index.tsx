@@ -418,6 +418,65 @@ const Index = () => {
         {/* ── Hondro Points Teaser ── */}
         <HondroPointsTeaser />
 
+        {/* ── SAFETY FIRST Section ── */}
+        <motion.section
+          className="rounded-2xl border border-primary/30 bg-gradient-to-br from-primary/5 via-card to-accent/5 p-10 text-center relative overflow-hidden"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          {/* Animated shield glow */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="w-64 h-64 rounded-full bg-primary/5 blur-3xl animate-pulse" />
+          </div>
+
+          <div className="relative z-10">
+            <motion.div
+              className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-primary/10 border border-primary/30 flex items-center justify-center"
+              animate={{ boxShadow: ["0 0 20px hsl(var(--primary) / 0.2)", "0 0 40px hsl(var(--primary) / 0.4)", "0 0 20px hsl(var(--primary) / 0.2)"] }}
+              transition={{ duration: 3, repeat: Infinity }}
+            >
+              <Shield className="w-8 h-8 text-primary" />
+            </motion.div>
+
+            <h2 className="font-display text-2xl text-foreground tracking-widest mb-3">
+              SAFETY IS OUR <span className="text-primary text-glow-cyan">FOUNDATION</span>
+            </h2>
+            <p className="text-sm text-muted-foreground max-w-2xl mx-auto mb-8 leading-relaxed">
+              We don't cut corners. Every line of code, every access rule, every transaction is built with your safety as the non-negotiable priority.
+              Your assets, your data, your trust — protected at every layer.
+            </p>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl mx-auto mb-8">
+              {[
+                { icon: "🛡️", title: "OpenZeppelin Audited", desc: "Industry-standard smart contract security patterns" },
+                { icon: "🔒", title: "ReentrancyGuard", desc: "Protection against re-entrancy exploits" },
+                { icon: "👥", title: "4-Tier RBAC", desc: "Master → Admin → Operator → Owner access hierarchy" },
+                { icon: "🚨", title: "Emergency Controls", desc: "Pausable contracts with instant emergency unlock" },
+                { icon: "🗄️", title: "Row-Level Security", desc: "Every database query enforced at the row level" },
+                { icon: "🔑", title: "2FA on All Staff", desc: "PIN + OTP verification for every admin panel" },
+                { icon: "🕵️", title: "HIBP Password Check", desc: "Leaked password detection on every signup" },
+                { icon: "📋", title: "Audit Required", desc: "Professional audit mandatory before mainnet" },
+              ].map((item) => (
+                <motion.div
+                  key={item.title}
+                  className="rounded-xl border border-primary/15 bg-card/60 p-4 text-center hover:border-primary/40 transition-colors"
+                  whileHover={{ y: -2 }}
+                >
+                  <span className="text-2xl block mb-2">{item.icon}</span>
+                  <p className="font-display text-[11px] text-foreground tracking-wider mb-1">{item.title}</p>
+                  <p className="text-[9px] text-muted-foreground leading-relaxed">{item.desc}</p>
+                </motion.div>
+              ))}
+            </div>
+
+            <p className="text-xs text-primary/80 font-display tracking-wider">
+              YOUR TRUST IS NOT OPTIONAL — IT'S ENGINEERED
+            </p>
+          </div>
+        </motion.section>
+
         {/* ── Coming Soon Teasers (launch mode) ── */}
         {launchMode && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
