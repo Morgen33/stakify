@@ -234,23 +234,33 @@ const Raffle = () => {
                 Connect your wallet to be <strong className="text-primary">first in line</strong>.
               </p>
               <div className="flex flex-wrap justify-center gap-2 mb-6">
-                {["NFTs", "ETH", "SOL", "USDC", "Tokens"].map((tag, i) => (
-                  <motion.span
-                    key={tag}
-                    className="px-3 py-1 rounded-full border border-accent/20 bg-accent/5 text-[10px] font-display text-accent"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.8 + i * 0.1 }}
-                  >
-                    {tag}
-                  </motion.span>
-                ))}
-              </div>
-              <div className="flex items-center justify-center gap-2 text-[10px] text-muted-foreground">
-                <Diamond className="w-3 h-3 text-primary" />
-                <span>Projects can host their own raffles</span>
-                <Diamond className="w-3 h-3 text-primary" />
-              </div>
+                 {["NFTs", "ETH", "SOL", "USDC", "Tokens"].map((tag, i) => (
+                    <motion.span
+                      key={tag}
+                      className="px-3 py-1 rounded-full border border-accent/20 bg-accent/5 text-[10px] font-display text-accent"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.8 + i * 0.1 }}
+                    >
+                      {tag}
+                    </motion.span>
+                  ))}
+                </div>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="font-display text-xs border-accent/30 text-accent hover:bg-accent/10 mb-4"
+                  onClick={() => toast({ title: "📩 Host a Raffle", description: "Your request has been sent to the admin team. We'll reach out shortly!" })}
+                >
+                  <Gift className="w-3.5 h-3.5 mr-1.5" /> Host a Raffle
+                </Button>
+
+                <div className="flex items-center justify-center gap-2 text-[10px] text-muted-foreground">
+                  <Diamond className="w-3 h-3 text-primary" />
+                  <span>Projects can host their own raffles • Escrow protected</span>
+                  <Diamond className="w-3 h-3 text-primary" />
+                </div>
             </motion.div>
           </div>
         </div>
