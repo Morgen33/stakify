@@ -154,7 +154,28 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
       if (accounts.length === 0) disconnect();
       else setState(s => ({ ...s, address: accounts[0] }));
     };
-    const handleChainChanged = () => window.location.reload();
+    const handleChainChanged = (_chainId: string) => {
+      // Re-fetch state instead of reloading to avoid flashing
+      const ethereum = (window as any).ethereum;
+      if (ethereum && state.address) {
+        const reconnect = async () => {
+          try {
+            const provider = new BrowserProvider(ethereum);
+            const signer = await provider.getSigner();
+            const network = await provider.getNetwork();
+            const balance = formatEther(await provider.getBalance(state.address!));
+            setState(s => ({
+              ...s,
+              balance: parseFloat(balance).toFixed(4),
+              chainId: Number(network.chainId),
+              provider,
+              signer,
+            }));
+          } catch {}
+        };
+        reconnect();
+      }
+    };
 
     ethereum.on("accountsChanged", handleAccountsChanged);
     ethereum.on("chainChanged", handleChainChanged);

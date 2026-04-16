@@ -28,9 +28,10 @@ const teaserFeatures = [
 
 interface WalletModalProps {
   trigger?: React.ReactNode;
+  redirectAfterConnect?: string | false;
 }
 
-const WalletModal = ({ trigger }: WalletModalProps) => {
+const WalletModal = ({ trigger, redirectAfterConnect = "/hub" }: WalletModalProps) => {
   const { isConnected, isConnecting, address, balance, chainId, shortAddress, disconnect, connectMetaMask, connectWalletConnect, connectCoinbase, connectGenericEVM, switchChain } = useWallet();
   const [open, setOpen] = useState(false);
   const [showChains, setShowChains] = useState(false);
@@ -53,19 +54,18 @@ const WalletModal = ({ trigger }: WalletModalProps) => {
   };
 
   const handleSignupComplete = () => {
-    // Store display name locally for now (can sync to profile later)
     if (displayName.trim()) {
       localStorage.setItem("sf_display_name", displayName.trim());
     }
     setShowSignup(false);
     setOpen(false);
-    navigate("/hub");
+    if (redirectAfterConnect) navigate(redirectAfterConnect);
   };
 
   const handleSkipSignup = () => {
     setShowSignup(false);
     setOpen(false);
-    navigate("/hub");
+    if (redirectAfterConnect) navigate(redirectAfterConnect);
   };
 
   const copyAddress = () => {
