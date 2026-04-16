@@ -348,6 +348,20 @@ const MasterPanel = () => {
   const deleteSetting = async (id: string) => { await supabase.from("platform_settings").delete().eq("id", id); fetchAll(); };
 
   // ─── Emergency ───
+  const [emergencyPinInput, setEmergencyPinInput] = useState("");
+  const [emergencyPinVerified, setEmergencyPinVerified] = useState(false);
+
+  const verifyEmergencyPin = () => {
+    const emergencyPinSetting = settings.find(s => s.key === "emergency_pin");
+    if (emergencyPinInput === (emergencyPinSetting?.value || "1220")) {
+      setEmergencyPinVerified(true);
+      toast({ title: "🔓 Emergency access granted" });
+    } else {
+      toast({ title: "❌ Incorrect emergency password", variant: "destructive" });
+      setEmergencyPinInput("");
+    }
+  };
+
   const emergencyUnlockStake = async (stakeId: string) => {
     if (!window.confirm("🚨 EMERGENCY UNLOCK this stake?")) return;
     await supabase.from("stakes").update({ status: "emergency_unlocked", unlock_at: new Date().toISOString() }).eq("id", stakeId);
