@@ -93,7 +93,7 @@ const Raffle = () => {
             <Badge variant="outline" className="text-[9px] font-display border-accent/30 text-accent animate-pulse">BETA</Badge>
           </div>
           <div className="flex items-center gap-3">
-            <WalletModal />
+            <WalletModal redirectAfterConnect={false} />
             <Button variant="outline" size="sm" onClick={() => navigate("/")} className="font-display text-xs">
               <ArrowLeft className="w-3 h-3 mr-1" /> Home
             </Button>
