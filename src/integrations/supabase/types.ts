@@ -692,49 +692,70 @@ export type Database = {
       }
       staking_pools: {
         Row: {
+          allowed_modes: string[]
           apy: number
           created_at: string
           created_by: string | null
+          custom_lock_options: number[]
+          early_unlock_enabled: boolean
           early_unlock_fee_pct: number
+          hard_reward_multiplier: number
           id: string
           lock_period_days: number
           platform_fee_pct: number
+          pool_banner_url: string | null
+          pool_description: string | null
           project_account_id: string | null
           project_logo: string | null
           project_name: string
           reward_token: string
+          soft_reward_multiplier: number
           status: string
           total_staked: number
           updated_at: string
         }
         Insert: {
+          allowed_modes?: string[]
           apy?: number
           created_at?: string
           created_by?: string | null
+          custom_lock_options?: number[]
+          early_unlock_enabled?: boolean
           early_unlock_fee_pct?: number
+          hard_reward_multiplier?: number
           id?: string
           lock_period_days?: number
           platform_fee_pct?: number
+          pool_banner_url?: string | null
+          pool_description?: string | null
           project_account_id?: string | null
           project_logo?: string | null
           project_name: string
           reward_token: string
+          soft_reward_multiplier?: number
           status?: string
           total_staked?: number
           updated_at?: string
         }
         Update: {
+          allowed_modes?: string[]
           apy?: number
           created_at?: string
           created_by?: string | null
+          custom_lock_options?: number[]
+          early_unlock_enabled?: boolean
           early_unlock_fee_pct?: number
+          hard_reward_multiplier?: number
           id?: string
           lock_period_days?: number
           platform_fee_pct?: number
+          pool_banner_url?: string | null
+          pool_description?: string | null
           project_account_id?: string | null
           project_logo?: string | null
           project_name?: string
           reward_token?: string
+          soft_reward_multiplier?: number
           status?: string
           total_staked?: number
           updated_at?: string

@@ -509,6 +509,7 @@ const MasterPanel = () => {
             <TabsTrigger value="settings" className="font-display gap-1.5 text-xs"><Settings className="w-3.5 h-3.5" /> Settings</TabsTrigger>
             <TabsTrigger value="diagnostics" className="font-display gap-1.5 text-xs text-primary"><Eye className="w-3.5 h-3.5" /> Diagnostics</TabsTrigger>
             <TabsTrigger value="features" className="font-display gap-1.5 text-xs"><Power className="w-3.5 h-3.5" /> Features</TabsTrigger>
+            <TabsTrigger value="games" className="font-display gap-1.5 text-xs text-neon-purple"><Gamepad2 className="w-3.5 h-3.5" /> 🎮 Games</TabsTrigger>
             <TabsTrigger value="launch" className="font-display gap-1.5 text-xs text-neon-green"><Zap className="w-3.5 h-3.5" /> 🚀 Launch</TabsTrigger>
             <TabsTrigger value="xray" className="font-display gap-1.5 text-xs text-accent"><ScanEye className="w-3.5 h-3.5" /> X-Ray</TabsTrigger>
             <TabsTrigger value="pin" className="font-display gap-1.5 text-xs text-primary"><KeyRound className="w-3.5 h-3.5" /> 🔑 PIN</TabsTrigger>
@@ -1008,6 +1009,63 @@ const MasterPanel = () => {
           {/* ═══ FEATURES ═══ */}
           <TabsContent value="features">
             <FeatureToggles />
+          </TabsContent>
+
+          {/* ═══ GAME ECONOMICS (Master Only) ═══ */}
+          <TabsContent value="games" className="space-y-6">
+            <div className="rounded-lg border border-neon-purple/30 bg-neon-purple/5 p-6">
+              <h3 className="font-display text-sm text-neon-purple mb-2 tracking-wider flex items-center gap-2">
+                <Gamepad2 className="w-4 h-4" /> GAME & CASINO ECONOMICS
+              </h3>
+              <p className="text-xs text-muted-foreground mb-6">
+                Only the Master can set pricing, payouts, and toggle availability for all games. These settings apply platform-wide.
+              </p>
+
+              <div className="space-y-4">
+                {[
+                  { key: "wheel_spin_cost", label: "Prize Wheel — Spin Cost (points)", defaultVal: "100" },
+                  { key: "wheel_max_payout", label: "Prize Wheel — Max Payout (points)", defaultVal: "1000" },
+                  { key: "lottery_ticket_price", label: "Lottery — Ticket Price (ETH)", defaultVal: "0.01" },
+                  { key: "lottery_payout_pct", label: "Lottery — Payout % to Winner", defaultVal: "80" },
+                  { key: "casino_house_edge", label: "Casino — House Edge %", defaultVal: "5" },
+                  { key: "randomizer_cost", label: "NFT Randomizer — Cost (ETH)", defaultVal: "0.005" },
+                  { key: "randomizer_payout", label: "NFT Randomizer — Max Payout Value (ETH)", defaultVal: "1" },
+                ].map(item => {
+                  const existing = settings.find((s: any) => s.key === item.key);
+                  return (
+                    <div key={item.key} className="flex items-center gap-3">
+                      <label className="text-xs text-muted-foreground font-display min-w-[280px]">{item.label}</label>
+                      <Input
+                        defaultValue={existing?.value ?? item.defaultVal}
+                        id={`game-${item.key}`}
+                        className="bg-secondary border-border text-sm max-w-[140px]"
+                      />
+                      <Button size="sm" className="font-display text-xs bg-neon-purple/20 text-neon-purple border border-neon-purple/30 hover:bg-neon-purple/30" onClick={async () => {
+                        const val = (document.getElementById(`game-${item.key}`) as HTMLInputElement)?.value;
+                        if (!val) return;
+                        if (existing) {
+                          await supabase.from("platform_settings").update({ value: val }).eq("id", existing.id);
+                        } else {
+                          await supabase.from("platform_settings").insert({ key: item.key, value: val });
+                        }
+                        toast({ title: `✅ ${item.label} updated` });
+                        fetchAll();
+                      }}>
+                        <Save className="w-3 h-3 mr-1" /> Save
+                      </Button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="rounded-lg border border-accent/20 bg-accent/5 p-4 flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-accent shrink-0 mt-0.5" />
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                <strong className="text-accent">MASTER ONLY:</strong> These settings control real money flows. Changes take effect immediately.
+                Admins can only toggle games on/off via Feature Toggles — they cannot modify pricing or payouts.
+              </p>
+            </div>
           </TabsContent>
 
           {/* ═══ LAUNCH MODE ═══ */}

@@ -10,10 +10,19 @@ import { useStakeForge, StakeMode } from "@/lib/contracts/useStakeForge";
 import { getEthPrice, formatMicroFee } from "@/lib/contracts/priceFeed";
 import { IS_TESTNET } from "@/lib/contracts/config";
 
-// Platform maintenance fee per stake/unstake action
 const PLATFORM_MICRO_FEE_USDC = 0.12;
 
 type StakeType = "soft" | "hard" | "flexible";
+
+interface PoolConfig {
+  allowed_modes?: string[];
+  custom_lock_options?: number[];
+  soft_reward_multiplier?: number;
+  hard_reward_multiplier?: number;
+  early_unlock_enabled?: boolean;
+  pool_description?: string;
+  pool_banner_url?: string;
+}
 
 interface StakeModalProps {
   poolName: string;
@@ -24,9 +33,10 @@ interface StakeModalProps {
   lockPeriodDays: number;
   platformFeePct: number;
   trigger?: React.ReactNode;
+  poolConfig?: PoolConfig;
 }
 
-const stakeTypes: { type: StakeType; mode: StakeMode; label: string; icon: typeof Lock; tip: string; desc: string }[] = [
+const allStakeTypes: { type: StakeType; mode: StakeMode; label: string; icon: typeof Lock; tip: string; desc: string }[] = [
   {
     type: "soft", mode: 0,
     label: "Soft Stake", icon: Unlock,
@@ -47,11 +57,20 @@ const stakeTypes: { type: StakeType; mode: StakeMode; label: string; icon: typeo
   },
 ];
 
-const durationOptions = [7, 14, 30, 60, 90, 180, 365];
+const StakeModal = ({
+  poolName, poolId, nftContract, apy, rewardToken, lockPeriodDays, platformFeePct, trigger,
+  poolConfig,
+}: StakeModalProps) => {
+  // Derive allowed modes and lock options from pool config
+  const allowedModes = poolConfig?.allowed_modes ?? ["soft", "hard", "flexible"];
+  const durationOptions = poolConfig?.custom_lock_options ?? [7, 14, 30, 60, 90, 180, 365];
+  const softMultiplier = poolConfig?.soft_reward_multiplier ?? 0.8;
+  const hardMultiplier = poolConfig?.hard_reward_multiplier ?? 1.2;
 
-const StakeModal = ({ poolName, poolId, nftContract, apy, rewardToken, lockPeriodDays, platformFeePct, trigger }: StakeModalProps) => {
+  const stakeTypes = allStakeTypes.filter(st => allowedModes.includes(st.type));
+
   const [open, setOpen] = useState(false);
-  const [stakeType, setStakeType] = useState<StakeType>("soft");
+  const [stakeType, setStakeType] = useState<StakeType>((stakeTypes[0]?.type as StakeType) || "soft");
   const [amount, setAmount] = useState("");
   const [tokenId, setTokenId] = useState("");
   const [customDays, setCustomDays] = useState(lockPeriodDays);
@@ -62,7 +81,6 @@ const StakeModal = ({ poolName, poolId, nftContract, apy, rewardToken, lockPerio
   const { isConnected } = useWallet();
   const { isReady, stake, approveNFT, isLoading } = useStakeForge();
 
-  // Fetch ETH price when modal opens
   useEffect(() => {
     if (open) {
       getEthPrice().then(data => setEthPrice(data.ethPrice));
@@ -74,12 +92,12 @@ const StakeModal = ({ poolName, poolId, nftContract, apy, rewardToken, lockPerio
   const parsedTokenId = parseInt(tokenId) || 0;
 
   const getEffectiveApy = () => {
-    if (stakeType === "hard") return apy * 1.2;
+    if (stakeType === "hard") return apy * hardMultiplier;
     if (stakeType === "flexible") {
       const multiplier = Math.min(customDays / lockPeriodDays, 2);
       return apy * (0.5 + multiplier * 0.5);
     }
-    return apy * 0.8;
+    return apy * softMultiplier;
   };
 
   const effectiveApy = getEffectiveApy();
@@ -94,28 +112,16 @@ const StakeModal = ({ poolName, poolId, nftContract, apy, rewardToken, lockPerio
 
   const handleStake = async () => {
     if (!isReady || poolId === undefined) return;
-
-    // Step 1: Approve NFT
     if (step === "input" && nftContract) {
       setStep("approve");
       const approved = await approveNFT(nftContract, parsedTokenId);
-      if (approved) {
-        setStep("confirm");
-      } else {
-        setStep("input");
-      }
+      if (approved) setStep("confirm"); else setStep("input");
       return;
     }
-
-    // Step 2: Execute stake
     if (step === "confirm" || step === "input") {
       const txHash = await stake(poolId, parsedTokenId, stakeMode, customLockSeconds);
-      if (txHash) {
-        setStep("done");
-        setTimeout(() => setOpen(false), 2000);
-      } else {
-        setStep("input");
-      }
+      if (txHash) { setStep("done"); setTimeout(() => setOpen(false), 2000); }
+      else setStep("input");
     }
   };
 
@@ -144,6 +150,13 @@ const StakeModal = ({ poolName, poolId, nftContract, apy, rewardToken, lockPerio
           </DialogTitle>
         </DialogHeader>
 
+        {/* Pool description banner */}
+        {poolConfig?.pool_description && (
+          <div className="rounded-lg border border-primary/20 bg-primary/5 p-3 mb-2">
+            <p className="text-xs text-muted-foreground">{poolConfig.pool_description}</p>
+          </div>
+        )}
+
         {step === "done" ? (
           <div className="text-center py-10">
             <p className="text-4xl mb-3">🎉</p>
@@ -152,7 +165,6 @@ const StakeModal = ({ poolName, poolId, nftContract, apy, rewardToken, lockPerio
           </div>
         ) : (
           <div className="space-y-5">
-            {/* Connection status */}
             {!isConnected && (
               <div className="rounded-lg border border-accent/30 bg-accent/5 p-3 text-center">
                 <p className="text-xs text-accent font-display">Connect your wallet to stake</p>
@@ -172,11 +184,11 @@ const StakeModal = ({ poolName, poolId, nftContract, apy, rewardToken, lockPerio
                 <Tooltip>
                   <TooltipTrigger><HelpCircle className="w-3 h-3" /></TooltipTrigger>
                   <TooltipContent className="max-w-xs">
-                    <p className="text-xs">Soft = withdraw anytime (lower rewards). Hard = locked (higher rewards). Flexible = you choose the duration.</p>
+                    <p className="text-xs">Available modes are configured by the project owner.</p>
                   </TooltipContent>
                 </Tooltip>
               </p>
-              <div className="grid grid-cols-3 gap-2">
+              <div className={`grid gap-2`} style={{ gridTemplateColumns: `repeat(${stakeTypes.length}, 1fr)` }}>
                 {stakeTypes.map((st) => (
                   <Tooltip key={st.type}>
                     <TooltipTrigger asChild>
@@ -231,17 +243,10 @@ const StakeModal = ({ poolName, poolId, nftContract, apy, rewardToken, lockPerio
             {/* Token ID */}
             <div>
               <p className="text-xs text-muted-foreground mb-2 font-display tracking-wider">NFT TOKEN ID</p>
-              <Input
-                type="number"
-                placeholder="Enter your NFT token ID"
-                value={tokenId}
-                onChange={(e) => setTokenId(e.target.value)}
-                className="bg-secondary border-border font-display"
-                min="0"
-              />
+              <Input type="number" placeholder="Enter your NFT token ID" value={tokenId} onChange={(e) => setTokenId(e.target.value)} className="bg-secondary border-border font-display" min="0" />
             </div>
 
-            {/* Amount (for display/reward calculation) */}
+            {/* Amount */}
             <div>
               <p className="text-xs text-muted-foreground mb-2 font-display tracking-wider flex items-center gap-1">
                 AMOUNT (NFTs)
@@ -250,15 +255,7 @@ const StakeModal = ({ poolName, poolId, nftContract, apy, rewardToken, lockPerio
                   <TooltipContent>Number of NFTs you're staking. Enter 1 for a single NFT.</TooltipContent>
                 </Tooltip>
               </p>
-              <Input
-                type="number"
-                placeholder="1"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                className="bg-secondary border-border text-lg font-display"
-                min="1"
-                step="1"
-              />
+              <Input type="number" placeholder="1" value={amount} onChange={(e) => setAmount(e.target.value)} className="bg-secondary border-border text-lg font-display" min="1" step="1" />
             </div>
 
             {/* Breakdown */}
@@ -268,13 +265,7 @@ const StakeModal = ({ poolName, poolId, nftContract, apy, rewardToken, lockPerio
                 <span className="font-display text-neon-green">{effectiveApy.toFixed(1)}%</span>
               </div>
               <div className="flex justify-between text-xs">
-                <span className="text-muted-foreground flex items-center gap-1">
-                  Lock Period
-                  <Tooltip>
-                    <TooltipTrigger><HelpCircle className="w-3 h-3" /></TooltipTrigger>
-                    <TooltipContent>How long your assets remain locked. Soft stakes have no lock.</TooltipContent>
-                  </Tooltip>
-                </span>
+                <span className="text-muted-foreground flex items-center gap-1">Lock Period</span>
                 <span className="font-display text-foreground">{stakeType === "soft" ? "None" : `${days} days`}</span>
               </div>
               <div className="flex justify-between text-xs">
@@ -286,7 +277,7 @@ const StakeModal = ({ poolName, poolId, nftContract, apy, rewardToken, lockPerio
                   Project Fee ({platformFeePct}%)
                   <Tooltip>
                     <TooltipTrigger><HelpCircle className="w-3 h-3" /></TooltipTrigger>
-                    <TooltipContent>Fee set by the project. This can be adjusted by the project owner.</TooltipContent>
+                    <TooltipContent>Fee set by the project owner.</TooltipContent>
                   </Tooltip>
                 </span>
                 <span className="font-display text-destructive">-{projectFee.toFixed(4)}</span>
