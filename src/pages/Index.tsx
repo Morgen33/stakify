@@ -314,12 +314,6 @@ const Index = () => {
             {isOperator && !isAdmin && (
               <Link to="/operator" className="text-sm text-accent hover:text-accent/80 transition-colors font-display">Command Center</Link>
             )}
-            {isAdmin && (
-              <Link to="/admin" className="text-sm text-neon-green hover:text-neon-green/80 transition-colors font-display">Admin</Link>
-            )}
-            {isMaster && (
-              <Link to="/master" className="text-sm text-primary hover:text-primary/80 transition-colors font-display">👑 Master</Link>
-            )}
             <WalletModal />
             {user ? (
               <Button variant="outline" size="sm" onClick={signOut} className="font-display border-border text-xs">Sign Out</Button>
