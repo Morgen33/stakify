@@ -513,94 +513,159 @@ const Raffle = () => {
           </div>
         </motion.div>
 
-        {/* ── Stats ── */}
-        <RaffleStats raffles={isDemo ? demoRaffles : raffles} />
-
-        {/* ── Filters + Actions ── */}
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
-          {/* Chain Tabs */}
-          <Tabs value={chainFilter} onValueChange={(v) => setChainFilter(v as any)} className="w-auto">
-            <TabsList className="bg-secondary/50 border border-border">
-              <TabsTrigger value="all" className="font-display text-xs data-[state=active]:bg-primary/20 data-[state=active]:text-primary">All Chains</TabsTrigger>
-              <TabsTrigger value="ETH" className="font-display text-xs data-[state=active]:bg-primary/20 data-[state=active]:text-primary">⟠ Ethereum</TabsTrigger>
-              <TabsTrigger value="SOL" className="font-display text-xs data-[state=active]:bg-accent/20 data-[state=active]:text-accent">◎ Solana</TabsTrigger>
-            </TabsList>
-          </Tabs>
-
-          <div className="flex items-center gap-3 flex-wrap">
-            {/* Status filter */}
-            <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as any)}>
-              <SelectTrigger className="w-[130px] bg-secondary border-border text-xs font-display h-9">
-                <Filter className="w-3 h-3 mr-1.5" />
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="active">● Live</SelectItem>
-                <SelectItem value="upcoming">Upcoming</SelectItem>
-                <SelectItem value="drawn">Drawn</SelectItem>
-              </SelectContent>
-            </Select>
-
-            {/* Search */}
-            <div className="relative">
-              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Search raffles..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 bg-secondary border-border text-xs h-9 w-[180px]"
-              />
+        {!featureEnabled ? (
+          /* ── Coming Soon Overlay ── */
+          <div className="relative">
+            {/* Blurred demo grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 select-none pointer-events-none filter blur-[6px] opacity-60">
+              {demoRaffles.slice(0, 6).map((demo, i) => (
+                <motion.div
+                  key={demo.id}
+                  className="rounded-2xl border border-border bg-card overflow-hidden"
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 0.7, y: 0 }}
+                  transition={{ delay: 0.1 + i * 0.08 }}
+                >
+                  <div className="w-full h-44 bg-gradient-to-br from-accent/15 to-primary/15 flex items-center justify-center">
+                    <Gift className="w-14 h-14 text-accent/20" />
+                  </div>
+                  <div className="p-5 space-y-3">
+                    <h3 className="font-display text-sm text-foreground">{demo.title}</h3>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[1, 2, 3].map(j => (
+                        <div key={j} className="h-14 rounded-xl bg-secondary/40 border border-border" />
+                      ))}
+                    </div>
+                    <div className="h-2.5 rounded-full bg-secondary" />
+                    <div className="h-9 rounded-lg bg-accent/20" />
+                  </div>
+                </motion.div>
+              ))}
             </div>
 
-            {/* Host */}
-            <HostRaffleDialog onSubmit={handleHostRaffle} />
+            {/* Centered Coming Soon card */}
+            <div className="absolute inset-0 flex items-center justify-center z-10">
+              <motion.div
+                className="text-center p-10 rounded-3xl border border-accent/30 bg-background/85 backdrop-blur-md shadow-2xl max-w-md"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.3 }}
+              >
+                <motion.div animate={{ rotate: [0, 5, -5, 0] }} transition={{ duration: 3, repeat: Infinity }}>
+                  <Lock className="w-16 h-16 text-accent mx-auto mb-4" />
+                </motion.div>
+                <h2 className="font-display text-3xl text-foreground mb-3 tracking-wider">COMING SOON</h2>
+                <p className="text-sm text-muted-foreground mb-6">
+                  The Raffle House is being stocked with <strong className="text-accent">epic prizes</strong>,
+                  NFT drops, token giveaways, and exclusive draws.
+                  Connect your wallet to be <strong className="text-primary">first in line</strong>.
+                </p>
+                <div className="flex flex-wrap justify-center gap-2 mb-6">
+                  {["NFTs", "ETH", "SOL", "USDC", "Tokens"].map((tag, i) => (
+                    <motion.span
+                      key={tag}
+                      className="px-3 py-1 rounded-full border border-accent/20 bg-accent/5 text-[10px] font-display text-accent"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.5 + i * 0.1 }}
+                    >
+                      {tag}
+                    </motion.span>
+                  ))}
+                </div>
+                <HostRaffleDialog onSubmit={handleHostRaffle} />
+                <div className="flex items-center justify-center gap-2 text-[10px] text-muted-foreground mt-4">
+                  <Diamond className="w-3 h-3 text-primary" />
+                  <span>Escrow protected · Threshold draws · Multi-chain</span>
+                  <Diamond className="w-3 h-3 text-primary" />
+                </div>
+              </motion.div>
+            </div>
           </div>
-        </div>
-
-        {/* ── Demo banner ── */}
-        {isDemo && (
-          <motion.div
-            className="mb-6 rounded-xl border border-accent/20 bg-accent/5 p-4 text-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-          >
-            <p className="text-xs text-muted-foreground">
-              <Sparkles className="w-3 h-3 inline mr-1 text-accent" />
-              These are <strong className="text-accent">preview raffles</strong> — real draws will appear once the Raffle House goes live.
-              <strong className="text-primary ml-1">Host your own raffle</strong> to be the first!
-            </p>
-          </motion.div>
-        )}
-
-        {/* ── Grid ── */}
-        {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="rounded-2xl border border-border bg-card h-[420px] animate-pulse" />
-            ))}
-          </div>
-        ) : displayRaffles.length === 0 ? (
-          <motion.div className="text-center py-20" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <Gift className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
-            <h3 className="font-display text-lg text-foreground mb-2">No Raffles Found</h3>
-            <p className="text-sm text-muted-foreground mb-4">Try adjusting your filters or be the first to host one!</p>
-            <HostRaffleDialog onSubmit={handleHostRaffle} />
-          </motion.div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <AnimatePresence mode="popLayout">
-              {displayRaffles.map((raffle, i) => (
-                <RaffleCard
-                  key={raffle.id}
-                  raffle={raffle}
-                  myTickets={getMyTicketsForRaffle(raffle.id)}
-                  onBuy={isDemo ? () => toast({ title: "Preview Only", description: "This is a demo raffle. Real draws coming soon!" }) : buyTicket}
-                  index={i}
-                />
-              ))}
-            </AnimatePresence>
-          </div>
+          <>
+            {/* ── Stats ── */}
+            <RaffleStats raffles={isDemo ? demoRaffles : raffles} />
+
+            {/* ── Filters + Actions ── */}
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
+              {/* Chain Tabs */}
+              <Tabs value={chainFilter} onValueChange={(v) => setChainFilter(v as any)} className="w-auto">
+                <TabsList className="bg-secondary/50 border border-border">
+                  <TabsTrigger value="all" className="font-display text-xs data-[state=active]:bg-primary/20 data-[state=active]:text-primary">All Chains</TabsTrigger>
+                  <TabsTrigger value="ETH" className="font-display text-xs data-[state=active]:bg-primary/20 data-[state=active]:text-primary">⟠ Ethereum</TabsTrigger>
+                  <TabsTrigger value="SOL" className="font-display text-xs data-[state=active]:bg-accent/20 data-[state=active]:text-accent">◎ Solana</TabsTrigger>
+                </TabsList>
+              </Tabs>
+
+              <div className="flex items-center gap-3 flex-wrap">
+                <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as any)}>
+                  <SelectTrigger className="w-[130px] bg-secondary border-border text-xs font-display h-9">
+                    <Filter className="w-3 h-3 mr-1.5" />
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Status</SelectItem>
+                    <SelectItem value="active">● Live</SelectItem>
+                    <SelectItem value="upcoming">Upcoming</SelectItem>
+                    <SelectItem value="drawn">Drawn</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <div className="relative">
+                  <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    placeholder="Search raffles..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-9 bg-secondary border-border text-xs h-9 w-[180px]"
+                  />
+                </div>
+
+                <HostRaffleDialog onSubmit={handleHostRaffle} />
+              </div>
+            </div>
+
+            {/* ── Demo banner ── */}
+            {isDemo && (
+              <motion.div className="mb-6 rounded-xl border border-accent/20 bg-accent/5 p-4 text-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                <p className="text-xs text-muted-foreground">
+                  <Sparkles className="w-3 h-3 inline mr-1 text-accent" />
+                  These are <strong className="text-accent">preview raffles</strong> — real draws will appear once the Raffle House goes live.
+                </p>
+              </motion.div>
+            )}
+
+            {/* ── Grid ── */}
+            {loading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="rounded-2xl border border-border bg-card h-[420px] animate-pulse" />
+                ))}
+              </div>
+            ) : displayRaffles.length === 0 ? (
+              <motion.div className="text-center py-20" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                <Gift className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
+                <h3 className="font-display text-lg text-foreground mb-2">No Raffles Found</h3>
+                <p className="text-sm text-muted-foreground mb-4">Try adjusting your filters or be the first to host one!</p>
+                <HostRaffleDialog onSubmit={handleHostRaffle} />
+              </motion.div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <AnimatePresence mode="popLayout">
+                  {displayRaffles.map((raffle, i) => (
+                    <RaffleCard
+                      key={raffle.id}
+                      raffle={raffle}
+                      myTickets={getMyTicketsForRaffle(raffle.id)}
+                      onBuy={isDemo ? () => toast({ title: "Preview Only", description: "This is a demo raffle. Real draws coming soon!" }) : buyTicket}
+                      index={i}
+                    />
+                  ))}
+                </AnimatePresence>
+              </div>
+            )}
+          </>
         )}
 
         {/* ── How It Works ── */}
