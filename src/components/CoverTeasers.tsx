@@ -1,13 +1,14 @@
 import { motion } from "framer-motion";
 import {
   Coins, Store, Gamepad2, Rocket, Globe, Flame,
-  Trophy, Sparkles, Zap, ShieldCheck
+  Trophy, Sparkles, Zap, ShieldCheck, Palette
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 const teasers = [
   { icon: Zap, title: "Staking Platform", status: "LIVE", desc: "Stake your NFTs & earn rewards across multiple projects", color: "text-primary", borderColor: "border-primary/30", bgColor: "bg-primary/5", live: true },
   { icon: Store, title: "Trade Store", status: "COMING SOON", desc: "Buy, sell, and trade digital collectibles & in-game items", color: "text-accent", borderColor: "border-accent/30", bgColor: "bg-accent/5", live: false },
+  { icon: Palette, title: "Trait Store", status: "COMING SOON", desc: "Customize your NFTs — swap traits, buy rarities, and style up", color: "text-neon-gold", borderColor: "border-neon-gold/30", bgColor: "bg-neon-gold/5", live: false },
   { icon: Gamepad2, title: "Casino & Games", status: "COMING SOON", desc: "Play-to-earn arcade games, slots, and mini-games", color: "text-neon-purple", borderColor: "border-neon-purple/30", bgColor: "bg-neon-purple/5", live: false },
   { icon: Rocket, title: "Launchpad", status: "COMING SOON", desc: "Launch your project on Ethereum & Solana — IDOs, mints, & more", color: "text-neon-green", borderColor: "border-neon-green/30", bgColor: "bg-neon-green/5", live: false },
   { icon: Globe, title: "Tokens Across All Platforms", status: "COMING SOON", desc: "One universal token ecosystem — use anywhere, earn everywhere", color: "text-primary", borderColor: "border-primary/30", bgColor: "bg-primary/5", live: false },
