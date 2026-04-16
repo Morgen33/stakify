@@ -28,9 +28,10 @@ const teaserFeatures = [
 
 interface WalletModalProps {
   trigger?: React.ReactNode;
+  redirectAfterConnect?: string | false;
 }
 
-const WalletModal = ({ trigger }: WalletModalProps) => {
+const WalletModal = ({ trigger, redirectAfterConnect = "/hub" }: WalletModalProps) => {
   const { isConnected, isConnecting, address, balance, chainId, shortAddress, disconnect, connectMetaMask, connectWalletConnect, connectCoinbase, connectGenericEVM, switchChain } = useWallet();
   const [open, setOpen] = useState(false);
   const [showChains, setShowChains] = useState(false);
