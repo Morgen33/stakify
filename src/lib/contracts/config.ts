@@ -28,6 +28,30 @@ export const CONTRACT_ADDRESSES: Record<number, { vault: string }> = {
 };
 
 /**
+ * Solana program addresses.
+ *
+ * ⚠️  UPDATE THESE after deploying Solana programs.
+ */
+export const SOLANA_PROGRAM_ADDRESSES = {
+  devnet: {
+    vault: "", // ← Replace after deploy to devnet
+  },
+  mainnet: {
+    vault: "", // ← Replace after deploy to mainnet-beta
+  },
+};
+
+/**
+ * Supported chains — both EVM and Solana
+ */
+export type SupportedChain = "ethereum" | "solana";
+
+export const SUPPORTED_CHAINS: { id: SupportedChain; label: string; icon: string; networks: string[] }[] = [
+  { id: "ethereum", label: "Ethereum", icon: "⟠", networks: ["Mainnet", "Sepolia", "Polygon", "Base", "Arbitrum"] },
+  { id: "solana", label: "Solana", icon: "◎", networks: ["Mainnet-Beta", "Devnet"] },
+];
+
+/**
  * Whether we're in testnet mode.
  * When true, the UI will show testnet badges and warnings.
  */
@@ -52,5 +76,11 @@ export const SEPOLIA_CHAIN = {
 export function getVaultAddress(chainId: number): string | null {
   const addr = CONTRACT_ADDRESSES[chainId]?.vault;
   if (!addr || addr === "0x0000000000000000000000000000000000000000") return null;
+  return addr;
+}
+
+export function getSolanaVaultAddress(network: "devnet" | "mainnet"): string | null {
+  const addr = SOLANA_PROGRAM_ADDRESSES[network]?.vault;
+  if (!addr) return null;
   return addr;
 }
